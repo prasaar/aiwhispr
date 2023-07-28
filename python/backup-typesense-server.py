@@ -7,6 +7,7 @@ import datetime
 import re
 import logging
 import getopt
+import configparser
 
 #logging.basicConfig(level=logging.WARNING)
 
@@ -14,11 +15,14 @@ def main(argv):
    typesense_hostname = ''
    typesense_portnumber = ''
    typesense_key = ''
+   configfile = ''
    full_path_to_backup_directory = ''
-   opts, args = getopt.getopt(argv,"hK:H:P:B:",["key=","hostname=","portnumber=","backupdirpath="])
+   opts, args = getopt.getopt(argv,"hK:H:P:B:C:",["key=","hostname=","portnumber=","backupdirpath=","configfile="])
    for opt, arg in opts:
       if opt == '-h':
-         print ('backup_typesense_server.py -K <typesense_admin_key> -H <hostname_or_ip_of_server> -P <server_port> -B <full_path_to_backup_directory>')
+         print('backup_typesense_server.py -K <key> -H <hostname> -P <portnumber> -B <backupdirpath>')
+         print(' OR ')
+         print('backup_typesense_server.py -C <typesense-server.ini file full path> -B <backupdirpath>')
          sys.exit()
       elif opt in ("-K", "--key"):
          typesense_key = arg
@@ -28,6 +32,15 @@ def main(argv):
          typesense_portnumber = arg
       elif opt in ("-B", "--backupdirpath"):
          full_path_to_backup_directory = arg
+      elif opt in ("-C", "--configfile"):
+         configfile = arg
+         config = configparser.ConfigParser()
+         config.read(configfile)
+         typesense_hostname = config.get('server', 'api-address') 
+         typesense_portnumber = config.get('server', 'api-port') 
+         typesense_key = config.get('server', 'api-key') 
+         
+
    print ('Typsense Server Host is ', typesense_hostname)
    print ('Typsense Server Port is ', typesense_portnumber)
    print ('Typsense Server Key is ', typesense_key)
