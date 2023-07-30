@@ -9,8 +9,8 @@ from datetime import datetime, timedelta
 
 curr_dir = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(1, os.path.abspath(os.path.join(curr_dir, os.pardir)))
-sys.path.append("../common-functions")
-import index_azure_content_site
+sys.path.append("../common-objects")
+from azureContentSite import azureContentSite
 
 
 def index(configfile):
@@ -70,5 +70,6 @@ def index(configfile):
     print ('Local index directory is ',index_log_directory)
 
     if src_type == 'azureblob':
-        index_azure_content_site.index(content_site_name=content_site_name,src_path=src_path,src_path_for_results=src_path_for_results,working_directory=working_directory,index_log_directory=index_log_directory,auth_type=auth_type,sas_token=sas_token,site_userid=site_userid, site_password=site_password,vectordb_type=vectordb_type,vectordb_hostname=vectordb_hostname,vectordb_portnumber=vectordb_portnumber, vectordb_key = vectordb_key)
-
+        contentSite = azureContentSite(content_site_name=content_site_name,src_path=src_path,src_path_for_results=src_path_for_results,working_directory=working_directory,index_log_directory=index_log_directory,auth_type=auth_type,sas_token=sas_token,site_userid=site_userid, site_password=site_password,vectordb_type=vectordb_type,vectordb_hostname=vectordb_hostname,vectordb_portnumber=vectordb_portnumber, vectordb_key = vectordb_key)
+        contentSite.connect()
+        contentSite.index()
