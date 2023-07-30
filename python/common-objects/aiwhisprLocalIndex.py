@@ -28,10 +28,15 @@ class aiwhisprLocalIndex:
        self.connection.execute(insert_string)
       
     def purge(self):
-       self.connection.execute("DELETE FROM ContentIndex")   
+       listOfTables = self.connection.execute( """SELECT name FROM sqlite_master WHERE type='table' AND name='ContentIndex'; """).fetchall()
+       if listOfTables == []:
+            print('ContentInded Table not found. Nothing to delete!')
+       else:
+           print('Deleting from table ContentIndex!')
+           self.connection.execute("DELETE FROM ContentIndex;")   
 
 
-    def getIndexStatus(self,index_status):
-       query_string = "SELECT content_site_name,src_path,src_path_for_results,content_path,content_type,content_creation_date,content_last_modified_date,content_uniq_id_src,content_tags_from_src,content_size,content_file_suffix, content_index_flag,index_status  FROM ContentIndex WHERE index_status = '" + index_status + "'"
+    def getContentProcessedStatus(self,content_processed_status):
+       query_string = "SELECT content_site_name,src_path,src_path_for_results,content_path,content_type,content_creation_date,content_last_modified_date,content_uniq_id_src,content_tags_from_src,content_size,content_file_suffix, content_index_flag,content_processed_status  FROM ContentIndex WHERE content_processed_status = '" + content_processed_status + "'"
        res = self.connection.execute(query_string)
        return res.fetchall()
