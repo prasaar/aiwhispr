@@ -10,8 +10,9 @@ from datetime import datetime, timedelta
 curr_dir = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(1, os.path.abspath(os.path.join(curr_dir, os.pardir)))
 sys.path.append("../common-objects")
+sys.path.append("../base-classes")
 from azureContentSite import azureContentSite
-
+from aiwhisprBaseClasses import vectorDb, siteAuth
 
 def index(configfile):
 
@@ -69,7 +70,17 @@ def index(configfile):
     print ('Local working directory  is ',working_directory)
     print ('Local index directory is ',index_log_directory)
 
+
+
+    vector_db = vectorDb(vectordb_type=vectordb_type, vectordb_hostname = vectordb_hostname, vectordb_portnumber = vectordb_portnumber, vectordb_key = vectordb_key)
+
+    if auth_type=='sas':
+        site_auth= siteAuth(auth_type,sas_token)
+    elif auth_type=='azlogin':
+        site_auth= siteAuth(auth_type,site_userid,site_password)
+
     if src_type == 'azureblob':
-        contentSite = azureContentSite(content_site_name=content_site_name,src_path=src_path,src_path_for_results=src_path_for_results,working_directory=working_directory,index_log_directory=index_log_directory,auth_type=auth_type,sas_token=sas_token,site_userid=site_userid, site_password=site_password,vectordb_type=vectordb_type,vectordb_hostname=vectordb_hostname,vectordb_portnumber=vectordb_portnumber, vectordb_key = vectordb_key)
+        #instantiate azureContentSite 
+        contentSite = azureContentSite(content_site_name=content_site_name,src_path=src_path,src_path_for_results=src_path_for_results,working_directory=working_directory,index_log_directory=index_log_directory,site_auth=site_auth,vector_db=vector_db)
         contentSite.connect()
         contentSite.index()

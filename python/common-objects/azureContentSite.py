@@ -13,32 +13,24 @@ import datetime
 curr_dir = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(1, os.path.abspath(os.path.join(curr_dir, os.pardir)))
 sys.path.append("../common-objects")
+sys.path.append("../base-classes")
 from aiwhisprLocalIndex import aiwhisprLocalIndex
+from aiwhisprBaseClasses import siteAuth,vectorDb,srcContentSite
 
 
-class azureContentSite:
-    def __init__(self,content_site_name,src_path,src_path_for_results,working_directory,index_log_directory,auth_type,sas_token,site_userid, site_password,vectordb_type,vectordb_hostname,vectordb_portnumber, vectordb_key):
-       self.content_site_name = content_site_name
-       self.src_path = src_path
-       self.src_path_for_results = src_path_for_results
-       self.working_directory = working_directory
-       self.index_log_directory = index_log_directory
-       self.auth_type = auth_type
-       self.sas_token = sas_token
-       self.site_userid = site_userid
-       self.site_password = site_password
-       self.vectordb_type = vectordb_type
-       self.vectordb_hostname = vectordb_hostname
-       self.vectordb_portnumber = vectordb_portnumber
-       self.vectordb_key = vectordb_key
-       self.file_extension_list = ['.txt', '.csv', '.xls', '.xlsx', '.doc', '.docx', '.ppt', '.pptx']
+class azureContentSite(srcContentSite):
+        
+    file_extension_list = ['.txt', '.csv', '.xls', '.xlsx', '.doc', '.docx', '.ppt', '.pptx']
+
+    def __init__(self,content_site_name:str,src_path:str,src_path_for_results:str,working_directory:str,index_log_directory:str,site_auth:siteAuth,vector_db:vectorDb):
+       srcContentSite.__init__(self,content_site_name=content_site_name,src_type="azureblob",src_path=src_path,src_path_for_results=src_path_for_results,working_directory=working_directory,index_log_directory=index_log_directory,site_auth=site_auth,vector_db=vector_db)
        self.azure_account_url = src_path.split('/')[2]
        self.container_name= src_path.split('/')[3]
 
     def connect(self):
        # Connect to Azure, Connect to localDB  which stores the ContentIndex
        # Create the BlobServiceClient object
-       self.blob_service_client = BlobServiceClient(account_url=self.azure_account_url, credential=self.sas_token)
+       self.blob_service_client = BlobServiceClient(account_url=self.azure_account_url, credential=self.site_auth.sas_token)
        self.container_client = self.blob_service_client.get_container_client(container=self.container_name)
        #get handle to the local index map object
        self.local_index = aiwhisprLocalIndex(self.index_log_directory, self.content_site_name)
@@ -46,7 +38,7 @@ class azureContentSite:
 
     def index(self):
        ###Now start reading the site and list all the files
-       if(self.auth_type == 'sas'):
+       if(self.site_auth.auth_type == 'sas'):
            print('Reading an Azure Storage Account : ', self.azure_account_url, 'with Container: ', self.container_name)
            print("purging the current local ContenIndex Map")
            self.local_index.purge()
