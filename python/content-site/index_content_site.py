@@ -6,7 +6,6 @@ import typesense
 import time
 import datetime
 import re
-import logging
 import getopt
 import configparser
 import io
@@ -20,10 +19,12 @@ sys.path.insert(1, os.path.abspath(os.path.join(curr_dir, os.pardir)))
 sys.path.append("../common-functions")
 import index_content_site_for_config
 
-#logging.basicConfig(level=logging.WARNING)
-
+import logging
+logging.basicConfig(level = logging.DEBUG,format = '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s')
+#logging.basicConfig(level = logging.CRITICAL,format = '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s')
 
 def main(argv):
+   logger = logging.getLogger(__name__)
    configfile = ''
    typesense_hostname = ''
    typesense_portnumber = ''
@@ -46,6 +47,7 @@ def main(argv):
          sys.exit()
       elif opt in ("-C", "--configfile"):
          configfile = arg
+         logger.info(configfile)
          index_content_site_for_config.index(configfile)
       elif opt in ("-A", "--all"):
          configfiledir = arg
@@ -53,8 +55,8 @@ def main(argv):
          myconfigfilelist = [f for f in glob.glob(globsearchpath)]
          for configfile in myconfigfilelist:
              print('##Config File : ',configfile)
+             logger.info(configfile)
              index_content_site_for_config.index(configfile)
-
 
 if __name__ == "__main__":
    main(sys.argv[1:])

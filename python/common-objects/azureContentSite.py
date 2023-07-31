@@ -6,26 +6,29 @@ import sqlite3
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient, generate_account_sas, ResourceTypes, AccountSasPermissions
 from datetime import datetime, timedelta
-import logging
 import pathlib
 import datetime
 
 curr_dir = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(1, os.path.abspath(os.path.join(curr_dir, os.pardir)))
 sys.path.append("../common-objects")
+sys.path.append("../common-functions")
 sys.path.append("../base-classes")
 from aiwhisprLocalIndex import aiwhisprLocalIndex
 from aiwhisprBaseClasses import siteAuth,vectorDb,srcContentSite
+import aiwhisprConstants 
 
+import logging
 
 class azureContentSite(srcContentSite):
         
-    file_extension_list = ['.txt', '.csv', '.xls', '.xlsx', '.doc', '.docx', '.ppt', '.pptx']
+    #file_extension_list = ['.txt', '.csv', '.xls', '.xlsx', '.doc', '.docx', '.ppt', '.pptx']
 
     def __init__(self,content_site_name:str,src_path:str,src_path_for_results:str,working_directory:str,index_log_directory:str,site_auth:siteAuth,vector_db:vectorDb):
        srcContentSite.__init__(self,content_site_name=content_site_name,src_type="azureblob",src_path=src_path,src_path_for_results=src_path_for_results,working_directory=working_directory,index_log_directory=index_log_directory,site_auth=site_auth,vector_db=vector_db)
        self.azure_account_url = src_path.split('/')[2]
        self.container_name= src_path.split('/')[3]
+       self.logger = logging.getLogger(__name__)
 
     def connect(self):
        # Connect to Azure, Connect to localDB  which stores the ContentIndex
@@ -39,14 +42,14 @@ class azureContentSite(srcContentSite):
     def index(self):
        ###Now start reading the site and list all the files
        if(self.site_auth.auth_type == 'sas'):
-           print('Reading an Azure Storage Account : ', self.azure_account_url, 'with Container: ', self.container_name)
-           print("purging the current local ContenIndex Map")
+           self.logger.info('Reading an Azure Storage Account : ' + self.azure_account_url +  ' with Container: ' + self.container_name)
+           self.logger.info("Purging the current local ContenIndex Map")
            self.local_index.purge()
            # List the blobs in the container
            blob_list = self.container_client.list_blobs()
            for blob in blob_list:
-               print("BlobName:" + blob.name,'last_modified:',blob.last_modified, 'creation_time:',blob.creation_time,'content_type:',blob.content_settings.content_type)
-               #print(blob)
+               self.logger.debug("BlobName:" + blob.name+' last_modified:'+str(blob.last_modified)+ ' creation_time:'+str(blob.creation_time))
+               #self.logger.debug(blob)
                #Insert this list in the index database
                content_file_suffix = pathlib.Path(blob.name).suffix          
                content_index_flag = 'N' #default
@@ -60,7 +63,7 @@ class azureContentSite(srcContentSite):
                content_processed_status = "N"
     
                if(content_file_suffix != None): 
-                   if ( content_file_suffix in self.file_extension_list ): 
+                   if ( content_file_suffix in aiwhisprConstants.FILEXTNLIST ): 
                        content_index_flag = 'Y'
                if ( (content_index_flag == 'N') and (blob.content_settings.content_type != None) and ( blob.content_settings.content_type[:4] == 'text' ) ):
                    content_index_flag = 'Y'
@@ -74,24 +77,20 @@ class azureContentSite(srcContentSite):
                if content_size == None:
                    content_size = 0
     
-               print("Insert Content Map Values in ")
-               print("####")
-               print(
-               self.content_site_name,'\n',
-               self.src_path,'\n',
-               self.src_path_for_results,'\n',
-               content_path,'\n',
-               content_type,'\n',
-               content_creation_date.timestamp(),'\n',
-               content_last_modified_date.timestamp(),'\n', 
-               content_uniq_id_src,'\n',
-               content_tags_from_src,'\n',
-               content_size,'\n',
-               content_file_suffix,'\n' ,
-               content_index_flag, '\n',
-               content_processed_status
-               )
-               print("####")
+               self.logger.debug("Insert Content Map Values:")
+               self.logger.debug(self.content_site_name)
+               self.logger.debug(self.src_path)
+               self.logger.debug(self.src_path_for_results)
+               self.logger.debug(content_path)
+               self.logger.debug(content_type)
+               self.logger.debug( str( content_creation_date.timestamp() ))
+               self.logger.debug( str(content_last_modified_date.timestamp() ))
+               self.logger.debug(content_uniq_id_src)
+               self.logger.debug(content_tags_from_src)
+               self.logger.debug(str(content_size))
+               self.logger.debug(content_file_suffix)
+               self.logger.debug(content_index_flag)
+               self.logger.debug(content_processed_status)
     
                self.local_index.insert(
                self.content_site_name, 
@@ -110,4 +109,4 @@ class azureContentSite(srcContentSite):
                )
            
            contentrows = self.local_index.getContentProcessedStatus("N") 
-           print("Total Number of rows in ContentIndex with ProcessedStatus = N:" , len(contentrows))
+           self.logger.debug("Total Number of rows in ContentIndex with ProcessedStatus = N:" + str( len(contentrows)) )

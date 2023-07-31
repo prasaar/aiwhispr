@@ -14,6 +14,9 @@ sys.path.append("../base-classes")
 from azureContentSite import azureContentSite
 from aiwhisprBaseClasses import vectorDb, siteAuth
 
+import logging
+logger = logging.getLogger(__name__)
+
 def index(configfile):
 
 
@@ -55,20 +58,20 @@ def index(configfile):
     index_log_directory = config.get('local','index-dir')
 
 
-    print ('VectorDB Server Host is ', vectordb_hostname)
-    print ('VectorDB Server Port is ', vectordb_portnumber)
-    print ('VectorDB Server Key is ', vectordb_key)
-    print ('VectorDB Type is ', vectordb_type)
-    print ('Site Name is ', content_site_name)
-    print ('Site Source Type is ', src_type)
-    print ('Site Source Path is ', src_path)
-    print ('Site Source Display Path is ', src_path_for_results)
-    print ('Site Authentication Type is ', auth_type)
-    print ('Site Authentication SAS Token is ', sas_token)
-    print ('Site User Id is ', site_userid)
-    print ('Site Password is ',site_password)
-    print ('Local working directory  is ',working_directory)
-    print ('Local index directory is ',index_log_directory)
+    logger.debug('VectorDB Server Host is ' + vectordb_hostname)
+    logger.debug('VectorDB Server Port is '+ vectordb_portnumber)
+    logger.debug('VectorDB Server Key is ' + vectordb_key)
+    logger.debug('VectorDB Type is '+ vectordb_type)
+    logger.debug('Site Name is '+ content_site_name)
+    logger.debug('Site Source Type is '+ src_type)
+    logger.debug('Site Source Path is '+ src_path)
+    logger.debug('Site Source Display Path is '+ src_path_for_results)
+    logger.debug('Site Authentication Type is '+ auth_type)
+    logger.debug('Site Authentication SAS Token is '+ sas_token)
+    logger.debug('Site User Id is '+ site_userid)
+    logger.debug('Site Password is '+site_password)
+    logger.debug('Local working directory  is '+working_directory)
+    logger.debug('Local index directory is '+index_log_directory)
 
 
 

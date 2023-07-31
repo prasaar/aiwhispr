@@ -1,4 +1,5 @@
 import sqlite3
+import logging
 
 class aiwhisprLocalIndex:
     def __init__(self,index_log_directory,content_site_name):
@@ -6,6 +7,7 @@ class aiwhisprLocalIndex:
        self.content_site_name = content_site_name
        dbfilename=index_log_directory+ '/' + content_site_name + '.db'
        self.connection = sqlite3.connect(dbfilename)
+       self.logger = logging.getLogger(__name__)
          
 
     def insert(self,content_site_name, src_path, src_path_for_results, content_path, content_type, content_creation_date, content_last_modified_date, content_uniq_id_src, content_tags_from_src, content_size, content_file_suffix, content_index_flag, content_processed_status):
@@ -30,7 +32,8 @@ class aiwhisprLocalIndex:
     def purge(self):
        listOfTables = self.connection.execute( """SELECT name FROM sqlite_master WHERE type='table' AND name='ContentIndex'; """).fetchall()
        if listOfTables == []:
-            print('ContentInded Table not found. Nothing to delete!')
+            print('ContentIndex Table not found. Nothing to delete!')
+            self.logger.info('ContentIndex Table not found. Nothing to delete!')
        else:
            print('Deleting from table ContentIndex!')
            self.connection.execute("DELETE FROM ContentIndex;")   
