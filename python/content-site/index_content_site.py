@@ -22,13 +22,6 @@ import index_content_site_for_config
 
 #logging.basicConfig(level=logging.WARNING)
 
-##List Azure Blobs
-def list_blobs_flat(self, blob_service_client: BlobServiceClient, container_name):
-    container_client = blob_service_client.get_container_client(container=container_name)
-    blob_list = container_client.list_blobs()
-    for blob in blob_list:
-        print(f"Name: {blob.name}")
-
 
 def main(argv):
    configfile = ''
