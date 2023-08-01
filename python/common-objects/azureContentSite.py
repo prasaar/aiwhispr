@@ -15,7 +15,7 @@ sys.path.append("../common-objects")
 sys.path.append("../common-functions")
 sys.path.append("../base-classes")
 from aiwhisprLocalIndex import aiwhisprLocalIndex
-from aiwhisprBaseClasses import siteAuth,vectorDb,srcContentSite
+from aiwhisprBaseClasses import siteAuth,vectorDb,srcContentSite,srcDocProcessor
 from azureBlobDownloader import azureBlobDownloader
 import aiwhisprConstants 
 
@@ -53,7 +53,7 @@ class azureContentSite(srcContentSite):
                self.logger.debug("BlobName:" + blob.name+' last_modified:'+str(blob.last_modified)+ ' creation_time:'+str(blob.creation_time))
                #self.logger.debug(blob)
                #Insert this list in the index database
-               content_file_suffix = pathlib.Path(blob.name).suffix          
+               content_file_suffix = pathlib.PurePath(blob.name).suffix          
                content_index_flag = 'N' #default
                content_path = blob.name
                content_type = blob.content_settings.content_type
@@ -111,11 +111,13 @@ class azureContentSite(srcContentSite):
                )
 
                if content_index_flag == 'Y':
-                   content_path_segments = content_path.split('/')
-                   no_of_content_path_segments = len(content_path_segments)
-                   download_file_name = self.working_directory + '/' + content_path_segments[(no_of_content_path_segments -1)]
-                   self.logger.debug('Downloaded File Name: ' + download_file_name)
-                   self.downloader.download_blob_to_file(self.blob_service_client, self.container_name, content_path, download_file_name) 
+                   download_file_path = self.getDownloadPath(content_path)
+                   self.logger.debug('Downloaded File Name: ' + download_file_path)
+                   self.downloader.download_blob_to_file(self.blob_service_client, self.container_name, content_path, download_file_path) 
+                   if content_file_suffix == '.txt':
+                       self.logger.debug('PROCESSING TEXT FILE TO CREATE CHUNKS')
+                       txtDocProcessor =  srcDocProcessor(download_file_path)
+                       txtDocProcessor.createChunks()
            
            contentrows = self.local_index.getContentProcessedStatus("N") 
            self.logger.debug("Total Number of rows in ContentIndex with ProcessedStatus = N:" + str( len(contentrows)) )
