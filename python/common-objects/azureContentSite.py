@@ -16,18 +16,20 @@ sys.path.append("../common-functions")
 sys.path.append("../base-classes")
 from aiwhisprLocalIndex import aiwhisprLocalIndex
 from aiwhisprBaseClasses import siteAuth,vectorDb,srcContentSite
+from azureBlobDownloader import azureBlobDownloader
 import aiwhisprConstants 
 
 import logging
 
 class azureContentSite(srcContentSite):
-        
-    #file_extension_list = ['.txt', '.csv', '.xls', '.xlsx', '.doc', '.docx', '.ppt', '.pptx']
+            
+    downloader:azureBlobDownloader
 
     def __init__(self,content_site_name:str,src_path:str,src_path_for_results:str,working_directory:str,index_log_directory:str,site_auth:siteAuth,vector_db:vectorDb):
        srcContentSite.__init__(self,content_site_name=content_site_name,src_type="azureblob",src_path=src_path,src_path_for_results=src_path_for_results,working_directory=working_directory,index_log_directory=index_log_directory,site_auth=site_auth,vector_db=vector_db)
        self.azure_account_url = src_path.split('/')[2]
        self.container_name= src_path.split('/')[3]
+       self.downloader = azureBlobDownloader()
        self.logger = logging.getLogger(__name__)
 
     def connect(self):
@@ -107,6 +109,13 @@ class azureContentSite(srcContentSite):
                content_index_flag, 
                content_processed_status
                )
+
+               if content_index_flag == 'Y':
+                   content_path_segments = content_path.split('/')
+                   no_of_content_path_segments = len(content_path_segments)
+                   download_file_name = self.working_directory + '/' + content_path_segments[(no_of_content_path_segments -1)]
+                   self.logger.debug('Downloaded File Name: ' + download_file_name)
+                   self.downloader.download_blob_to_file(self.blob_service_client, self.container_name, content_path, download_file_name) 
            
            contentrows = self.local_index.getContentProcessedStatus("N") 
            self.logger.debug("Total Number of rows in ContentIndex with ProcessedStatus = N:" + str( len(contentrows)) )

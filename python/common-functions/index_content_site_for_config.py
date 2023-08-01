@@ -9,13 +9,16 @@ from datetime import datetime, timedelta
 
 curr_dir = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(1, os.path.abspath(os.path.join(curr_dir, os.pardir)))
-sys.path.append("../common-objects")
+
 sys.path.append("../base-classes")
-from azureContentSite import azureContentSite
 from aiwhisprBaseClasses import vectorDb, siteAuth
+
+sys.path.append("../common-functions")
+import initializeContentSite
 
 import logging
 logger = logging.getLogger(__name__)
+
 
 def index(configfile):
 
@@ -82,8 +85,7 @@ def index(configfile):
     elif auth_type=='azlogin':
         site_auth= siteAuth(auth_type,site_userid,site_password)
 
-    if src_type == 'azureblob':
-        #instantiate azureContentSite 
-        contentSite = azureContentSite(content_site_name=content_site_name,src_path=src_path,src_path_for_results=src_path_for_results,working_directory=working_directory,index_log_directory=index_log_directory,site_auth=site_auth,vector_db=vector_db)
-        contentSite.connect()
-        contentSite.index()
+    #if src_type == 'azureblob':
+    contentSite = initializeContentSite.initialize(src_type=src_type,content_site_name=content_site_name,src_path=src_path,src_path_for_results=src_path_for_results,working_directory=working_directory,index_log_directory=index_log_directory,site_auth=site_auth,vector_db=vector_db)
+    contentSite.connect()
+    contentSite.index()
