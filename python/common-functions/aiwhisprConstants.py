@@ -1,2 +1,2 @@
 
-FILEXTNLIST = ['.txt', '.csv', '.xls', '.xlsx', '.doc', '.docx', '.ppt', '.pptx']
+FILEXTNLIST = ['.txt', '.csv', '.pdf', '.xls', '.xlsx', '.doc', '.docx', '.ppt', '.pptx', '.wiki', '.md' ]
