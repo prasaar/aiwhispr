@@ -175,11 +175,14 @@ class srcDocProcessor:
     def detectLanguage(self,text_chunk:str)->str:
         doc = self.nlp_model(text_chunk)
         out_text_chunk = ''
+        ctr = 0
         for i, sent in enumerate(doc.sents):
+            ctr = ctr + 1
             if sent._.language['language'] == 'en':
                 out_text_chunk = out_text_chunk + sent.text
+                self.baseLogger.debug("sentence %d in text chunk is English", ctr)
             else:
-                self.baseLogger.warning('Found a text chunk sentence which is not english. Removing this sentence.Lang=' + sent._.language['language'])
+                self.baseLogger.warning('Found a sentence %d in text chunk which is not English. Removing this sentence.Lang= %s', ctr, sent._.language['language'])
         return out_text_chunk
 
     #private function
@@ -274,7 +277,8 @@ class srcDocProcessor:
             
                 for newline in txtfile:
                     ##READ EACH LINE IN THE LOCAL TEXT FILE , REMOVE NEWLINE TO  REPLACE WITH WHITESPACE
-                    newline = newline.rstrip() ##Remove the trailing newline
+                    #newline = newline.rstrip() ##Remove the trailing newline
+                    newline = newline.rstrip()
                     current_line = current_line + newline
                     words_in_the_current_line =  current_line.split()
                     no_of_words_in_current_line = len(words_in_the_current_line)
