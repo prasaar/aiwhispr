@@ -24,17 +24,24 @@ class siteAuth:
     site_userid:str
     site_password:str
     sas_token:str
-
-    def __init__(self,auth_type,site_userid,site_password):
+    az_key:str
+    aws_access_key_id:str
+    aws_secret_access_key:str
+    logger = logging.getLogger(__name__)
+    
+    def __init__(self,auth_type:str,**kwargs):
         self.auth_type = auth_type
-        self.site_userid = site_userid
-        self.site_password = site_password
-
-    def __init__(self,auth_type,sas_token):
-         self.auth_type = auth_type
-         self.sas_token = sas_token
-
-
+        match self.auth_type:
+            case 'sas':
+                self.sas_token = kwargs['sas_token']
+            case 'az-storage-key':
+                self.az_key = kwargs['az_key']
+            case 'aws-key':
+                self.aws_access_key_id = kwargs['aws_access_key_id']
+                self.aws_secret_access_key = kwargs['aws_secret_access_key']
+            case other:
+                self.logger.error('Dont know how to handle the auth type %s', self.auth_type)
+            
 
 #Base Class vectorDb:
 class vectorDb:
@@ -179,8 +186,8 @@ class srcDocProcessor:
         for i, sent in enumerate(doc.sents):
             ctr = ctr + 1
             if sent._.language['language'] == 'en':
-                out_text_chunk = out_text_chunk + sent.text
-                self.baseLogger.debug("sentence %d in text chunk is English", ctr)
+                out_text_chunk = out_text_chunk + sent.text.encode('latin1').decode('utf-8')
+                self.baseLogger.debug("sentence %s in text chunk is English", sent.text.encode('latin1').decode('utf-8'))
             else:
                 self.baseLogger.warning('Found a sentence %d in text chunk which is not English. Removing this sentence.Lang= %s', ctr, sent._.language['language'])
         return out_text_chunk
@@ -247,6 +254,7 @@ class srcDocProcessor:
     def saveTextChunk(self, text_chunk_file_path:str, text_chunk:str):
         save_text_chunk = self.validateTextChunk(text_chunk)
         self.baseLogger.debug('Writing a text chunk at :' + text_chunk_file_path)
+        #self.baselogger.debug('TEXTCHUNK:' + save_text_chunk)
         f = open(text_chunk_file_path,"w")
         f.write(save_text_chunk)
         f.close()
