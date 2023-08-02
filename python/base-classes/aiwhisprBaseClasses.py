@@ -7,6 +7,7 @@ import sys
 import pathlib
 import logging
 import time
+import magic
 
 
 sys.path.append("../common-functions")
@@ -221,95 +222,94 @@ class srcDocProcessor:
         self.baseLogger.debug('Creating Chunks for ' + self.extracted_text_file_path)
         #This function should be called only after the extractText function has been called
         ## ##the chunks will be 1.txt , 2.txt ......
-        #with open(  self.extracted_text_file_path,newline = "\n", encoding='ISO-8859-1') as txtfile:
-        with open(  self.extracted_text_file_path,newline = "\n") as txtfile:
 
-            #We are using fill the bucket approach
-            #We fill the current_text_chunk bucket with previous leftover words and words from new line
-            #If the count whats in the bucket[word counter] + (previous leftover words + newline words) is less than bucket capacity(MAXCHUNKSIZE) then put both in the bucket, you have no leftovers 
-            #If the previous leftover words and the newline will not fit in the bucket then start putting each word in the bucket until the bucket is full 
-            #IF the bucket is full then we empty the bucket by saving it to a file,  the remaining words which could not be put in the bucke are treated as leftover words.
-            #Process repeats until we reach end of line
+        try:
+        
+            with open(  self.extracted_text_file_path,newline = "\n", encoding='ISO-8859-1') as txtfile:
+
+                #We are using fill the bucket approach
+                #We fill the current_text_chunk bucket with previous leftover words and words from new line
+                #If the count whats in the bucket[word counter] + (previous leftover words + newline words) is less than bucket capacity(MAXCHUNKSIZE) then put both in the bucket, you have no leftovers 
+                #If the previous leftover words and the newline will not fit in the bucket then start putting each word in the bucket until the bucket is full 
+                #IF the bucket is full then we empty the bucket by saving it to a file,  the remaining words which could not be put in the bucke are treated as leftover words.
+                #Process repeats until we reach end of line
+                
+                current_text_chunk = ''
+                current_line = ''
+                self.no_of_chunks = 0
+                word_ctr = 0
             
-            current_text_chunk = ''
-            current_line = ''
-            self.no_of_chunks = 0
-            word_ctr = 0
-          
-            for newline in txtfile:
-                ##READ EACH LINE IN THE LOCAL TEXT FILE , REMOVE NEWLINE TO  REPLACE WITH WHITESPACE
-                newline = newline.rstrip() ##Remove the trailing newline
-                current_line = current_line + newline
-                words_in_the_current_line =  current_line.split()
-                no_of_words_in_current_line = len(words_in_the_current_line)
+                for newline in txtfile:
+                    ##READ EACH LINE IN THE LOCAL TEXT FILE , REMOVE NEWLINE TO  REPLACE WITH WHITESPACE
+                    newline = newline.rstrip() ##Remove the trailing newline
+                    current_line = current_line + newline
+                    words_in_the_current_line =  current_line.split()
+                    no_of_words_in_current_line = len(words_in_the_current_line)
 
-                while ((word_ctr <= self.MAXCHUNKSIZE) and ( no_of_words_in_current_line > 0)):  
-                    self.baseLogger.debug('Word Counter: ' + str(word_ctr) + ' Words in current line: ' + str(no_of_words_in_current_line) )
-                    #We are in a loop so first check if the chunk bucket is full
-                    # If the word counter has reached MAXCHUNKSIZE then first save the text chunk and reset the word counter, text chunk
-                    #if word_ctr == self.MAXCHUNKSIZE:
-                    #    self.no_of_chunks = self.no_of_chunks + 1
-                    #    chunk_file_path = os.path.join(self.text_chunks_dir, str(self.no_of_chunks) + '.txt')
-                    #    self.baseLogger.debug('Write the text chunk no: ' + str(self.no_of_chunks) + ' to ' + chunk_file_path )
-                    #    self.saveTextChunk(chunk_file_path,current_text_chunk)
-                    #    current_text_chunk = ''
-                    #   word_ctr = 0
-                    #   self.baseLogger.debug('Added chunk number: ' + str(self.no_of_chunks))
- 
-                    ##Add this line to current text chunk if the total number of words (word ctr + current_line) is below the MACHUNKSIZE 
-                    if ((word_ctr + no_of_words_in_current_line) <= (self.MAXCHUNKSIZE) ):
-                        #Fill the bucket with the current line since it fits in the remaining space of the text chunk bucket
-                        current_text_chunk = current_text_chunk + ' ' + current_line
-                        word_ctr = word_ctr + no_of_words_in_current_line ##Set size of the bucket (current total no of words)
-                        #reset current line to blank
-                        current_line = ''
-                        words_in_the_current_line =  current_line.split()
-                        no_of_words_in_current_line = 0
+                    while ((word_ctr <= self.MAXCHUNKSIZE) and ( no_of_words_in_current_line > 0)):  
+                        self.baseLogger.debug('Word Counter: ' + str(word_ctr) + ' Words in current line: ' + str(no_of_words_in_current_line) )
+                        
+    
+                        ##Add this line to current text chunk if the total number of words (word ctr + current_line) is below the MACHUNKSIZE 
+                        if ((word_ctr + no_of_words_in_current_line) <= (self.MAXCHUNKSIZE) ):
+                            #Fill the bucket with the current line since it fits in the remaining space of the text chunk bucket
+                            current_text_chunk = current_text_chunk + ' ' + current_line
+                            word_ctr = word_ctr + no_of_words_in_current_line ##Set size of the bucket (current total no of words)
+                            #reset current line to blank
+                            current_line = ''
+                            words_in_the_current_line =  current_line.split()
+                            no_of_words_in_current_line = 0
 
-                        if word_ctr == self.MAXCHUNKSIZE:
-                            #if the last fill has filled the text chunk bucket then save it to file
-                            self.no_of_chunks = self.no_of_chunks + 1
-                            chunk_file_path = os.path.join(self.text_chunks_dir, str(self.no_of_chunks) + '.txt')
-                            self.baseLogger.debug('Text chunk full with this line.Write the text chunk no: ' + str(self.no_of_chunks) + ' to ' + chunk_file_path )
-                            self.saveTextChunk(chunk_file_path,current_text_chunk)
-                            ##The text chunk bucket has been saved. So reset current_text_chunk
-                            current_text_chunk = ''
-                            word_ctr = 0
-                            self.baseLogger.debug('Text chunk full with this line. Added chunk number: ' + str(self.no_of_chunks))       
-                    else:  
-                        # the current line is too big
-                        #Read each word iteratively. Stop when word counter either reaches the chunk size or 
-                        # we have read all the words in the current + new line
-                        i = 0
-                        self.baseLogger.debug('We have to read each word in the line to fill in text chunk')
-                        no_words_added_to_text_chunk = 0
-                        while (word_ctr <= self.MAXCHUNKSIZE and i < no_of_words_in_current_line ):
-                            current_text_chunk = current_text_chunk + words_in_the_current_line[i] + ' '
-                            i = i + 1
-                            word_ctr = word_ctr + 1
-                            no_words_added_to_text_chunk = no_words_added_to_text_chunk + 1
-                           
                             if word_ctr == self.MAXCHUNKSIZE:
+                                #if the last fill has filled the text chunk bucket then save it to file
                                 self.no_of_chunks = self.no_of_chunks + 1
                                 chunk_file_path = os.path.join(self.text_chunks_dir, str(self.no_of_chunks) + '.txt')
-                                self.baseLogger.debug('Text chunk full.Write the text chunk no: ' + str(self.no_of_chunks) + ' to ' + chunk_file_path )
+                                self.baseLogger.debug('Text chunk full with this line.Write the text chunk no: ' + str(self.no_of_chunks) + ' to ' + chunk_file_path )
                                 self.saveTextChunk(chunk_file_path,current_text_chunk)
+                                ##The text chunk bucket has been saved. So reset current_text_chunk
                                 current_text_chunk = ''
                                 word_ctr = 0
-                                self.baseLogger.debug('Text chunk full. Added chunk number: ' + str(self.no_of_chunks))
-                                current_line = '' ##Reset the current line
-                                new_no_of_words_in_the_current_line = 0
-                                while i < no_of_words_in_current_line :
-                                    current_line =  current_line + words_in_the_current_line[i] + ' '
-                                    i = i + 1
-                                    new_no_of_words_in_the_current_line = new_no_of_words_in_the_current_line + 1
-                                no_of_words_in_current_line = new_no_of_words_in_the_current_line
+                                self.baseLogger.debug('Text chunk full with this line. Added chunk number: ' + str(self.no_of_chunks))       
+                        else:  
+                            # the current line is too big
+                            #Read each word iteratively. Stop when word counter either reaches the chunk size or 
+                            # we have read all the words in the current + new line
+                            i = 0
+                            self.baseLogger.debug('We have to read each word in the line to fill in text chunk')
+                            no_words_added_to_text_chunk = 0
+                            while (word_ctr <= self.MAXCHUNKSIZE and i < no_of_words_in_current_line ):
+                                current_text_chunk = current_text_chunk + words_in_the_current_line[i] + ' '
+                                i = i + 1
+                                word_ctr = word_ctr + 1
+                                no_words_added_to_text_chunk = no_words_added_to_text_chunk + 1
+                            
+                                if word_ctr == self.MAXCHUNKSIZE:
+                                    self.no_of_chunks = self.no_of_chunks + 1
+                                    chunk_file_path = os.path.join(self.text_chunks_dir, str(self.no_of_chunks) + '.txt')
+                                    self.baseLogger.debug('Text chunk full.Write the text chunk no: ' + str(self.no_of_chunks) + ' to ' + chunk_file_path )
+                                    self.saveTextChunk(chunk_file_path,current_text_chunk)
+                                    current_text_chunk = ''
+                                    word_ctr = 0
+                                    self.baseLogger.debug('Text chunk full. Added chunk number: ' + str(self.no_of_chunks))
+                                    current_line = '' ##Reset the current line
+                                    new_no_of_words_in_the_current_line = 0
+                                    while i < no_of_words_in_current_line :
+                                        current_line =  current_line + words_in_the_current_line[i] + ' '
+                                        i = i + 1
+                                        new_no_of_words_in_the_current_line = new_no_of_words_in_the_current_line + 1
+                                    no_of_words_in_current_line = new_no_of_words_in_the_current_line
 
-                                
-            #After reading all the lines if the current_text_chunk has remaining words and we have read the last line, it should be saved as a new chunk     
-            if(len(current_text_chunk) > 0 ):
-                self.no_of_chunks = self.no_of_chunks + 1
-                chunk_file_path = os.path.join(self.text_chunks_dir, str(self.no_of_chunks) + '.txt')
-                self.baseLogger.debug('Write the last text chunk no: ' + str(self.no_of_chunks) + ' to ' + chunk_file_path )
-                self.saveTextChunk(chunk_file_path, current_text_chunk)
-                self.baseLogger.debug('Added last chunk number: ' + str(self.no_of_chunks))
+                                    
+                #After reading all the lines if the current_text_chunk has remaining words and we have read the last line, it should be saved as a new chunk     
+                if(len(current_text_chunk) > 0 ):
+                    self.no_of_chunks = self.no_of_chunks + 1
+                    chunk_file_path = os.path.join(self.text_chunks_dir, str(self.no_of_chunks) + '.txt')
+                    self.baseLogger.debug('Write the last text chunk no: ' + str(self.no_of_chunks) + ' to ' + chunk_file_path )
+                    self.saveTextChunk(chunk_file_path, current_text_chunk)
+                    self.baseLogger.debug('Added last chunk number: ' + str(self.no_of_chunks))
+        except Exception as exc:
+            self.baseLogger.error('We have a problem when creating text chunks for ' + self.extracted_text_file_path)
+            self.baseLogger.error('Check text file encoding and also check if the extracted file was created')
+            print(exc.with_traceback)
+        finally:
+            self.baseLogger.info('Completed extracting text chunks')
