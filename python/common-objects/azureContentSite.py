@@ -14,9 +14,11 @@ sys.path.insert(1, os.path.abspath(os.path.join(curr_dir, os.pardir)))
 sys.path.append("../common-objects")
 sys.path.append("../common-functions")
 sys.path.append("../base-classes")
+import initializeDocumentProcessor
 from aiwhisprLocalIndex import aiwhisprLocalIndex
 from aiwhisprBaseClasses import siteAuth,vectorDb,srcContentSite,srcDocProcessor
 from azureBlobDownloader import azureBlobDownloader
+
 import aiwhisprConstants 
 
 import logging
@@ -114,9 +116,10 @@ class azureContentSite(srcContentSite):
                    download_file_path = self.getDownloadPath(content_path)
                    self.logger.debug('Downloaded File Name: ' + download_file_path)
                    self.downloader.download_blob_to_file(self.blob_service_client, self.container_name, content_path, download_file_path) 
-                   if content_file_suffix == '.txt':
+                   if (content_file_suffix == '.txt' or content_file_suffix == '.csv' or content_type[:4] == 'text') :
                        self.logger.debug('PROCESSING TEXT FILE TO CREATE CHUNKS')
-                       txtDocProcessor =  srcDocProcessor(download_file_path)
+                       txtDocProcessor =  initializeDocumentProcessor.initialize('.text',download_file_path)
+                       txtDocProcessor.extractText()
                        txtDocProcessor.createChunks()
            
            contentrows = self.local_index.getContentProcessedStatus("N") 
