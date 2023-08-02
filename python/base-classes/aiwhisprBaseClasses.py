@@ -7,12 +7,15 @@ import sys
 import pathlib
 import logging
 import time
-import magic
+
+import spacy
+from spacy.language import Language
+from spacy_language_detection import LanguageDetector
+import logging
 
 
 sys.path.append("../common-functions")
 import aiwhisprConstants
-
 
 #Base Class siteAuth
 class siteAuth:
@@ -162,7 +165,23 @@ class srcDocProcessor:
     MAXCHUNKSIZE = aiwhisprConstants.TXTCHUNKSIZE
     
     baseLogger = logging.getLogger(__name__)
-    
+
+    # private function
+    def get_lang_detector(self,nlp, name):
+        return LanguageDetector(seed=42) 
+
+    # Sentence level language detection
+    #private function
+    def detectLanguage(self,text_chunk:str)->str:
+        doc = self.nlp_model(text_chunk)
+        out_text_chunk = ''
+        for i, sent in enumerate(doc.sents):
+            if sent._.language['language'] == 'en':
+                out_text_chunk = out_text_chunk + sent.text
+            else:
+                self.baseLogger.warning('Found a text chunk sentence which is not english. Removing this sentence.Lang=' + sent._.language['language'])
+        return out_text_chunk
+
     #private function
     def get_random_string(self,length:int):
         # choose from all lowercase letter
@@ -181,6 +200,11 @@ class srcDocProcessor:
             return file_size
         
     def __init__(self, downloaded_file_path):
+
+        self.nlp_model = spacy.load("en_core_web_sm")
+        Language.factory("language_detector", func=self.get_lang_detector)
+        self.nlp_model.add_pipe('language_detector', last=True)
+
         self.downloaded_file_path = downloaded_file_path
         self.downloaded_file_size = self.getFileSize(self.downloaded_file_path)
         self.downloaded_file_dir = pathlib.PurePath(self.downloaded_file_path).parent
@@ -207,15 +231,24 @@ class srcDocProcessor:
         pass
 
     #private function
-    def saveTextChunk(self, text_chunk_file_path:str, text_chunk:str):
+    def validateTextChunk(self,text_chunk:str)->str:
+        out_text_chunk:str
+        out_text_chunk = text_chunk
         try:
-            self.baseLogger.debug('Writing a text chunk at :' + text_chunk_file_path)
-            f = open(text_chunk_file_path,"w")
-            f.write(text_chunk)
-            f.close()
+            out_text_chunk = self.detectLanguage(text_chunk)
         except:
-            self.baseLogger.error('Could not write the text chunk to file:' + text_chunk_file_path )
-        
+            self.baseLogger.error('Error when validating the text chunk language')
+        return out_text_chunk
+
+    #private function
+    def saveTextChunk(self, text_chunk_file_path:str, text_chunk:str):
+        save_text_chunk = self.validateTextChunk(text_chunk)
+        self.baseLogger.debug('Writing a text chunk at :' + text_chunk_file_path)
+        f = open(text_chunk_file_path,"w")
+        f.write(save_text_chunk)
+        f.close()
+    
+
     #public function
     def createChunks(self):
         self.baseLogger.debug('MAXCHUNK SIZE is :' + str(self.MAXCHUNKSIZE))
