@@ -1,3 +1,4 @@
+from operator import truediv
 import os
 import sys
 import io
@@ -7,6 +8,8 @@ import boto3
 from datetime import datetime, timedelta
 import pathlib
 import datetime
+
+from more_itertools import bucket
 
 curr_dir = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(1, os.path.abspath(os.path.join(curr_dir, os.pardir)))
@@ -50,71 +53,96 @@ class awsS3ContentSite(srcContentSite):
         self.logger.info("Purging the current local ContenIndex Map")
         self.local_index.purge()
         # List all the objects in the bucket 
-        bucket_objects_list = self.s3_client.list_objects_v2(Bucket=self.s3_bucket_name)
-        for bucket_object in bucket_objects_list['Contents']:
-            self.logger.debug("Object Name: %s LastModified: %s", bucket_object['Key'],str(bucket_object['LastModified']))
-            #Insert this list in the index database
-            content_path = bucket_object['Key']
-            content_file_suffix = pathlib.PurePath(content_path).suffix          
-            content_index_flag = 'N' #default
-            content_type = 'NONE' #AWS S3 Does not give you content type
-            content_creation_date = bucket_object['LastModified']
-            content_last_modified_date = bucket_object['LastModified']
-            content_uniq_id_src = content_path
-            content_tags_from_src = ''
-            content_size = bucket_object['Size']
-            content_processed_status = "N"
+        continueReadingBucket = True
+        bucketListIsTruncated = False
+        NextContinuationToken = ''
+        while continueReadingBucket:
 
-            if(content_file_suffix != None): 
-                if ( content_file_suffix in aiwhisprConstants.FILEXTNLIST ): 
-                    content_index_flag = 'Y'
+            if bucketListIsTruncated:
+                self.logger.debug('Another loop to read the next set of bucket objects')
+                bucket_objects_list = self.s3_client.list_objects_v2(Bucket=self.s3_bucket_name,ContinuationToken=NextContinuationToken,MaxKeys=aiwhisprConstants.S3MAXKEYS)
+            else:
+                #This is the first and the last call to read bucket contents
+                bucket_objects_list = self.s3_client.list_objects_v2(Bucket=self.s3_bucket_name,MaxKeys=aiwhisprConstants.S3MAXKEYS)
 
-            if content_file_suffix == None:
-                content_file_suffix = 'NONE'
+            bucketListIsTruncated = bucket_objects_list['IsTruncated']
+            keyCount = bucket_objects_list['KeyCount']
+            self.logger.debug('bucketListIsTruncated: %s keyCount: %d', str(bucketListIsTruncated), keyCount)
 
-            if content_size == None:
-                content_size = 0
+            if bucketListIsTruncated:
+                #We will have to do another pass after processing these results
+                NextContinuationToken = bucket_objects_list['NextContinuationToken']
+                continueReadingBucket = True
+            else:
+                #this is the last result set
+                continueReadingBucket = False
+                NextContinuationToken = ''
 
-            self.logger.debug("Insert Content Map Values:")
-            self.logger.debug(self.content_site_name)
-            self.logger.debug(self.src_path)
-            self.logger.debug(self.src_path_for_results)
-            self.logger.debug(content_path)
-            self.logger.debug(content_type)
-            self.logger.debug( str( content_creation_date.timestamp() ))
-            self.logger.debug( str(content_last_modified_date.timestamp() ))
-            self.logger.debug(content_uniq_id_src)
-            self.logger.debug(content_tags_from_src)
-            self.logger.debug(str(content_size))
-            self.logger.debug(content_file_suffix)
-            self.logger.debug(content_index_flag)
-            self.logger.debug(content_processed_status)
+            
+            for bucket_object in bucket_objects_list['Contents']:
+                self.logger.debug("Object Name: %s LastModified: %s", bucket_object['Key'],str(bucket_object['LastModified']))
+                #Insert this list in the index database
+                content_path = bucket_object['Key']
+                content_file_suffix = pathlib.PurePath(content_path).suffix          
+                content_index_flag = 'N' #default
+                content_type = 'NONE' #AWS S3 Does not give you content type
+                content_creation_date = bucket_object['LastModified']
+                content_last_modified_date = bucket_object['LastModified']
+                content_uniq_id_src = content_path
+                content_tags_from_src = ''
+                content_size = bucket_object['Size']
+                content_processed_status = "N"
 
-            self.local_index.insert(
-            self.content_site_name, 
-            self.src_path, 
-            self.src_path_for_results, 
-            content_path, 
-            content_type, 
-            content_creation_date.timestamp(), 
-            content_last_modified_date.timestamp(), 
-            content_uniq_id_src, 
-            content_tags_from_src, 
-            content_size, 
-            content_file_suffix, 
-            content_index_flag, 
-            content_processed_status
-            )
+                if(content_file_suffix != None): 
+                    if ( content_file_suffix in aiwhisprConstants.FILEXTNLIST ): 
+                        content_index_flag = 'Y'
 
-            if content_index_flag == 'Y':
-                download_file_path = self.getDownloadPath(content_path)
-                self.logger.debug('Downloaded File Name: ' + download_file_path)
-                self.downloader.download_s3object_to_file(self.s3_client, self.s3_bucket_name, content_path, download_file_path) 
-                if (content_file_suffix == '.txt' or content_file_suffix == '.csv') :
-                    self.logger.debug('PROCESSING TEXT FILE TO CREATE CHUNKS')
-                    txtDocProcessor =  initializeDocumentProcessor.initialize('.text',download_file_path)
-                    txtDocProcessor.extractText()
-                    txtDocProcessor.createChunks()
-        
-        contentrows = self.local_index.getContentProcessedStatus("N") 
-        self.logger.debug("Total Number of rows in ContentIndex with ProcessedStatus = N:" + str( len(contentrows)) )
+                if content_file_suffix == None:
+                    content_file_suffix = 'NONE'
+
+                if content_size == None:
+                    content_size = 0
+
+                self.logger.debug("Insert Content Map Values:")
+                self.logger.debug(self.content_site_name)
+                self.logger.debug(self.src_path)
+                self.logger.debug(self.src_path_for_results)
+                self.logger.debug(content_path)
+                self.logger.debug(content_type)
+                self.logger.debug( str( content_creation_date.timestamp() ))
+                self.logger.debug( str(content_last_modified_date.timestamp() ))
+                self.logger.debug(content_uniq_id_src)
+                self.logger.debug(content_tags_from_src)
+                self.logger.debug(str(content_size))
+                self.logger.debug(content_file_suffix)
+                self.logger.debug(content_index_flag)
+                self.logger.debug(content_processed_status)
+
+                self.local_index.insert(
+                self.content_site_name, 
+                self.src_path, 
+                self.src_path_for_results, 
+                content_path, 
+                content_type, 
+                content_creation_date.timestamp(), 
+                content_last_modified_date.timestamp(), 
+                content_uniq_id_src, 
+                content_tags_from_src, 
+                content_size, 
+                content_file_suffix, 
+                content_index_flag, 
+                content_processed_status
+                )
+
+                if content_index_flag == 'Y':
+                    download_file_path = self.getDownloadPath(content_path)
+                    self.logger.debug('Downloaded File Name: ' + download_file_path)
+                    self.downloader.download_s3object_to_file(self.s3_client, self.s3_bucket_name, content_path, download_file_path) 
+                    if (content_file_suffix == '.txt' or content_file_suffix == '.csv') :
+                        self.logger.debug('PROCESSING TEXT FILE TO CREATE CHUNKS')
+                        txtDocProcessor =  initializeDocumentProcessor.initialize('.text',download_file_path)
+                        txtDocProcessor.extractText()
+                        txtDocProcessor.createChunks()
+            
+            contentrows = self.local_index.getContentProcessedStatus("N") 
+            self.logger.debug("Total Number of rows in ContentIndex with ProcessedStatus = N:" + str( len(contentrows)) )
