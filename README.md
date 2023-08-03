@@ -133,3 +133,10 @@ pip install spacy-language-detection
 pip install boto3 
 ```
 
+##Environment variables
+You can setup the AIWHISPR_HOME_DIR environment variable 
+
+##Security of AIWhispr config files
+Configuration files for each content site is stored under $AIWHISPR_HOME_DIR/config/sites-available/
+The config files that AIWhispr reads contains the access keys , so please ensure that these config files don't have public read access.Also ensure that these config files are not managed under a public source code repository.
+    
