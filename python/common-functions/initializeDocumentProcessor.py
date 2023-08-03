@@ -23,7 +23,7 @@ def initialize(content_file_suffix:str,downloaded_file_path:str):
     logger.debug('initializing with content_file_suffix: ' + content_file_suffix)
     #Return the prcessor for the file type  
     match content_file_suffix:
-        case '.txt' | '.csv' | '.text':
+        case '.txt' | '.csv' | '.text' | '.py' | '.js' | '.php' | '.sh' | '.c' | '.pl' | '.cpp' | '.cs' | '.h' | '.java' | '.swift':
             logger.debug('in initialize : returning a text document processor')
             docProcessor = aiwhisprTextDocProcessor(downloaded_file_path)
             return docProcessor
