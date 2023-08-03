@@ -9,6 +9,8 @@ from aiwhisprBaseClasses import vectorDb, siteAuth
 
 sys.path.append("../common-objects")
 from azureContentSite import azureContentSite
+from awsS3ContentSite import awsS3ContentSite
+
 
 import logging
 
@@ -19,5 +21,8 @@ def initialize(src_type:str,content_site_name:str,src_path:str,src_path_for_resu
         case 'azureblob':
             logger.debug('azureContentSite instantiated')
             return azureContentSite(content_site_name=content_site_name,src_path=src_path,src_path_for_results=src_path_for_results,working_directory=working_directory,index_log_directory=index_log_directory,site_auth=site_auth,vector_db=vector_db)
+        case 's3':
+            logger.debug('AWS S3 ContentSite instantiated')
+            return awsS3ContentSite(content_site_name=content_site_name,src_path=src_path,src_path_for_results=src_path_for_results,working_directory=working_directory,index_log_directory=index_log_directory,site_auth=site_auth,vector_db=vector_db)
         case other:
             logger.error('We dont have a content site handler for content site type :' + src_type)
