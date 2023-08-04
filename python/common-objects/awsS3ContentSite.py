@@ -137,12 +137,13 @@ class awsS3ContentSite(srcContentSite):
                 if content_index_flag == 'Y':
                     download_file_path = self.getDownloadPath(content_path)
                     self.logger.debug('Downloaded File Name: ' + download_file_path)
-                    self.downloader.download_s3object_to_file(self.s3_client, self.s3_bucket_name, content_path, download_file_path) 
-                    if (content_file_suffix == '.txt' or content_file_suffix == '.csv') :
-                        self.logger.debug('PROCESSING TEXT FILE TO CREATE CHUNKS')
-                        txtDocProcessor =  initializeDocumentProcessor.initialize('.text',download_file_path)
-                        txtDocProcessor.extractText()
-                        txtDocProcessor.createChunks()
-            
+                    self.downloader.download_s3object_to_file(self.s3_client, self.s3_bucket_name, content_path, download_file_path)                     
+                    docProcessor =  initializeDocumentProcessor.initialize(content_file_suffix,download_file_path)
+                    if (docProcessor != None ):
+                        docProcessor.extractText()
+                        docProcessor.createChunks()
+                    else:
+                        self.logger.debug('Content Index Flag was "Y" but we did not get a valid document processor')
+
             contentrows = self.local_index.getContentProcessedStatus("N") 
             self.logger.debug("Total Number of rows in ContentIndex with ProcessedStatus = N:" + str( len(contentrows)) )

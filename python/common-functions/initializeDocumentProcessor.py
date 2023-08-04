@@ -17,29 +17,47 @@ sys.path.insert(1, os.path.abspath(os.path.join(curr_dir, os.pardir)))
 
 sys.path.append("../common-objects")
 from aiwhisprTextDocProcessor import aiwhisprTextDocProcessor
+from aiwhisprPdfDocProcessor import aiwhisprPdfDocProcessor
+from aiwhisprMSdocxDocProcessor import aiwhisprMSdocxDocProcessor
+from aiwhisprMSxlsxDocProcessor import aiwhisprMSxlsxDocProcessor
+from aiwhisprMSpptxDocProcessor import aiwhisprMSpptxDocProcessor
 
 def initialize(content_file_suffix:str,downloaded_file_path:str):
     logger = logging.getLogger(__name__)
     logger.debug('initializing with content_file_suffix: ' + content_file_suffix)
     #Return the prcessor for the file type  
-    match content_file_suffix:
-        case '.txt' | '.csv' | '.text' | '.py' | '.js' | '.php' | '.sh' | '.c' | '.pl' | '.cpp' | '.cs' | '.h' | '.java' | '.swift':
-            logger.debug('in initialize : returning a text document processor')
+    if content_file_suffix in aiwhisprConstants.TXTFILEXTN:
+            logger.debug('in initialize : returning a text document processor for %s', downloaded_file_path)
             docProcessor = aiwhisprTextDocProcessor(downloaded_file_path)
             return docProcessor
-        #case .xls' | '.xlsx'
-            #return aiwhisprMSXlsDocProcessor(downloaded_file_path)
-        #case '.doc' | '.docx'
-            #return aiwhisprMSWordDocProcessor(downloaded_file_path)
-        #case '.ppt' | '.pptx'
-            #return aiwhisprMSPptDocProcessor(downloaded_file_path)
-        #case '.pdf'
-            #return aiwhisprPdfDocProcessor(downloaded_file_path)
-        #case '.wiki'
+    elif content_file_suffix == '.pdf':
+            logger.debug('in initialize : returning a pdf document processor for %s', downloaded_file_path)
+            docProcessor = aiwhisprPdfDocProcessor(downloaded_file_path)
+            return docProcessor
+    elif (content_file_suffix == '.xlsx'):
+            logger.debug('in initialize : returning a xlsx document processor for %s', downloaded_file_path)
+            docProcessor = aiwhisprMSxlsxDocProcessor(downloaded_file_path)
+            return docProcessor
+    #elif (content_file_suffix == '.xls'):
+    #        return aiwhisprMSxlsDocProcessor(downloaded_file_path)
+    elif (content_file_suffix == '.docx'):
+            logger.debug('in initialize : returning a docx document processor for %s', downloaded_file_path)
+            docProcessor = aiwhisprMSdocxDocProcessor(downloaded_file_path)
+            return docProcessor
+    #elif (content_file_suffix == '.doc'):
+    #        return aiwhisprMSdocDocProcessor(downloaded_file_path)
+    elif (content_file_suffix == '.pptx'):
+            logger.debug('in initialize : returning a pptx document processor for %s', downloaded_file_path)
+            docProcessor = aiwhisprMSpptxDocProcessor(downloaded_file_path)
+            return docProcessor
+    #elif (content_file_suffix == '.ppt'):
+    #        return aiwhisprMSpptDocProcessor(downloaded_file_path)
+    #elif (content_file_suffix == '.wiki'):
             #return aiwhisprWikiDocProcessor(downloaded_file_path)
-        #case '.xml'
+    #elif (content_file_suffix == '.xml'):
             #return aiwhisprXmlDocProcessor(downloaded_file_path)
-        #case '.md'
+    #elif (content_file_suffix == '.md'):
             #return aiwhisprMdDocProcessor(downloaded_file_path)
-        case other:
-            logger.critical('Document Processing Class does not exist. Cannot handle the file with suffix: ' + content_file_suffix + ' for file ' + downloaded_file_path)
+    else:
+        logger.critical('Document Processing Class does not exist. Cannot handle the file with suffix: ' + content_file_suffix + ' for file ' + downloaded_file_path)
+        return None

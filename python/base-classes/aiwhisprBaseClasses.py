@@ -187,9 +187,9 @@ class srcDocProcessor:
             ctr = ctr + 1
             if sent._.language['language'] == 'en':
                 out_text_chunk = out_text_chunk + sent.text.encode('latin1').decode('utf-8')
-                self.baseLogger.debug("sentence %s in text chunk is English", sent.text.encode('latin1').decode('utf-8'))
+                self.baseLogger.debug("sentence {%s}  [validated sentence as English])", sent.text.encode('latin1').decode('utf-8'))
             else:
-                self.baseLogger.warning('Found a sentence %d in text chunk which is not English. Removing this sentence.Lang= %s', ctr, sent._.language['language'])
+                self.baseLogger.warning('Found sentence number %d in text chunk which is not English. Removing this sentence.Lang= %s', ctr, sent._.language['language'])
         return out_text_chunk
 
     #private function
@@ -227,9 +227,7 @@ class srcDocProcessor:
         os.makedirs(self.extracted_text_file_dir)
         self.baseLogger.debug("Created a temporary directory path for extracted text file name: " +self. extracted_text_file_dir)
         ##the extracted text file name will replace any space " " in its name with "_" and will have .txt suffix 
-        self.extracted_text_file_path = os.path.join(self.extracted_text_file_dir, self.downloaded_filename.replace(' ','_') , '.txt')      
-      
-        
+        self.extracted_text_file_path = os.path.join(self.extracted_text_file_dir, self.downloaded_filename.replace(' ','_') ) + '.txt'      
         
         self.text_chunks_dir = os.path.join(self.downloaded_file_dir, 'chunks'+ self.get_random_string(4) + ts )
         os.makedirs(self.text_chunks_dir)
