@@ -8,12 +8,12 @@ AIWhispr is a semantic search engine that is
 
 ## Guardrails
 - A semantic search engine should be easy to install.  Developers , system administrators, users should be able to follow the instruction to install and configure the semantic search engine without any source code changes.
-- This is an applciation, not a dev toolkit/library.
 - A semantic search engine should have fast response times for search queries. Take more time for data preparation, indexing if it helps improve the search response time.
 - A semantic search engine should be able to ingest content from both on OS, cloud (e.g. Azure Blob, AWS S3 ) with simple configuration, no code changes.
 - A semantic search engine should be able to ingest multiple file types. If a file type is not handled then code changes should be minimum.
 - A semantic search engine should clean the data before it submits it to the LLM for encoding. 
 - A semantic search engine should be able to run in multiple levels of logging (DEBUG,CRITICAL,ERROR, INFO) so that developers, system administrators can monitor the health, setup alerts.
+- Every AIWhispr feature will be built based on community feedback.Feedback from users will define the desired outcome of the feature.
 
 
 ##Contact
@@ -131,6 +131,11 @@ pip install spacy-language-detection
 ###AWS
 ```
 pip install boto3 
+```
+
+### Document Reader which will extract text from different document types
+```
+pip install pypdf
 ```
 
 ##Environment variables
