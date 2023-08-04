@@ -12,6 +12,11 @@ contact@aiwhispr.com
 ## Prerequisite software, python packages 
 
 ### Download Typesense and install
+AIWhispr uses Typesense to store text, corresponding vector embeddings created by the LLM.
+A big Thanks!! to the Typesense team, community. 
+We tried many different vector databases, testing for both high speed text and vector search.
+All of them are good, but we found Typesense the easiest to work with and delivering great performance.
+
 You can follow the instructions on 
 https://typesense.org/docs/guide/install-typesense.html
 
