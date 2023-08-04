@@ -1,6 +1,6 @@
-#AIWhispr
+# AIWhispr
 
-##Overview
+## Overview
 AIWhispr is a semantic search engine that is 
 - easy to install,
 - fast response time to search queries,
@@ -16,19 +16,16 @@ AIWhispr is a semantic search engine that is
 - Every AIWhispr feature will be built based on community feedback.Feedback from users will define the desired outcome of the feature.
 
 
-##Contact
+## Contact
 contact@aiwhispr.com
 
-##License
-GNU GPL
+## Prerequisite software, python packages 
 
-##Prerequisite : Install and configure Typesense vector database
-
-###Download Typesense and install
+### Download Typesense and install
 You can follow the instructions on 
 https://typesense.org/docs/guide/install-typesense.html
 
-###Configure Typesense for aiwhispr
+### Configure Typesense for aiwhispr
 Run the below setup commands [ Example is for Ubuntu Linux.]
 
 ```
@@ -50,7 +47,7 @@ log-dir = /var/log/typesense
 ```
 
 Now change the data-dir and log-dir configurations to a separate directory which keeps aiwhispr
-Example
+Example , I created a seprate directories under (preferably under a high speed SSD based file mount in production) /aiwhispr-data/
 ```
 data-dir = /aiwhispr-data/typesense
 log-dir = /aiwhispr-data/log/typesense
@@ -76,16 +73,9 @@ sudo systemctl  stop  typesense-server.service
 sudo systemctl  start typesense-server.service
 ```
 
-Check that typesense database directory structure is created
+Check that typesense database directory structure is created , example:
 ```
 ls -l /aiwhispr-data/typesense 
-
-Output should be like
-```
-total 12
-drwxr-xr-x 3 root root 4096 Jul 27 06:35 db
-drwxr-xr-x 3 root root 4096 Jul 27 06:35 meta
-drwxr-xr-x 5 root root 4096 Jul 27 06:35 state
 ```
 
 Check that typesense log file created , like
@@ -93,13 +83,7 @@ Check that typesense log file created , like
 ls -l /aiwhispr-data/log/typesense 
 ```
 
-Output should be like
-```
-total 12
--rw-r--r-- 1 root root 9600 Jul 27 06:37 typesense.log
-```
-
-Allow the Linux firewall to open the Typesense-Server port.
+Open the Typesense-Server port on Linux firewall if you have setup a seprate machine to host typesense-server.
 ```
 sudo ufw allow 8108
 ```
@@ -112,7 +96,7 @@ install the typesense client
 ```
 pip3 install typesense
 ```
-##Prerequisite Python packages
+### Prerequisite Python packages
 
 ###Azure
 ```
@@ -136,6 +120,7 @@ pip install boto3
 ### Document Reader which will extract text from different document types
 ```
 pip install pypdf
+pip install textract
 ```
 
 ##Environment variables
