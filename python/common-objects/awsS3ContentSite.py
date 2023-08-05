@@ -25,7 +25,7 @@ import aiwhisprConstants
 
 import logging
 
-class awsS3ContentSite(srcContentSite):
+class createContentSite(srcContentSite):
             
     downloader:awsS3Downloader
 

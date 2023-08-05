@@ -45,11 +45,12 @@ def index(configfile):
     src_type = config.get('content-site','srctype')
     src_path = config.get('content-site','srcpath')
     src_path_for_results = config.get('content-site','displaypath')
+    content_site_module = config.get('content-site','contentSiteModule')
     logger.debug('Site Name is '+ content_site_name)
     logger.debug('Site Source Type is '+ src_type)
     logger.debug('Site Source Path is '+ src_path)
     logger.debug('Site Source Display Path is '+ src_path_for_results)
-
+    logger.debug('Content Site Module is: %s', content_site_module)
     #Read the vector database configs
     vectordb_hostname = config.get('vectordb', 'api-address')
     vectordb_portnumber = config.get('vectordb', 'api-port')
@@ -121,6 +122,6 @@ def index(configfile):
 
                                 
     #Initialize the content site handler. The returned oject is content site specific (azure, aws,filepath) handler
-    contentSite = initializeContentSite.initialize(src_type=src_type,content_site_name=content_site_name,src_path=src_path,src_path_for_results=src_path_for_results,working_directory=working_directory,index_log_directory=index_log_directory,site_auth=site_auth,vector_db=vector_db)
+    contentSite = initializeContentSite.initialize(content_site_module=content_site_module,src_type=src_type,content_site_name=content_site_name,src_path=src_path,src_path_for_results=src_path_for_results,working_directory=working_directory,index_log_directory=index_log_directory,site_auth=site_auth,vector_db=vector_db)
     contentSite.connect()
     contentSite.index()

@@ -23,7 +23,7 @@ import aiwhisprConstants
 
 import logging
 
-class azureContentSite(srcContentSite):
+class createContentSite(srcContentSite):
             
     downloader:azureBlobDownloader
 

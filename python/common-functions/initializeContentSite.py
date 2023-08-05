@@ -1,5 +1,6 @@
 import os
 import sys
+from importlib import import_module
 
 curr_dir = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(1, os.path.abspath(os.path.join(curr_dir, os.pardir)))
@@ -8,21 +9,14 @@ sys.path.append("../base-classes")
 from aiwhisprBaseClasses import vectorDb, siteAuth
 
 sys.path.append("../common-objects")
-from azureContentSite import azureContentSite
-from awsS3ContentSite import awsS3ContentSite
+#from azureContentSite import azureContentSite
+#from awsS3ContentSite import awsS3ContentSite
 
 
 import logging
 
-def initialize(src_type:str,content_site_name:str,src_path:str,src_path_for_results:str,working_directory:str,index_log_directory:str,site_auth:siteAuth,vector_db:vectorDb):
+def initialize(content_site_module:str,src_type:str,content_site_name:str,src_path:str,src_path_for_results:str,working_directory:str,index_log_directory:str,site_auth:siteAuth,vector_db:vectorDb):
     logger = logging.getLogger(__name__)
-    
-    match src_type:
-        case 'azureblob':
-            logger.debug('azureContentSite instantiated')
-            return azureContentSite(content_site_name=content_site_name,src_path=src_path,src_path_for_results=src_path_for_results,working_directory=working_directory,index_log_directory=index_log_directory,site_auth=site_auth,vector_db=vector_db)
-        case 's3':
-            logger.debug('AWS S3 ContentSite instantiated')
-            return awsS3ContentSite(content_site_name=content_site_name,src_path=src_path,src_path_for_results=src_path_for_results,working_directory=working_directory,index_log_directory=index_log_directory,site_auth=site_auth,vector_db=vector_db)
-        case other:
-            logger.error('We dont have a content site handler for content site type :' + src_type)
+    #Dynamically import module and instantiate
+    contentSiteMgr = import_module(content_site_module)
+    return   contentSiteMgr.createContentSite(content_site_name=content_site_name,src_path=src_path,src_path_for_results=src_path_for_results,working_directory=working_directory,index_log_directory=index_log_directory,site_auth=site_auth,vector_db=vector_db)
