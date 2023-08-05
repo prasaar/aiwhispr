@@ -9,8 +9,8 @@ sys.path.append("../base-classes")
 from aiwhisprBaseClasses import vectorDb, siteAuth
 
 sys.path.append("../common-objects")
-#from azureContentSite import azureContentSite
-#from awsS3ContentSite import awsS3ContentSite
+sys.path.append("../content-site")
+
 
 
 import logging
