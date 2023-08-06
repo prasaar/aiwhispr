@@ -33,7 +33,7 @@ class  getDocProcessor(srcDocProcessor):
             text = textract.process(pptx_filepath).decode('utf-8')
             self.logger.debug('Extracted text from pptx file')
         except:
-            self.logger.error("could extract text from pptx file: %s", pptx_filepath )
+            self.logger.error("could not extract text from pptx file: %s", pptx_filepath )
         else:
             try:
                 f = open(txt_filepath, "w")

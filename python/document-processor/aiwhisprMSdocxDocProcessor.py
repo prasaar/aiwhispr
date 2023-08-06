@@ -34,7 +34,7 @@ class getDocProcessor(srcDocProcessor):
             text = textract.process(docx_filepath).decode('utf-8')
             self.logger.debug('Extracted text from docx file')
         except:
-            self.logger.error("Could not extract text from docx file: %s", docx_filepath)
+            self.logger.error("could not extract text from docx file: %s", docx_filepath)
         else:    
             try:
                 f = open(txt_filepath, "w")

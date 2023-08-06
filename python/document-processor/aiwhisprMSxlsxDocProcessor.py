@@ -33,7 +33,7 @@ class getDocProcessor(srcDocProcessor):
             text = textract.process(xlsx_filepath).decode('utf-8')
             self.logger.debug('Extracted text from xlsx file')
         except:
-            self.logger.error("could extract text from xlsx file: %s", xlsx_filepath )
+            self.logger.error("could not extract text from xlsx file: %s", xlsx_filepath )
         else:
             try:
                 f = open(txt_filepath, "w")
