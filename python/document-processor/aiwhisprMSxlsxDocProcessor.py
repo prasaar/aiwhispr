@@ -29,13 +29,16 @@ class getDocProcessor(srcDocProcessor):
         
         xlsx_filepath = self.downloaded_file_path
         txt_filepath = self.extracted_text_file_path
-
-        text = textract.process(xlsx_filepath).decode('utf-8')
-        self.logger.debug('Extracted text from xlsx file')
         try:
-            f = open(txt_filepath, "w")
+            text = textract.process(xlsx_filepath).decode('utf-8')
+            self.logger.debug('Extracted text from xlsx file')
         except:
-            self.logger.error('Could not not open a file to save the extracted text : %s', txt_filepath)
+            self.logger.error("could extract text from xlsx file: %s", xlsx_filepath )
         else:
-            f.write(text)
-            f.close()
+            try:
+                f = open(txt_filepath, "w")
+            except:
+                self.logger.error('Could not not open a file to save the extracted text : %s', txt_filepath)
+            else:
+                f.write(text)
+                f.close()

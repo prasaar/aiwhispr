@@ -30,12 +30,16 @@ class getDocProcessor(srcDocProcessor):
         docx_filepath = self.downloaded_file_path
         txt_filepath = self.extracted_text_file_path
 
-        text = textract.process(docx_filepath).decode('utf-8')
-        self.logger.debug('Extracted text from docx file')
         try:
-            f = open(txt_filepath, "w")
+            text = textract.process(docx_filepath).decode('utf-8')
+            self.logger.debug('Extracted text from docx file')
         except:
-            self.logger.error('Could not not open a file to save the extracted text : %s', txt_filepath)
-        else:
-            f.write(text)
-            f.close()
+            self.logger.error("Could not extract text from docx file: %s", docx_filepath)
+        else:    
+            try:
+                f = open(txt_filepath, "w")
+            except:
+                self.logger.error('Could not not open a file to save the extracted text : %s', txt_filepath)
+            else:
+                f.write(text)
+                f.close()

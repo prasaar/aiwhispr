@@ -29,22 +29,27 @@ class getDocProcessor(srcDocProcessor):
         
         pdf_filepath = self.downloaded_file_path
         txt_filepath = self.extracted_text_file_path
-
-        reader = PdfReader(pdf_filepath)
-        text = ""
+        
         try:
-            f = open(txt_filepath, "w")
+            reader = PdfReader(pdf_filepath)
+            self.logger.debug("Instantiated reader for pdf file")
+            text = ""
         except:
-            self.logger.error('Could not not open a file to save the extracted test : %s', txt_filepath)
+            self.logger.error("Could not instantiate a reader for pdf file: %s", pdf_filepath)
         else:
-            for page in reader.pages:
-                try:
-                    text = page.extract_text() + "\n"
-                    self.logger.debug('Extracted Text from Pdf File : %s', pdf_filepath)
-                    f.write(text)
-                except:
-                    self.logger.error('Error while extracting a page from the pdf file : %s', pdf_filepath)
+            try:
+                f = open(txt_filepath, "w")
+            except:
+                self.logger.error('Could not not open a file to save the extracted text : %s', txt_filepath)
+            else:
+                for page in reader.pages:
+                    try:
+                        text = page.extract_text() + "\n"
+                        self.logger.debug('Extracted Text from Pdf File : %s', pdf_filepath)
+                        f.write(text)
+                    except:
+                        self.logger.error('Error while extracting a page from the pdf file : %s', pdf_filepath)
 
-            #Close text file after writing the extracted text
-            f.close()
+                #Close text file after writing the extracted text
+                f.close()
 
