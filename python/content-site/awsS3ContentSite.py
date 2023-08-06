@@ -50,8 +50,8 @@ class createContentSite(srcContentSite):
     def index(self):
         ###Now start reading the site and list all the files
         self.logger.info('Reading AWS S3 bucket:' + self.s3_bucket_name)
-        self.logger.info("Purging the current local ContenIndex Map")
-        self.local_index.purge()
+        self.logger.info("Purging the current local ContentIndex Map")
+        self.local_index.deleteAll()
         # List all the objects in the bucket 
         continueReadingBucket = True
         bucketListIsTruncated = False
@@ -118,6 +118,9 @@ class createContentSite(srcContentSite):
                 self.logger.debug(content_index_flag)
                 self.logger.debug(content_processed_status)
 
+                rsync_status = 'I'
+                self.logger.debug(rsync_status)
+
                 self.local_index.insert(
                 self.content_site_name, 
                 self.src_path, 
@@ -131,7 +134,8 @@ class createContentSite(srcContentSite):
                 content_size, 
                 content_file_suffix, 
                 content_index_flag, 
-                content_processed_status
+                content_processed_status,
+                rsync_status
                 )
 
                 if content_index_flag == 'Y':
