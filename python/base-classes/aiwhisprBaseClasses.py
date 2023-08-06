@@ -69,7 +69,7 @@ class vectorDb:
         pass
 
     #public function
-    def purge(self):
+    def deleteAll(self):
         pass
 
     #public function
@@ -129,7 +129,7 @@ class srcContentSite:
         pass
 
     #public function
-    def purge(self):
+    def deleteAll(self):
         pass
 
     #public function
@@ -361,6 +361,5 @@ class srcDocProcessor:
         except Exception as exc:
             self.baseLogger.error('We have a problem when creating text chunks for ' + self.extracted_text_file_path)
             self.baseLogger.error('Check text file encoding and also check if the extracted file was created')
-            print(exc.with_traceback)
         finally:
             self.baseLogger.info('Completed extracting text chunks')
