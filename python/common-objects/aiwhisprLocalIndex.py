@@ -10,10 +10,10 @@ class aiwhisprLocalIndex:
        self.logger = logging.getLogger(__name__)
          
 
-    def insert(self,content_site_name, src_path, src_path_for_results, content_path, content_type, content_creation_date, content_last_modified_date, content_uniq_id_src, content_tags_from_src, content_size, content_file_suffix, content_index_flag, content_processed_status):
-       self.connection.execute("CREATE TABLE IF NOT EXISTS ContentIndex( content_site_name TEXT,src_path TEXT,src_path_for_results TEXT,content_path TEXT,content_type TEXT,content_creation_date REAL,content_last_modified_date REAL,content_uniq_id_src TEXT, content_tags_from_src TEXT, content_size INTEGER,content_file_suffix TEXT, content_index_flag TEXT, content_processed_status TEXT)")
+    def insert(self,content_site_name, src_path, src_path_for_results, content_path, content_type, content_creation_date, content_last_modified_date, content_uniq_id_src, content_tags_from_src, content_size, content_file_suffix, content_index_flag, content_processed_status, rsync_status = 'I'):
+       self.connection.execute("CREATE TABLE IF NOT EXISTS ContentIndex( content_site_name TEXT,src_path TEXT,src_path_for_results TEXT,content_path TEXT,content_type TEXT,content_creation_date REAL,content_last_modified_date REAL,content_uniq_id_src TEXT, content_tags_from_src TEXT, content_size INTEGER,content_file_suffix TEXT, content_index_flag TEXT, content_processed_status TEXT, rsync_status TEXT)" )
 
-       insert_string = "INSERT INTO ContentIndex(content_site_name, src_path, src_path_for_results, content_path, content_type, content_creation_date, content_last_modified_date, content_uniq_id_src, content_tags_from_src, content_size, content_file_suffix, content_index_flag, content_processed_status) VALUES("
+       insert_string = "INSERT INTO ContentIndex(content_site_name, src_path, src_path_for_results, content_path, content_type, content_creation_date, content_last_modified_date, content_uniq_id_src, content_tags_from_src, content_size, content_file_suffix, content_index_flag, content_processed_status, rsync_status) VALUES("
        insert_string = insert_string + "'" + content_site_name + "'," 
        insert_string = insert_string + "'" + src_path + "'," 
        insert_string = insert_string + "'" + src_path_for_results + "'," 
@@ -25,17 +25,17 @@ class aiwhisprLocalIndex:
        insert_string = insert_string + str(content_size) + ","
        insert_string = insert_string + "'" + content_file_suffix + "',"
        insert_string = insert_string + "'" + content_index_flag + "',"
-       insert_string = insert_string + "'" + content_processed_status + "')"
+       insert_string = insert_string + "'" + content_processed_status + "',"
+       insert_string = insert_string + "'" + rsync_status + "')"
 
        self.connection.execute(insert_string)
       
-    def purge(self):
+    def deleteAll(self):
        listOfTables = self.connection.execute( """SELECT name FROM sqlite_master WHERE type='table' AND name='ContentIndex'; """).fetchall()
-       if listOfTables == []:
-            print('ContentIndex Table not found. Nothing to delete!')
-            self.logger.info('ContentIndex Table not found. Nothing to delete!')
+       if len(listOfTables) == 0:
+            self.logger.info('In deleteAll .... ContentIndex Table not found. Nothing to delete!')
        else:
-           print('Deleting from table ContentIndex!')
+           self.logger.info('Deleting from table ContentIndex!')
            self.connection.execute("DELETE FROM ContentIndex;")   
 
 
