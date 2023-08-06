@@ -18,6 +18,8 @@ sys.path.append("../common-functions")
 import aiwhisprConstants
 
 #Base Class siteAuth
+#Support S3, Azureblob, filepath mounts
+#If you want to include other types of authentication then inherit from this class and you can process the cofigurations from kwargs
 class siteAuth:
 
     auth_type:str
@@ -27,11 +29,15 @@ class siteAuth:
     az_key:str
     aws_access_key_id:str
     aws_secret_access_key:str
+    check_file_permission:str
+    auth_config: dict
     logger = logging.getLogger(__name__)
     
     def __init__(self,auth_type:str,**kwargs):
         self.auth_type = auth_type
         match self.auth_type:
+            case 'filechecks':
+                self.check_file_permission = kwargs['check_file_permission']
             case 'sas':
                 self.sas_token = kwargs['sas_token']
             case 'az-storage-key':
@@ -40,8 +46,10 @@ class siteAuth:
                 self.aws_access_key_id = kwargs['aws_access_key_id']
                 self.aws_secret_access_key = kwargs['aws_secret_access_key']
             case other:
-                self.logger.error('Dont know how to handle the auth type %s', self.auth_type)
-            
+                self.logger.debug('Dont know how to handle the auth type %s', self.auth_type)
+                self.auth_config = kwargs['auth_config']
+                if self.auth_config != None:
+                    self.logger.debug("The auth_config dictionary is %s", str(self.auth_config) )            
 
 #Base Class vectorDb:
 class vectorDb:

@@ -3,6 +3,7 @@ FILEXTNLIST = ['.txt', '.csv', '.pdf', '.xlsx', '.docx', '.pptx']
 
 TXTCHUNKSIZE = 700
 S3MAXKEYS=1000   #MAXIMUM ALLOWED VALUE IS 1000
+BUFFERSIZEFORCOPY = 1024*1024*100
 
 # This is a dictionary that maps the file suffix to the moduleName that can process the document
 # Edit this when you add a module to handle a new document type (.suffix)

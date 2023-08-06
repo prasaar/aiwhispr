@@ -84,7 +84,25 @@ def index(configfile):
     #Also ensure that these config files are not managed under a public source code repository
     match src_type:
         case 'filepath':
-            logger.debug('src_type is filepath so will be direct access. Read Access Permissions should be set')
+            auth_type= config.get('content-site-auth','authtype')
+            logger.debug('src_type is filepath so will be direct access. We will check for permissions')
+            logger.debug('Site Authentication Type is '+ auth_type)
+            match auth_type:
+                case 'filechecks':
+                    check_file_permission = config.get('content-site-auth','check-file-permission')
+
+                    if check_file_permission == None:
+                       check_file_permission = "N"
+                    elif check_file_permission == "n" or check_file_permission == "no" or check_file_permission =="No" or check_file_permission == "N":
+                        check_file_permission = "N"
+                    elif check_file_permission == "y" or check_file_permission == "yes" or check_file_permission =="Yes" or check_file_permission == "Y":
+                        check_file_permission = "Y"  #Check that file can be read before it's read and indexed.
+                    else: 
+                        check_file_permission = "N"
+                    
+                    logger.debug("Src Type : %s , Check File Permission Flag : %s", src_type, check_file_permission)
+                    site_auth = siteAuth(auth_type=auth_type,check_file_permission=check_file_permission)
+
         case 'azureblob':
             auth_type= config.get('content-site-auth','authtype')
             logger.debug('Site Authentication Type is '+ auth_type)
@@ -119,7 +137,11 @@ def index(configfile):
                         site_auth=siteAuth(auth_type=auth_type,aws_access_key_id=aws_access_key_id,aws_secret_access_key=aws_secret_access_key)
                 case other:
                     logger.error('Dont know how to handle for s3,auth type %s', auth_type)
-
+        case other: ##Could be custom config-site. So read the site-auth configs as it is as pass them as a dictionary  
+            logger.debug('Site Authentication Type is '+ auth_type)
+            #eturn a list of name, value pairs for the options in the content-site-auth section
+            auth_config = dict(config.items('content-site-auth'))
+            site_auth=siteAuth(auth_type=auth_type,auth_config=auth_config)
                                 
     #Initialize the content site handler. The returned oject is content site specific (azure, aws,filepath) handler
     contentSite = initializeContentSite.initialize(content_site_module=content_site_module,src_type=src_type,content_site_name=content_site_name,src_path=src_path,src_path_for_results=src_path_for_results,working_directory=working_directory,index_log_directory=index_log_directory,site_auth=site_auth,vector_db=vector_db)
