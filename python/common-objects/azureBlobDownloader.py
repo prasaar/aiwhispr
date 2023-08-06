@@ -3,8 +3,11 @@ import os
 import uuid
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient, ContainerClient, BlobBlock, BlobClient
+import logging
 
 class azureBlobDownloader(object):
+
+    logger = logging.getLogger(__name__)
 
     # <Snippet_download_blob_file>
     def download_blob_to_file(self, blob_service_client: BlobServiceClient, container_name:str, blob_flat_name:str, download_file_name:str):
@@ -36,7 +39,7 @@ class azureBlobDownloader(object):
         # readinto() downloads the blob contents to a stream and returns the number of bytes read
         stream = io.BytesIO()
         num_bytes = blob_client.download_blob().readinto(stream)
-        print(f"Number of bytes: {num_bytes}")
+        self.logger.debug("Number of bytes: %d", num_bytes)
     # </Snippet_download_blob_stream>
 
     # <Snippet_download_blob_text>
@@ -46,7 +49,7 @@ class azureBlobDownloader(object):
         # encoding param is necessary for readall() to return str, otherwise it returns bytes
         downloader = blob_client.download_blob(max_concurrency=1, encoding='UTF-8')
         blob_text = downloader.readall()
-        print(f"Blob contents: {blob_text}")
+        self.logger.debug("Blob contents: %s", blob_text)
     # </Snippet_download_blob_text>
 
     # <Snippet_download_blob_transfer_options>
