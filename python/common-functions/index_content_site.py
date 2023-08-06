@@ -15,7 +15,6 @@ from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient, g
 from datetime import datetime, timedelta
 
 curr_dir = os.path.dirname(os.path.realpath(__file__))
-print(curr_dir)
 os.chdir(curr_dir)
 os.getcwd()
 sys.path.insert(1, os.path.abspath(os.path.join(curr_dir, os.pardir)))
