@@ -1,5 +1,6 @@
 ##This file implements all the base classes in aiwhispr
 ##We dont use typical __ because there is no real private variable in python
+from pyexpat import model
 import random
 import string
 import os
@@ -7,11 +8,14 @@ import sys
 import pathlib
 import logging
 import time
+from xmlrpc.client import Boolean
 
 import spacy
 from spacy.language import Language
 from spacy_language_detection import LanguageDetector
 import logging
+
+import shutil
 
 
 sys.path.append("../common-functions")
@@ -199,6 +203,19 @@ class srcContentSite:
 
         self.baseLogger.debug('Download File Path: ' + download_file_path)
         return download_file_path
+    
+    def backupDownloadDirectories(self):
+        #This function is called when a full index is done on the content-site
+        #It will move the content-site-name dir to another name
+        site_working_directory_subdir = os.path.join( self.working_directory , self.content_site_name)
+        isDirExist = os.path.exists(site_working_directory_subdir)
+        if isDirExist:
+            site_working_directory_subdir_bkup = site_working_directory_subdir + '_' + self.get_random_string(6) + '_bkup'
+            self.baseLogger.info("Backup existing directory to %s", site_working_directory_subdir_bkup)
+            try:
+                shutil.move(site_working_directory_subdir, site_working_directory_subdir_bkup )
+            except:
+                self.baseLogger.error("Could not move %s to %s", site_working_directory_subdir, site_working_directory_subdir_bkup )
 
 #BASE CLASS: srcDocProcessor for Document Processors which extract text, then chunk the text
 class srcDocProcessor:
@@ -308,6 +325,7 @@ class srcDocProcessor:
         self.baseLogger.debug('Creating Chunks for ' + self.extracted_text_file_path)
         #This function should be called only after the extractText function has been called
         ## ##the chunks will be 1.txt , 2.txt ......
+        chunk_id_dict = {}
 
         try:
         
@@ -353,6 +371,7 @@ class srcDocProcessor:
                                 chunk_file_path = os.path.join(self.text_chunks_dir, str(self.no_of_chunks) + '.txt')
                                 self.baseLogger.debug('Text chunk full with this line.Write the text chunk no: ' + str(self.no_of_chunks) + ' to ' + chunk_file_path )
                                 self.saveTextChunk(chunk_file_path,current_text_chunk)
+                                chunk_id_dict[chunk_file_path] = self.no_of_chunks
                                 ##The text chunk bucket has been saved. So reset current_text_chunk
                                 current_text_chunk = ''
                                 word_ctr = 0
@@ -375,6 +394,7 @@ class srcDocProcessor:
                                     chunk_file_path = os.path.join(self.text_chunks_dir, str(self.no_of_chunks) + '.txt')
                                     self.baseLogger.debug('Text chunk full.Write the text chunk no: ' + str(self.no_of_chunks) + ' to ' + chunk_file_path )
                                     self.saveTextChunk(chunk_file_path,current_text_chunk)
+                                    chunk_id_dict[chunk_file_path] = self.no_of_chunks
                                     current_text_chunk = ''
                                     word_ctr = 0
                                     self.baseLogger.debug('Text chunk full. Added chunk number: ' + str(self.no_of_chunks))
@@ -393,9 +413,28 @@ class srcDocProcessor:
                     chunk_file_path = os.path.join(self.text_chunks_dir, str(self.no_of_chunks) + '.txt')
                     self.baseLogger.debug('Write the last text chunk no: ' + str(self.no_of_chunks) + ' to ' + chunk_file_path )
                     self.saveTextChunk(chunk_file_path, current_text_chunk)
+                    chunk_id_dict[chunk_file_path] = self.no_of_chunks
                     self.baseLogger.debug('Added last chunk number: ' + str(self.no_of_chunks))
         except Exception as exc:
             self.baseLogger.error('We have a problem when creating text chunks for ' + self.extracted_text_file_path)
             self.baseLogger.error('Check text file encoding and also check if the extracted file was created')
         finally:
             self.baseLogger.info('Completed extracting text chunks')
+            return chunk_id_dict
+
+
+
+
+#BASE CLASS: baseLlmModel
+class baseLlmModel:
+    model_name:str
+    isApi:Boolean
+    isLibrary:Boolean
+
+    def __init__(self)
+        pass
+
+
+
+
+    

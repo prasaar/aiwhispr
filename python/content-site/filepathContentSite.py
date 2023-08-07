@@ -40,13 +40,27 @@ class createContentSite(srcContentSite):
            self.logger.error("Src Type: %s Source Path: %s does not exist", self.src_type, self.src_path)
        #get handle to the local index map object
        self.local_index = aiwhisprLocalIndex(self.index_log_directory, self.content_site_name)
+       #Request the vector db to connect to the server
+       self.vector_db.connect()
        
     def index(self):
-        ###Now start reading the site and list all the files
+
+         #Indexing is a multi-step operation
+        # 1\ Cleanup : Purge the local index, vector db , move the old work dub-directorry to a backup
+        # 2\ Read content site, for each file  get the file suffix and decide if we extract text for vector embeddings
+        #      If we decide to process the file then download it, extract text and break the text into chunks
+        #      For each text chunk get the vector embedding
+        #      Insert the text chunk, associated meta data and vector embedding into the vector database
+
+        #1\ Cleanup : Purge old records in local index, vectorDb for this site
+        self.local_index.deleteAll()
+        self.vector_db.deleteAll()
+        self.backupDownloadDirectories()
+
+        ###2\ Now start reading the site and list all the files
         self.logger.info('Reading From Top Level Directory:' + self.src_path)
         self.logger.info("Purging the current local ContentIndex Map")
-        self.local_index.deleteAll()
-
+        
         directory = self.src_path
         for dirpath, dirnames, filenames in os.walk(directory):
             for filename in filenames:
@@ -62,6 +76,8 @@ class createContentSite(srcContentSite):
                     
                     #Insert this list in the index database
                     #content_path = content_path
+
+                    #Get metadata for each file
                     content_file_suffix = pathlib.PurePath(content_path).suffix          
                     content_index_flag = 'N' #default
                     content_type = 'NONE' #AWS S3 Does not give you content type
@@ -72,6 +88,8 @@ class createContentSite(srcContentSite):
                     content_size = os.path.getsize(content_path)
                     content_processed_status = "N"
                     self.logger.debug("File Path: %s CreateDate: %f LastModified: %f Size: %d", content_path,content_creation_date, content_last_modified_date, content_size)
+                    
+                    #Decide if the file should be read
                     if(content_file_suffix != None): 
                         if ( content_file_suffix in aiwhisprConstants.FILEXTNLIST ): 
                             content_index_flag = 'Y'
@@ -121,13 +139,19 @@ class createContentSite(srcContentSite):
                     )
 
                     if content_index_flag == 'Y':
+                        #Download the file
                         download_file_path = self.getDownloadPath(content_path)
                         self.logger.debug('Downloaded File Name: ' + download_file_path)
                         self.downloader.download_content_file(content_path, download_file_path)                     
                         docProcessor =  initializeDocumentProcessor.initialize(content_file_suffix,download_file_path)
                         if (docProcessor != None ):
+                            #Extract text
                             docProcessor.extractText()
-                            docProcessor.createChunks()
+                            #Create text chunks
+                            chunk_id_dict = docProcessor.createChunks()
+                            self.logger.debug("%d chunks created for %s", len(chunk_id_dict), download_file_path)
+                            for id in chunk_id_dict.keys():
+                                self.logger.debug("id:{%s} text_chunk_no:{%d}", id, chunk_id_dict[id])
                         else:
                             self.logger.debug('Content Index Flag was "Y" but we did not get a valid document processor')
 
