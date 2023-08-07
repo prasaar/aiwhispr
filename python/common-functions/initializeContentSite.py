@@ -15,8 +15,22 @@ sys.path.append("../content-site")
 
 import logging
 
-def initialize(content_site_module:str,src_type:str,content_site_name:str,src_path:str,src_path_for_results:str,working_directory:str,index_log_directory:str,site_auth:siteAuth,vector_db:vectorDb):
-    logger = logging.getLogger(__name__)
-    #Dynamically import module and instantiate
-    contentSiteMgr = import_module(content_site_module)
-    return   contentSiteMgr.createContentSite(content_site_name=content_site_name,src_path=src_path,src_path_for_results=src_path_for_results,working_directory=working_directory,index_log_directory=index_log_directory,site_auth=site_auth,vector_db=vector_db)
+def initialize(content_site_module:str,
+               src_type:str,
+               content_site_name:str,
+               src_path:str,
+               src_path_for_results:str,
+               working_directory:str,
+               index_log_directory:str,
+               site_auth:siteAuth,
+               vector_db:vectorDb):
+        logger = logging.getLogger(__name__)
+        #Dynamically import module and instantiate
+        contentSiteMgr = import_module(content_site_module)
+        return   contentSiteMgr.createContentSite(content_site_name=content_site_name,
+                                                  src_path=src_path,
+                                                  src_path_for_results=src_path_for_results,
+                                                  working_directory=working_directory,
+                                                  index_log_directory=index_log_directory,
+                                                  site_auth=site_auth,
+                                                  vector_db = vector_db)

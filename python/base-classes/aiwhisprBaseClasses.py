@@ -17,7 +17,7 @@ import logging
 sys.path.append("../common-functions")
 import aiwhisprConstants
 
-#Base Class siteAuth
+#BASE CLASS: siteAuth
 #Support S3, Azureblob, filepath mounts
 #If you want to include other types of authentication then inherit from this class and you can process the cofigurations from kwargs
 class siteAuth:
@@ -35,14 +35,19 @@ class siteAuth:
     
     def __init__(self,auth_type:str,**kwargs):
         self.auth_type = auth_type
+        self.logger.debug("auth_type=%s",auth_type)
         match self.auth_type:
             case 'filechecks':
+                self.logger.debug("filechecks:check_file_permission=%s",kwargs['check_file_permission'] )
                 self.check_file_permission = kwargs['check_file_permission']
             case 'sas':
+                self.logger.debug("sas:sas_token=%s",kwargs['sas_token'] )
                 self.sas_token = kwargs['sas_token']
             case 'az-storage-key':
+                self.logger.debug("az-storage-key:az_key=%s",kwargs['az_key'] )
                 self.az_key = kwargs['az_key']
             case 'aws-key':
+                self.logger.debug("aws-key:aws_access_key_id=%s,aws_secret_access_key=%s",kwargs['aws_access_key_id'], kwargs['aws_secret_access_key'] )
                 self.aws_access_key_id = kwargs['aws_access_key_id']
                 self.aws_secret_access_key = kwargs['aws_secret_access_key']
             case other:
@@ -51,21 +56,51 @@ class siteAuth:
                 if self.auth_config != None:
                     self.logger.debug("The auth_config dictionary is %s", str(self.auth_config) )            
 
-#Base Class vectorDb:
+#BASE CLASS: vectorDb:
 class vectorDb:
     vectordb_type:str
     vectordb_hostname:str
     vectordb_portnumber:str
     vectordb_key:str
+    content_site_name:str 
+    src_path:str 
+    src_path_for_results:str
 
-    def __init__(self,vectordb_type,vectordb_hostname,vectordb_portnumber, vectordb_key):
-        self.vectordb_type = vectordb_type
+    def __init__(self,vectordb_hostname,vectordb_portnumber, vectordb_key, content_site_name:str,src_path:str,src_path_for_results:str):
         self.vectordb_hostname = vectordb_hostname
         self.vectordb_portnumber = vectordb_portnumber
         self.vectordb_key = vectordb_key
+        self.content_site_name = content_site_name
+        self.src_path = src_path
+        self.src_path_for_results = src_path_for_results
 
+        self.baseLogger = logging.getLogger(__name__)
+        self.baseLogger.debug("vectordb_hostname = %s", self.vectordb_hostname)
+        self.baseLogger.debug("vectordb_portnumber = %s", self.vectordb_portnumber)
+        self.baseLogger.debug("vectordb_key = %s", self.vectordb_key)
+        self.baseLogger.debug("content_site_name = %s", self.content_site_name)
+        self.baseLogger.debug("src_path = %s", self.src_path)
+        self.baseLogger.debug("src_path_for_results = %s", self.src_path_for_results)
+        
+
+    #We are defining the signature in base class to show that we are folling a particular schema
+    #A schema change has to be managed carefully across the application.
+    #A customer vectorDB module can be written  and instantiated easily so lets keep schema changes to a minimu, only when necessary.
     #public function 
-    def insert(self):
+    def insert(self, id:str,
+               text_chunk_file_path:str, 
+               content_path:str, 
+               last_edit_date:float, 
+               tags:str, 
+               title:str, 
+               text_chunk:str, 
+               text_chunk_no:int, 
+               vector_embedding:[]
+               ):
+        pass
+
+    #public function
+    def connect(self):
         pass
 
     #public function
@@ -84,7 +119,7 @@ class vectorDb:
 #There will be seperate classes for each source e.g. azure, s3, file etc.
 #The base class is useful to design the basic operations that we will link to any Content Site
 
-#Base Class srcContentSite
+#BASE CLASS: srcContentSite
 class srcContentSite:
 
     content_site_name:str
@@ -98,16 +133,18 @@ class srcContentSite:
 
     baseLogger = logging.getLogger(__name__)
     #Init without siteAuth e.g. local file directory
-    def __init__(self, content_site_name:str, src_type:str, src_path:str, src_path_for_results:str, working_directory:str, index_log_directory:str, vector_db:vectorDb ):
-        self.content_site_name = content_site_name
-        self.src_type = src_type
-        self.src_path = src_path
-        self.src_path_for_results = src_path_for_results
-        self.working_directory = working_directory
-        self.index_log_directory = index_log_directory
-        self.vector_db = vector_db
+    #def __init__(self, content_site_name:str, src_type:str, src_path:str, src_path_for_results:str, working_directory:str, index_log_directory:str, vector_db:vectorDb ):
+    #    self.content_site_name = content_site_name
+    #    self.src_type = src_type
+    #   self.src_path = src_path
+    #   self.src_path_for_results = src_path_for_results
+    #   self.working_directory = working_directory
+    #   self.index_log_directory = index_log_directory
+    #   self.vector_db = vector_db
         
-    #Init with siteAuth e.g.  azureblob,s3,gs
+    #Common init signature
+    #We have defined a common signature for bases and expect derived classes also to follow this signature.
+    #the Derives classes are isntatiated dynamically so it's important we have a common signature.
     def __init__(self, content_site_name:str, src_type:str, src_path:str, src_path_for_results:str, working_directory:str, index_log_directory:str, site_auth:siteAuth, vector_db:vectorDb ):
         self.content_site_name = content_site_name
         self.src_type = src_type
@@ -115,10 +152,9 @@ class srcContentSite:
         self.src_path_for_results = src_path_for_results
         self.working_directory = working_directory
         self.index_log_directory = index_log_directory
-        self.vector_db = vector_db
         self.site_auth = site_auth
-       
-
+        self.vector_db = vector_db
+        
     #These operations shold be implemented is the sub(child) classes
     #public function
     def connect(self):
@@ -164,7 +200,7 @@ class srcContentSite:
         self.baseLogger.debug('Download File Path: ' + download_file_path)
         return download_file_path
 
-#Base class for Document Processors which extract text, then chunk the text
+#BASE CLASS: srcDocProcessor for Document Processors which extract text, then chunk the text
 class srcDocProcessor:
     downloaded_file_path:str
     downloaded_file_size:str

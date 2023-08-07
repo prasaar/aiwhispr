@@ -15,6 +15,7 @@ from aiwhisprBaseClasses import vectorDb, siteAuth
 
 sys.path.append("../common-functions")
 import initializeContentSite
+import initializeVectorDb
 
 import logging
 logger = logging.getLogger(__name__)
@@ -23,7 +24,7 @@ logger = logging.getLogger(__name__)
 def index(configfile):
 
 
-    vectordb_type = ''
+    vectordb_module = ''
     vectordb_hostname = ''
     vectordb_portnumber = ''
     vectordb_key = ''
@@ -56,13 +57,12 @@ def index(configfile):
     vectordb_portnumber = config.get('vectordb', 'api-port')
     vectordb_key = config.get('vectordb', 'api-key')
     #db-type can be typesense,qdrant 
-    vectordb_type = config.get('vectordb','db-type')
+    vectordb_module = config.get('vectordb','vectorDbModule')
     logger.debug('VectorDB Server Host is ' + vectordb_hostname)
     logger.debug('VectorDB Server Port is '+ vectordb_portnumber)
     logger.debug('VectorDB Server Key is ' + vectordb_key)
-    logger.debug('VectorDB Type is '+ vectordb_type)
-    vector_db = vectorDb(vectordb_type=vectordb_type, vectordb_hostname = vectordb_hostname, vectordb_portnumber = vectordb_portnumber, vectordb_key = vectordb_key)
-
+    logger.debug('VectorDB Module is '+ vectordb_module)
+    
 
     #Read config for local working 
     working_directory = config.get('local','working-dir')
@@ -142,8 +142,27 @@ def index(configfile):
             #eturn a list of name, value pairs for the options in the content-site-auth section
             auth_config = dict(config.items('content-site-auth'))
             site_auth=siteAuth(auth_type=auth_type,auth_config=auth_config)
-                                
+
+    #Instantiate the vector db object. This will return a vectorDb derived class based on the module name
+    vector_db = initializeVectorDb.initialize(vectordb_module=vectordb_module,
+                                             vectordb_hostname = vectordb_hostname, 
+                                             vectordb_portnumber = vectordb_portnumber, 
+                                             vectordb_key = vectordb_key,
+                                             content_site_name = content_site_name,
+                                             src_path = src_path, 
+                                             src_path_for_results = src_path_for_results
+                                             )
+                            
     #Initialize the content site handler. The returned oject is content site specific (azure, aws,filepath) handler
-    contentSite = initializeContentSite.initialize(content_site_module=content_site_module,src_type=src_type,content_site_name=content_site_name,src_path=src_path,src_path_for_results=src_path_for_results,working_directory=working_directory,index_log_directory=index_log_directory,site_auth=site_auth,vector_db=vector_db)
+    contentSite = initializeContentSite.initialize(content_site_module=content_site_module,
+                                                   src_type=src_type,
+                                                   content_site_name=content_site_name,
+                                                   src_path=src_path,
+                                                   src_path_for_results=src_path_for_results,
+                                                   working_directory=working_directory,
+                                                   index_log_directory=index_log_directory,
+                                                   site_auth=site_auth,
+                                                   vector_db = vector_db)
+    
     contentSite.connect()
     contentSite.index()

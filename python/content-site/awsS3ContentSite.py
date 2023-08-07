@@ -35,6 +35,7 @@ class createContentSite(srcContentSite):
        self.downloader = awsS3Downloader()
        self.logger = logging.getLogger(__name__)
 
+
     def connect(self):
        # Connect to AWS S3, Connect to localDB  which stores the ContentIndex
        # Create the boto3 client object
@@ -46,6 +47,8 @@ class createContentSite(srcContentSite):
                self.logger.error('No authentication provided for AWS S3 connection')
        #get handle to the local index map object
        self.local_index = aiwhisprLocalIndex(self.index_log_directory, self.content_site_name)
+       #Request the vector db to connect to the server
+       self.vector_db.connect()
        
     def index(self):
         ###Now start reading the site and list all the files
