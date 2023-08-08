@@ -18,7 +18,7 @@ sys.path.append("../common-functions")
 sys.path.append("../base-classes")
 import initializeDocumentProcessor
 from aiwhisprLocalIndex import aiwhisprLocalIndex
-from aiwhisprBaseClasses import siteAuth,vectorDb,srcContentSite
+from aiwhisprBaseClasses import siteAuth,vectorDb,srcContentSite, baseLlmService
 from awsS3Downloader import awsS3Downloader
 
 import aiwhisprConstants 
@@ -29,8 +29,8 @@ class createContentSite(srcContentSite):
             
     downloader:awsS3Downloader
 
-    def __init__(self,content_site_name:str,src_path:str,src_path_for_results:str,working_directory:str,index_log_directory:str,site_auth:siteAuth,vector_db:vectorDb):
-       srcContentSite.__init__(self,content_site_name=content_site_name,src_type="s3",src_path=src_path,src_path_for_results=src_path_for_results,working_directory=working_directory,index_log_directory=index_log_directory,site_auth=site_auth,vector_db=vector_db)
+    def __init__(self,content_site_name:str,src_path:str,src_path_for_results:str,working_directory:str,index_log_directory:str,site_auth:siteAuth,vector_db:vectorDb,llm_service:baseLlmService):
+       srcContentSite.__init__(self,content_site_name=content_site_name,src_type="s3",src_path=src_path,src_path_for_results=src_path_for_results,working_directory=working_directory,index_log_directory=index_log_directory,site_auth=site_auth,vector_db=vector_db, llm_service = llm_service)
        self.s3_bucket_name = src_path.split('/')[2]
        self.downloader = awsS3Downloader()
        self.logger = logging.getLogger(__name__)
@@ -49,6 +49,8 @@ class createContentSite(srcContentSite):
        self.local_index = aiwhisprLocalIndex(self.index_log_directory, self.content_site_name)
        #Request the vector db to connect to the server
        self.vector_db.connect()
+       #Connect the LLM Service for encoding text -> vector
+       self.llm_service.connect()
        
     def index(self):
         
@@ -122,7 +124,9 @@ class createContentSite(srcContentSite):
 
                 if content_size == None:
                     content_size = 0
-
+                
+                rsync_status = 'I'
+                ####DEBUG####
                 self.logger.debug("Insert Content Map Values:")
                 self.logger.debug(self.content_site_name)
                 self.logger.debug(self.src_path)
@@ -136,11 +140,11 @@ class createContentSite(srcContentSite):
                 self.logger.debug(str(content_size))
                 self.logger.debug(content_file_suffix)
                 self.logger.debug(content_index_flag)
-                self.logger.debug(content_processed_status)
-
-                rsync_status = 'I'
+                self.logger.debug(content_processed_status)                
                 self.logger.debug(rsync_status)
+                ####DEBUG-END####
 
+                #Insert in local index 
                 self.local_index.insert(
                 self.content_site_name, 
                 self.src_path, 
@@ -171,12 +175,32 @@ class createContentSite(srcContentSite):
                         #Create text chunks
                         chunk_id_dict = docProcessor.createChunks()
                         self.logger.debug("%d chunks created for %s", len(chunk_id_dict), download_file_path)
+                        #For each chunk, read text, create vector embedding and insert in vectordb
                         for id in chunk_id_dict.keys():
-                            self.logger.debug("id:{%s} text_chunk_no:{%d}", id, chunk_id_dict[id])
+                            text_chunk_no = chunk_id_dict[id]
+                            self.logger.debug("id:{%s} text_chunk_no:{%d}", id, text_chunk_no)
+                            #Now encode the text chunk. id is the file path to the text chunk
+                            text_f = open(id)
+                            text_chunk_read = text_f.read()
+                            vec_emb = self.llm_service.encode(text_chunk_read)
+                            self.logger.debug("Vector encoding dimension is {%d}", len(vec_emb))
+                            text_f.close()
+
+                            #Insert the meta data, text chunk, vector emebdding for text chunk in vectordb
+                            self.logger.debug("Inserting the record in vector database for id{%s}", id)
+                            self.vector_db.insert(id = id,
+                                                  content_path = content_path, 
+                                                  last_edit_date = content_last_modified_date.timestamp() , 
+                                                  tags = content_tags_from_src, 
+                                                  title = "", 
+                                                  text_chunk = text_chunk_read, 
+                                                  text_chunk_no = text_chunk_no, 
+                                                  vector_embedding = vec_emb)
+                            
                     else:
                         self.logger.debug('Content Index Flag was "Y" but we did not get a valid document processor')
 
-                    
+                   
 
             contentrows = self.local_index.getContentProcessedStatus("N") 
             self.logger.debug("Total Number of rows in ContentIndex with ProcessedStatus = N:" + str( len(contentrows)) )

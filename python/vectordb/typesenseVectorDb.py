@@ -2,6 +2,7 @@ import os
 import sys
 import io
 import uuid
+import time
 from datetime import datetime, timedelta
 import pathlib
 import json
@@ -97,8 +98,8 @@ class createVectorDb(vectorDb):
 
                 self.logger.info("Create Collection : %s", json.dumps(create_response))
 
-    def insert(self, id:str,
-               text_chunk_file_path:str, 
+    def insert(self, 
+               id:str,
                content_path:str, 
                last_edit_date:float, 
                tags:str, 
@@ -107,33 +108,31 @@ class createVectorDb(vectorDb):
                text_chunk_no:int, 
                vector_embedding:[]
                ):
-        #Lets read the chuk file first
-        text_chunk = ''
+        #Lets read the chunk file first
+
         try:
-            with open(text_chunk_file_path) as f:
-                text_chunk = f.readlines()
+            #get the current time since epoch in seconds
+            vector_embedding_date = time.time()
+
+             ##Insert record in typesense collection
+            content_chunk_map_record = {
+                'id' :  id,
+                'content_site_name' : self.content_site_name,
+                'src_path' : self.src_path,
+                'src_path_for_results' : self.src_path_for_results,
+                'content_path' : content_path,
+                'last_edit_date' : last_edit_date,
+                'tags' : tags,
+                'title' : title,
+                'text_chunk' : text_chunk,
+                'text_chunk_no' : text_chunk_no,
+                'vector_embedding' : vector_embedding,
+                'vector_embedding_date': vector_embedding_date
+            }
+            self.vectorDbClient.collections['content_chunk_map'].documents.create(content_chunk_map_record)
         except:
-            self.logger.error("Could not read the text chunk file %s", text_chunk_file_path)
-        else:
-            try:
-                ##Insert record in typesense collection
-                content_chunk_map_record = {
-                    'id' :  id,
-                    'content_site_name' : self.content_site_name,
-                    'src_path' : self.src_path,
-                    'src_path_for_results' : self.src_path_for_results,
-                    'content_path' : content_path,
-                    'last_edit_date' : last_edit_date,
-                    'tags' : tags,
-                    'title' : title,
-                    'text_chunk' : text_chunk,
-                    'text_chunk_no' : text_chunk_no,
-                    'vector_embedding' : vector_embedding
-                }
-                self.vectorDbClient.collections['content_chunk_map'].documents.create(content_chunk_map_record)
-            except:
-                self.logger.error("Could not insert the record in typesense")
-                self.logger.error(json.dumps(content_chunk_map_record))
+            self.logger.error("Could not insert the record in typesense")
+            self.logger.error(json.dumps(content_chunk_map_record))
 
     def deleteAll(self):
         #delete all rows for the content_site_name 
@@ -151,4 +150,28 @@ class createVectorDb(vectorDb):
         except: 
             self.logger.error("Could not deleteAll for content_chunk_map")   
             self.logger.erro(json.dumps(search_parameters))
-            
+
+    def search(self,content_site_name,vector_embedding, limit_hits):
+        
+        vector_as_string = ','. join(str(e) for e in vector_embedding)
+        
+        search_requests = {
+                'searches': [
+                {
+                    'collection': 'content_chunk_map',
+                    'q' : '*',
+                    'vector_query': 'vector_embedding:([' + vector_as_string + '])',
+                },
+                ]
+            }
+        
+        common_search_params =  {
+                'per_page': limit_hits,
+                'limit_hits': limit_hits,
+                'exclude_fields': 'vector_embedding',
+                'filter_by': 'content_site_name:='  + content_site_name
+        }
+
+        search_results = self.vectorDbClient.multi_search.perform(search_requests, common_search_params)
+        return search_results
+

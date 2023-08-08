@@ -6,7 +6,7 @@ curr_dir = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(1, os.path.abspath(os.path.join(curr_dir, os.pardir)))
 
 sys.path.append("../base-classes")
-from aiwhisprBaseClasses import vectorDb, siteAuth
+from aiwhisprBaseClasses import vectorDb, siteAuth, baseLlmService
 
 sys.path.append("../common-objects")
 sys.path.append("../content-site")
@@ -23,7 +23,8 @@ def initialize(content_site_module:str,
                working_directory:str,
                index_log_directory:str,
                site_auth:siteAuth,
-               vector_db:vectorDb):
+               vector_db:vectorDb,
+               llm_service:baseLlmService):
         logger = logging.getLogger(__name__)
         #Dynamically import module and instantiate
         contentSiteMgr = import_module(content_site_module)
@@ -33,4 +34,5 @@ def initialize(content_site_module:str,
                                                   working_directory=working_directory,
                                                   index_log_directory=index_log_directory,
                                                   site_auth=site_auth,
-                                                  vector_db = vector_db)
+                                                  vector_db = vector_db,
+                                                  llm_service = llm_service)

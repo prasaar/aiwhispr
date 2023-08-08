@@ -16,6 +16,7 @@ from aiwhisprBaseClasses import vectorDb, siteAuth
 sys.path.append("../common-functions")
 import initializeContentSite
 import initializeVectorDb
+import initializeLlmService
 
 import logging
 logger = logging.getLogger(__name__)
@@ -41,35 +42,46 @@ def index(configfile):
     config =  configparser.ConfigParser(interpolation=None)
     config.read(configfile)
 
+    logger.info("Started indexing using config file")
     #Read the content site configs
     content_site_name = config.get('content-site','sitename')
     src_type = config.get('content-site','srctype')
     src_path = config.get('content-site','srcpath')
     src_path_for_results = config.get('content-site','displaypath')
     content_site_module = config.get('content-site','contentSiteModule')
-    logger.debug('Site Name is '+ content_site_name)
-    logger.debug('Site Source Type is '+ src_type)
-    logger.debug('Site Source Path is '+ src_path)
-    logger.debug('Site Source Display Path is '+ src_path_for_results)
-    logger.debug('Content Site Module is: %s', content_site_module)
+    logger.info('Site Name is '+ content_site_name)
+    logger.info('Site Source Type is '+ src_type)
+    logger.info('Site Source Path is '+ src_path)
+    logger.info('Site Source Display Path is '+ src_path_for_results)
+    logger.info('Content Site Module is: %s', content_site_module)
     #Read the vector database configs
     vectordb_hostname = config.get('vectordb', 'api-address')
     vectordb_portnumber = config.get('vectordb', 'api-port')
     vectordb_key = config.get('vectordb', 'api-key')
     #db-type can be typesense,qdrant 
     vectordb_module = config.get('vectordb','vectorDbModule')
-    logger.debug('VectorDB Server Host is ' + vectordb_hostname)
-    logger.debug('VectorDB Server Port is '+ vectordb_portnumber)
+    logger.info('VectorDB Server Host is ' + vectordb_hostname)
+    logger.info('VectorDB Server Port is '+ vectordb_portnumber)
     logger.debug('VectorDB Server Key is ' + vectordb_key)
-    logger.debug('VectorDB Module is '+ vectordb_module)
+    logger.info('VectorDB Module is '+ vectordb_module)
     
 
     #Read config for local working 
     working_directory = config.get('local','working-dir')
     index_log_directory = config.get('local','index-dir')
-    logger.debug('Local working directory  is '+working_directory)
-    logger.debug('Local index directory is '+index_log_directory)
- 
+    logger.info('Local working directory  is '+working_directory)
+    logger.info('Local index directory is '+index_log_directory)
+
+    #Read config for the LLM Service
+    model_family = config.get('llm-service', 'model-family')
+    model_name = config.get('llm-service', 'model-name')
+    llm_service_api_key = config.get('llm-service', 'llm-service-api-key')
+    llm_service_module = config.get('llm-service', 'llmServiceModule')
+    logger.info("LLM Model Family is %s", model_family)
+    logger.info("LLM Model Name is %s", model_name)
+    logger.debug("LLM Api Key is %s", llm_service_api_key)
+    logger.info("LLM Service Module Name is %s", llm_service_module)
+    
     #Read configs for the site-authentication
     #Source Type are the root directory hosting types from where we read the path/files
     #Source Tpe can be a filepath, azureblob, s3(aws)
@@ -152,6 +164,11 @@ def index(configfile):
                                              src_path = src_path, 
                                              src_path_for_results = src_path_for_results
                                              )
+    
+    llm_service = initializeLlmService.initialize(llm_service_module = llm_service_module, 
+                                                  model_family = model_family, 
+                                                  model_name = model_name,
+                                                  llm_service_api_key = llm_service_api_key)
                             
     #Initialize the content site handler. The returned oject is content site specific (azure, aws,filepath) handler
     contentSite = initializeContentSite.initialize(content_site_module=content_site_module,
@@ -162,7 +179,8 @@ def index(configfile):
                                                    working_directory=working_directory,
                                                    index_log_directory=index_log_directory,
                                                    site_auth=site_auth,
-                                                   vector_db = vector_db)
+                                                   vector_db = vector_db,
+                                                   llm_service = llm_service)
     
     contentSite.connect()
     contentSite.index()

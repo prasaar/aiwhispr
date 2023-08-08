@@ -21,6 +21,30 @@ import shutil
 sys.path.append("../common-functions")
 import aiwhisprConstants
 
+
+#BASE CLASS: baseLlmService
+class baseLlmService:
+    model_family:str
+    model_name:str
+
+    def __init__(self, model_family:str, model_name:str, llm_service_api_key:str):
+        model_family:str
+        model_name:str
+        llm_service_api_key:str
+        
+        self.model_family = model_family
+        self.model_name = model_name
+        self.llm_service_api_key = llm_service_api_key
+    
+    #public function
+    def connect(self):
+        pass
+
+    #public function
+    def encode(self,in_text:str):
+        pass
+
+
 #BASE CLASS: siteAuth
 #Support S3, Azureblob, filepath mounts
 #If you want to include other types of authentication then inherit from this class and you can process the cofigurations from kwargs
@@ -133,6 +157,7 @@ class srcContentSite:
     index_log_directory:str
     site_auth:siteAuth
     vector_db:vectorDb
+    llm_service:baseLlmService
     
 
     baseLogger = logging.getLogger(__name__)
@@ -149,7 +174,7 @@ class srcContentSite:
     #Common init signature
     #We have defined a common signature for bases and expect derived classes also to follow this signature.
     #the Derives classes are isntatiated dynamically so it's important we have a common signature.
-    def __init__(self, content_site_name:str, src_type:str, src_path:str, src_path_for_results:str, working_directory:str, index_log_directory:str, site_auth:siteAuth, vector_db:vectorDb ):
+    def __init__(self, content_site_name:str, src_type:str, src_path:str, src_path_for_results:str, working_directory:str, index_log_directory:str, site_auth:siteAuth, vector_db:vectorDb, llm_service:baseLlmService ):
         self.content_site_name = content_site_name
         self.src_type = src_type
         self.src_path = src_path
@@ -158,6 +183,7 @@ class srcContentSite:
         self.index_log_directory = index_log_directory
         self.site_auth = site_auth
         self.vector_db = vector_db
+        self.llm_service = llm_service
         
     #These operations shold be implemented is the sub(child) classes
     #public function
@@ -425,14 +451,6 @@ class srcDocProcessor:
 
 
 
-#BASE CLASS: baseLlmModel
-class baseLlmModel:
-    model_name:str
-    isApi:Boolean
-    isLibrary:Boolean
-
-    def __init__(self)
-        pass
 
 
 
