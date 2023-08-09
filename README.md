@@ -1,5 +1,7 @@
 # AIWhispr
 
+## Note : We are working on a release (Version:GoldenWattle) tested on AWS,Azure with some new features.This will be available on 13 Sep, 5 PM AEST.
+
 ## Overview
 AIWhispr is a semantic search engine that  
 - is easy to install,
