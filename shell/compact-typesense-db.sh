@@ -10,12 +10,12 @@ helpFunction()
    exit 1 # Exit script after printing help
 }
 
-while getopts "k:h:p:" opt
+while getopts "K:H:P:" opt
 do
    case "$opt" in
-      k ) key="$OPTARG" ;;
-      h ) hostname="$OPTARG" ;;
-      p ) portnumber="$OPTARG" ;;
+      K ) key="$OPTARG" ;;
+      H ) hostname="$OPTARG" ;;
+      P ) portnumber="$OPTARG" ;;
       ? ) helpFunction ;; # Print helpFunction in case parameter is non-existent
    esac
 done
