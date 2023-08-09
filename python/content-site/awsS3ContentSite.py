@@ -5,6 +5,9 @@ import io
 import uuid
 import sqlite3
 import boto3
+from botocore import UNSIGNED as botoUNSIGNED
+from botocore.client import Config as botoConfig
+
 from datetime import datetime, timedelta
 import pathlib
 import datetime
@@ -42,7 +45,11 @@ class createContentSite(srcContentSite):
        match self.site_auth.auth_type:
            case 'aws-key':
                self.logger.info('Connecting to AWS S3 using AWS KEY')
-               self.s3_client = boto3.client('s3', aws_access_key_id=self.site_auth.aws_access_key_id, aws_secret_access_key=self.site_auth.aws_secret_access_key)
+               if self.site_auth.aws_access_key_id == 'UNSIGNED':
+                   self.logger.info('Connecting to AWS S3 using UNSIGNED ACCESS')
+                   self.s3_client = boto3.client('s3',config=botoConfig(signature_version=botoUNSIGNED))   
+               else:
+                   self.s3_client = boto3.client('s3', aws_access_key_id=self.site_auth.aws_access_key_id, aws_secret_access_key=self.site_auth.aws_secret_access_key)
            case other:
                self.logger.error('No authentication provided for AWS S3 connection')
        #get handle to the local index map object
