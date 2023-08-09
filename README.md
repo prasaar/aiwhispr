@@ -43,21 +43,7 @@ api-key = <TYPESENSE_ADMIN_API_KEY>
 log-dir = /var/log/typesense
 ```
 
-Now change the data-dir and log-dir configurations to a separate directory which keeps aiwhispr
-Example , I created a seprate directories under (preferably under a high speed SSD based file mount in production) /aiwhispr-data/
-```
-data-dir = /aiwhispr-data/typesense
-log-dir = /aiwhispr-data/log/typesense
-```
-Also, store the <TYPESENSE_ADMIN_API_KEY> safely. You will need this later to setup the schema for the vector database.
-
-
-The below  3 commands will create the data and log directories before you start the type sense-server with the changed configuration.
-```
-sudo  mkdir /aiwhispr-data/typesense 
-sudo  mkdir /aiwhispr-data/log 
-sudo  mkdir /aiwhispr-data/log/typesense
-```
+Store the <TYPESENSE_ADMIN_API_KEY> safely. You will need this later to setup the schema for the vector database.
 
 Confirm that the typsesense-server is enabled
 ```
@@ -69,17 +55,6 @@ Restart the typsesense-server
 sudo systemctl  stop  typesense-server.service
 sudo systemctl  start typesense-server.service
 ```
-
-Check that typesense database directory structure is created , example:
-```
-ls -l /aiwhispr-data/typesense 
-```
-
-Check that typesense log file created , like
-```
-ls -l /aiwhispr-data/log/typesense 
-```
-
 Open the Typesense-Server port on Linux firewall if you have setup a seprate machine to host typesense-server.
 ```
 sudo ufw allow 8108
@@ -114,19 +89,19 @@ pip install spacy-language-detection
 pip install boto3 
 ```
 
-### shutil to copy local files,Document Reader which will extract text from different document types
+###shutil to copy local files,Document Reader which will extract text from different document types
 ```
 pip install shutil
 pip install pypdf
 pip install textract
 ```
 
-### LLM Model Libraries
+###LLM Model Libraries
 ```
 pip install -U sentence-transformers
 ```
 
-### Flask to run the searchService endpoint via a web interface
+###Flask to run the searchService endpoint via a web interface
 ```
 pip install flask
 ```
