@@ -35,34 +35,58 @@ class searchHandler:
    logger=logging.getLogger(__name__)
 
    def setup(self,llm_service_module:str, vectordb_module:str, model_family:str, model_name:str, llm_service_api_key:str, vectordb_hostname:str, vectordb_portnumber:str,vectordb_key:str, content_site_name:str,src_path:str,src_path_for_results:str):
-       llmServiceMgr = import_module(llm_service_module)
-       vectorDbMgr = import_module(vectordb_module)
+      llmServiceMgr = import_module(llm_service_module)
+      vectorDbMgr = import_module(vectordb_module)
 
-       self.vector_db = vectorDbMgr.createVectorDb(vectordb_hostname = vectordb_hostname,
-                                           vectordb_portnumber = vectordb_portnumber,
-                                           vectordb_key = vectordb_key,
-                                           content_site_name = content_site_name,
-                                           src_path = src_path,
-                                           src_path_for_results = src_path_for_results)
+      self.vector_db = vectorDbMgr.createVectorDb(vectordb_hostname = vectordb_hostname,
+                                          vectordb_portnumber = vectordb_portnumber,
+                                          vectordb_key = vectordb_key,
+                                          content_site_name = content_site_name,
+                                          src_path = src_path,
+                                          src_path_for_results = src_path_for_results)
 
-       self.vector_db.connect()
-       self.content_site_name = content_site_name
-       self.src_path = src_path
-       self.src_path_for_results = src_path_for_results
+      self.vector_db.connect()
+      self.content_site_name = content_site_name
+      self.src_path = src_path
+      self.src_path_for_results = src_path_for_results
 
-       self.model= llmServiceMgr.createLlmService(model_family = model_family,model_name = model_name, llm_service_api_key = llm_service_api_key )
-       self.model.connect()
+      self.model= llmServiceMgr.createLlmService(model_family = model_family,model_name = model_name, llm_service_api_key = llm_service_api_key )
+      self.model.connect()
 
    def search(self,input_query:str): 
-       self.logger.debug("get vector embedding for text:{%s}",input_query)
-       query_embedding_vector =  self.model.encode(input_query)
-       #query_embedding_vector_as_list = query_embedding_vector.tolist()
-       #vector_as_string = ' '. join(str(e) for e in query_embedding_vector_as_list)
-       query_embedding_vector_as_list = query_embedding_vector
-       vector_as_string = ' '. join(str(e) for e in query_embedding_vector_as_list)
-       self.logger.debug("vector embedding:{%s}",vector_as_string)
-       search_results = self.vector_db.search(self.content_site_name,query_embedding_vector_as_list, self.limit_hits)
-       print(search_results)
+      self.logger.debug("get vector embedding for text:{%s}",input_query)
+      query_embedding_vector =  self.model.encode(input_query)
+      #query_embedding_vector_as_list = query_embedding_vector.tolist()
+      #vector_as_string = ' '. join(str(e) for e in query_embedding_vector_as_list)
+      query_embedding_vector_as_list = query_embedding_vector
+      vector_as_string = ' '. join(str(e) for e in query_embedding_vector_as_list)
+      self.logger.debug("vector embedding:{%s}",vector_as_string)
+      search_results = self.vector_db.search(self.content_site_name,query_embedding_vector_as_list, self.limit_hits)
+
+      #print(search_results)
+
+      no_of_semantic_hits = search_results['results'][0]['found']
+      i = 0
+      display_html = ''
+      while i < no_of_semantic_hits:
+         chunk_map_record = search_results['results'][0]['hits'][i]['document']
+         record_id = chunk_map_record['id']
+         content_path = chunk_map_record['content_path']
+         display_url = chunk_map_record['src_path_for_results'] + '/' + chunk_map_record['content_path']
+         text_chunk = chunk_map_record['text_chunk']
+         if len(text_chunk) <= 200:
+            display_text_chunk = text_chunk
+         else:
+            display_text_chunk = text_chunk[:197] + '...'
+         
+         display_html = display_html + '<a href="' + display_url + '">' + content_path + '</a><br>'
+         display_html = display_html + '<div><p>' + display_text_chunk + '</p></div><br>'
+         i=i+1
+         
+      return display_html
+   
+           
+
 
 
 mySearchHandler = []
@@ -110,7 +134,7 @@ def semantic_search():
    else:
       input_query = request.args.get('query')
 
-   mySearchHandler[0].search(input_query)
+   return mySearchHandler[0].search(input_query)
 
 ### END OF FUNCTION SEARCH
 
