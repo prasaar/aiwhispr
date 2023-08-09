@@ -55,27 +55,32 @@ class searchHandler:
       self.model= llmServiceMgr.createLlmService(model_family = model_family,model_name = model_name, llm_service_api_key = llm_service_api_key )
       self.model.connect()
 
-   def search(self,input_query:str, result_format:str): 
+   def search(self,input_query:str, result_format:str, textsearch_flag:str): 
 
       output_format = result_format      
       self.logger.debug("result format: %s", result_format)
       if output_format not in ['html','json']:
-         self.logger.debug("cannot handle this result format type")
-      
+         self.logger.error("cannot handle this result format type")
+      if textsearch_flag not in ['Y', 'N']:
+         self.logger.error("text search flag should be a Y or N")
+
       self.logger.debug("get vector embedding for text:{%s}",input_query)
       query_embedding_vector =  self.model.encode(input_query)
       query_embedding_vector_as_list = query_embedding_vector
       vector_as_string = ' '. join(str(e) for e in query_embedding_vector_as_list)
       self.logger.debug("vector embedding:{%s}",vector_as_string)
-      search_results = self.vector_db.search(self.content_site_name,query_embedding_vector_as_list, self.limit_hits)
 
-      #print(search_results)
+      if textsearch_flag == 'Y':
+         search_results = self.vector_db.search(self.content_site_name,query_embedding_vector_as_list, self.limit_hits,input_query)
+      else:
+         search_results = self.vector_db.search(self.content_site_name,query_embedding_vector_as_list, self.limit_hits)
+      
+      
+      display_html = '<div class="aiwhisprSemanticSearchResults">'
+      display_json = []
 
       no_of_semantic_hits = search_results['results'][0]['found']
       i = 0
-      display_html = ''
-      display_json = []
-
       while i < no_of_semantic_hits:
          chunk_map_record = search_results['results'][0]['hits'][i]['document']
          content_site_name = chunk_map_record['content_site_name']
@@ -103,10 +108,53 @@ class searchHandler:
             json_record['src_path'] = src_path
             json_record['src_path_for_results'] = src_path_for_results
             json_record['text_chunk'] = text_chunk
+            json_record['search_type'] = 'semantic'
             ##Add this dict record in the list
             display_json.append(json_record)
       
          i = i + 1 
+      
+      display_html = display_html + '</div>'
+
+      if textsearch_flag == "Y": ## Process second batch of results which are from the text search
+         display_html = display_html + '<div class="aiwhisprTextSearchResults">'
+         
+         j = 0
+         no_of_text_hits = len(search_results['results'][1]['hits'])
+         
+         while j < no_of_text_hits:
+            chunk_map_record = search_results['results'][1]['hits'][j]['document']
+            content_site_name = chunk_map_record['content_site_name']
+            record_id = chunk_map_record['id']
+            content_path = chunk_map_record['content_path']
+            src_path = chunk_map_record['src_path']
+            src_path_for_results = chunk_map_record['src_path_for_results']
+            text_chunk = chunk_map_record['text_chunk']
+               
+            if output_format == 'html':
+               display_url = src_path_for_results + '/' + content_path
+               if len(text_chunk) <= 200:
+                  display_text_chunk = text_chunk
+               else:
+                  display_text_chunk = text_chunk[:197] + '...'
+               display_html = display_html + '<a href="' + display_url + '">' + content_path + '</a><br>'
+               display_html = display_html + '<div><p>' + display_text_chunk + '</p></div><br>'
+               
+            if output_format == 'json':
+               json_record = {} #Dict
+               json_record['content_path'] = content_path
+               json_record['id'] = record_id
+               json_record['content_site_name'] = content_site_name
+               json_record['src_path'] = src_path
+               json_record['src_path_for_results'] = src_path_for_results
+               json_record['text_chunk'] = text_chunk
+               json_record['search_type'] = 'text'
+               ##Add this dict record in the list
+               display_json.append(json_record)
+         
+            j = j + 1 
+         
+         display_html = display_html + '</div>'
 
       #Return based on result_format
       if output_format == 'json':
@@ -161,11 +209,20 @@ def semantic_search():
    if request.method == 'POST':
       input_query = request.form['query']
       result_format = request.form['resultformat']
+      textsearch_flag = request.form['withtextsearch']
    else:
       input_query = request.args.get('query')
       result_format = request.args.get('resultformat')
-      print("Result Format: " + result_format)
-   return mySearchHandler[0].search(input_query, result_format)
+      textsearch_flag = request.args.get('withtextsearch')
+
+   if result_format == None or len(result_format) == 0:
+      result_format = 'json' #Default
+   if textsearch_flag == None or len(textsearch_flag) == 0 or textsearch_flag == 'N' or textsearch_flag == "no" or textsearch_flag == "No":
+      textsearch_flag = 'N'
+   if textsearch_flag == 'Y' or textsearch_flag == "yes" or textsearch_flag == "Yes":
+      textsearch_flag = 'Y'
+   
+   return mySearchHandler[0].search(input_query, result_format, textsearch_flag)
 
 
 
