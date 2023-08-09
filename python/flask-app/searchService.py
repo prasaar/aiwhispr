@@ -1,3 +1,4 @@
+from unittest import result
 from flask import Flask,redirect, url_for, request
 import os
 import sys
@@ -24,6 +25,7 @@ from aiwhisprBaseClasses import baseLlmService, vectorDb
 
 import logging
 logging.basicConfig(level = logging.DEBUG,format = '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s')
+
 
 class searchHandler:
    model:baseLlmService
@@ -53,11 +55,15 @@ class searchHandler:
       self.model= llmServiceMgr.createLlmService(model_family = model_family,model_name = model_name, llm_service_api_key = llm_service_api_key )
       self.model.connect()
 
-   def search(self,input_query:str): 
+   def search(self,input_query:str, result_format:str): 
+
+      output_format = result_format      
+      self.logger.debug("result format: %s", result_format)
+      if output_format not in ['html','json']:
+         self.logger.debug("cannot handle this result format type")
+      
       self.logger.debug("get vector embedding for text:{%s}",input_query)
       query_embedding_vector =  self.model.encode(input_query)
-      #query_embedding_vector_as_list = query_embedding_vector.tolist()
-      #vector_as_string = ' '. join(str(e) for e in query_embedding_vector_as_list)
       query_embedding_vector_as_list = query_embedding_vector
       vector_as_string = ' '. join(str(e) for e in query_embedding_vector_as_list)
       self.logger.debug("vector embedding:{%s}",vector_as_string)
@@ -68,26 +74,47 @@ class searchHandler:
       no_of_semantic_hits = search_results['results'][0]['found']
       i = 0
       display_html = ''
+      display_json = []
+
       while i < no_of_semantic_hits:
          chunk_map_record = search_results['results'][0]['hits'][i]['document']
+         content_site_name = chunk_map_record['content_site_name']
          record_id = chunk_map_record['id']
          content_path = chunk_map_record['content_path']
-         display_url = chunk_map_record['src_path_for_results'] + '/' + chunk_map_record['content_path']
+         src_path = chunk_map_record['src_path']
+         src_path_for_results = chunk_map_record['src_path_for_results']
          text_chunk = chunk_map_record['text_chunk']
-         if len(text_chunk) <= 200:
-            display_text_chunk = text_chunk
-         else:
-            display_text_chunk = text_chunk[:197] + '...'
-         
-         display_html = display_html + '<a href="' + display_url + '">' + content_path + '</a><br>'
-         display_html = display_html + '<div><p>' + display_text_chunk + '</p></div><br>'
-         i=i+1
-         
-      return display_html
-   
+            
+
+         if output_format == 'html':
+            display_url = src_path_for_results + '/' + content_path
+            if len(text_chunk) <= 200:
+               display_text_chunk = text_chunk
+            else:
+               display_text_chunk = text_chunk[:197] + '...'
+            display_html = display_html + '<a href="' + display_url + '">' + content_path + '</a><br>'
+            display_html = display_html + '<div><p>' + display_text_chunk + '</p></div><br>'
+            
+         if output_format == 'json':
+            json_record = {} #Dict
+            json_record['content_path'] = content_path
+            json_record['id'] = record_id
+            json_record['content_site_name'] = content_site_name
+            json_record['src_path'] = src_path
+            json_record['src_path_for_results'] = src_path_for_results
+            json_record['text_chunk'] = text_chunk
+            ##Add this dict record in the list
+            display_json.append(json_record)
+      
+         i = i + 1 
+
+      #Return based on result_format
+      if output_format == 'json':
+         return { 'results': display_json} #Return as dict
+      else:
+         return display_html
            
-
-
+         
 
 mySearchHandler = []
 
@@ -129,12 +156,17 @@ def say_hello():
 #This is the search function that does a semantic vector search
 @app.route('/search',methods = ['POST', 'GET'])
 def semantic_search():
+
    if request.method == 'POST':
       input_query = request.form['query']
+      result_format = request.form['resultformat']
    else:
       input_query = request.args.get('query')
+      result_format = request.args.get('resultformat')
+      print("Result Format: " + result_format)
+   return mySearchHandler[0].search(input_query, result_format)
 
-   return mySearchHandler[0].search(input_query)
+
 
 ### END OF FUNCTION SEARCH
 
