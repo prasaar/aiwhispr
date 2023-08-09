@@ -114,10 +114,21 @@ pip install spacy-language-detection
 pip install boto3 
 ```
 
-### Document Reader which will extract text from different document types
+### shutil to copy local files,Document Reader which will extract text from different document types
 ```
+pip install shutil
 pip install pypdf
 pip install textract
+```
+
+### LLM Model Libraries
+```
+pip install -U sentence-transformers
+```
+
+### Flask to run the searchService endpoint via a web interface
+```
+pip install flask
 ```
 
 ##Environment variables
