@@ -123,7 +123,8 @@ def setup(argv):
     opts, args = getopt.getopt(argv,"hC:",["configfile="])
     for opt, arg in opts:
         if opt == '-h':
-            print('vectorEncodingService.py -C <vector_encoding_config_file>' )
+            print('This uses flask so provide full path to python3 for the python script and the config file in command line argument')
+            print('<full_directory_path>/searchService.py -C <vector_encoding_config_file>' )
             sys.exit()
         elif opt in ("-C", "--configfile"):
             configfile = arg
