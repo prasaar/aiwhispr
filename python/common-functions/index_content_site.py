@@ -14,6 +14,24 @@ from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient, generate_account_sas, ResourceTypes, AccountSasPermissions
 from datetime import datetime, timedelta
 
+aiwhispr_home =os.environ['AIWHISPR_HOME']
+aiwhispr_logging_level = os.environ['AIWHISPR_LOG_LEVEL']
+print("AIWHISPR_HOME=%s", aiwhispr_home)
+print("LOGGING_LEVEL", aiwhispr_logging_level)
+
+import logging
+
+if (aiwhispr_logging_level == "Debug" or aiwhispr_logging_level == "DEBUG"):
+   logging.basicConfig(level = logging.DEBUG,format = '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s')
+elif: (aiwhispr_logging_level == "Info" or aiwhispr_logging_level == "INFO"):
+   logging.basicConfig(level = logging.INFO,format = '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s')
+elif: (aiwhispr_logging_level == "Warning" or aiwhispr_logging_level == "WARNING"):
+   logging.basicConfig(level = logging.WARNING,format = '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s')
+elif: (aiwhispr_logging_level == "Error" or aiwhispr_logging_level == "ERROR"):
+   logging.basicConfig(level = logging.ERROR,format = '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s')
+else:   #DEFAULT logging level is DEBUG
+   logging.basicConfig(level = logging.DEBUG,format = '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s')
+
 curr_dir = os.path.dirname(os.path.realpath(__file__))
 os.chdir(curr_dir)
 os.getcwd()
@@ -21,9 +39,6 @@ sys.path.insert(1, os.path.abspath(os.path.join(curr_dir, os.pardir)))
 sys.path.append("../common-functions")
 import index_content_site_for_config
 
-import logging
-logging.basicConfig(level = logging.DEBUG,format = '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s')
-#logging.basicConfig(level = logging.CRITICAL,format = '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s')
 
 def main(argv):
    logger = logging.getLogger(__name__)
