@@ -32,6 +32,6 @@ then
 fi
 
 # Begin script in case all parameters are correct
-URL=http://"$hostname":"$portnumber"/search?query="$query"'&resultformat='$resultformat'&withtestsearch='$withtextsearch
+URL=http://"$hostname":"$portnumber"/aiwhispr?query="$query"'&resultformat='$resultformat'&withtextsearch='$withtextsearch
 echo $URL
 curl -sS  $URL
