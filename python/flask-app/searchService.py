@@ -177,16 +177,8 @@ class searchHandler:
 
 mySearchHandler = []
 
-def setup(argv):
-    configfile=''
-    opts, args = getopt.getopt(argv,"hC:",["configfile="])
-    for opt, arg in opts:
-        if opt == '-h':
-            print('This uses flask so provide full path to python3 for the python script and the config file in command line argument')
-            print('<full_directory_path>/searchService.py -C <vector_encoding_config_file>' )
-            sys.exit()
-        elif opt in ("-C", "--configfile"):
-            configfile = arg
+def setup(configfile):
+    
     #interpolation is set to None to allow reading special symbols like %
     config =  configparser.ConfigParser(interpolation=None)
     config.read(configfile)
@@ -240,7 +232,23 @@ def semantic_search():
 ### END OF FUNCTION SEARCH
 
 if __name__ == '__main__':
+   #The list based approach enabled pass be reference
    mySearchHandler.append(searchHandler())
-   setup(sys.argv[1:])
-   app.run(debug=True,host='127.0.0.1', port=5002)
+   
+   configfile=''
+   serviceportnumber=0
+
+   opts, args = getopt.getopt(sys.argv[1:],"hC:P:",["configfile=","serviceportnumber="])
+   for opt, arg in opts:
+      if opt == '-h':
+         print('This uses flask so provide full path to python3 for the python script and the config file in command line argument')
+         print('<full_directory_path>/searchService.py -C <config file of the content site> -P<flask port number on which this service should listen> ' )
+         sys.exit()
+      elif opt in ("-C", "--configfile"):
+         configfile = arg
+      elif opt in ("-P", "--serviceportnumber"):
+         serviceportnumber = int(arg)
+
+   setup(configfile)
+   app.run(debug=True,host='127.0.0.1', port=serviceportnumber)
 
