@@ -10,6 +10,7 @@ import logging
 import getopt
 import configparser
 from importlib import import_module
+import urllib.parse
 
 curr_dir = os.path.dirname(os.path.realpath(__file__))
 os.chdir(curr_dir)
@@ -92,7 +93,12 @@ class searchHandler:
             
 
          if output_format == 'html':
-            display_url = src_path_for_results + '/' + content_path
+            
+            if src_path_for_results[0:4] == 'http':
+               display_url = urllib.parse.quote(src_path_for_results + '/' + content_path)
+            else:
+               display_url = src_path_for_results + '/' + content_path
+
             if len(text_chunk) <= 200:
                display_text_chunk = text_chunk
             else:
@@ -132,7 +138,12 @@ class searchHandler:
             text_chunk = chunk_map_record['text_chunk']
                
             if output_format == 'html':
-               display_url = src_path_for_results + '/' + content_path
+
+               if src_path_for_results[0:4] == 'http':
+                  display_url = urllib.parse.quote(src_path_for_results + '/' + content_path)
+               else:
+                  display_url = src_path_for_results + '/' + content_path
+
                if len(text_chunk) <= 200:
                   display_text_chunk = text_chunk
                else:
