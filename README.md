@@ -86,11 +86,11 @@ llmServiceModule=libSbertLlmService
 This section is used to configure the source from which AIWhispr will read the files which have to be indexed. 
 sitename=<sets a unique name for this configuration, content indexing>
 
-srctype=<Can be filepath / s3 / azureblob. A filepath means a locally accessible directory path, s3 is for a AWS S3 bucket, azureblob is for a  Azure Blob container >
+srctype= <Can be filepath / s3 / azureblob. A filepath means a locally accessible directory path, s3 is for a AWS S3 bucket, azureblob is for a  Azure Blob container >
 
-srcpath=<path from which AIWhisper will start reading and indexing the content>
+srcpath = <path from which AIWhisper will start reading and indexing the content>
 
-displaypath=<top level path that AIWhispr will use when returning the search results. Example : you can save all you your files under /var/www/html ; when the search results are displayed on a browser the top level path is repalced with http://hostname >
+displaypath = <top level path that AIWhispr will use when returning the search results. Example : you can save all you your files under /var/www/html , when the search results are displayed, the top level path is replaced with http://hostname >
 
-contentSiteModule=<python module that handles indexing for files/content in the specified srctype.There are are test configuration examples in the same folder for s3 , azureblob.
+contentSiteModule = <python module that handles indexing for files/content in the specified srctype.There are are test configuration examples in the same folder for s3 , azureblob.
 
