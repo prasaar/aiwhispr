@@ -24,9 +24,23 @@ sys.path.append("../common-functions")
 sys.path.append("../common-objects")
 from aiwhisprBaseClasses import baseLlmService, vectorDb 
 
-import logging
-logging.basicConfig(level = logging.DEBUG,format = '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s')
+aiwhispr_home =os.environ['AIWHISPR_HOME']
+aiwhispr_logging_level = os.environ['AIWHISPR_LOG_LEVEL']
+print("AIWHISPR_HOME=%s", aiwhispr_home)
+print("LOGGING_LEVEL", aiwhispr_logging_level)
 
+import logging
+
+if (aiwhispr_logging_level == "Debug" or aiwhispr_logging_level == "DEBUG"):
+   logging.basicConfig(level = logging.DEBUG,format = '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s')
+elif (aiwhispr_logging_level == "Info" or aiwhispr_logging_level == "INFO"):
+   logging.basicConfig(level = logging.INFO,format = '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s')
+elif (aiwhispr_logging_level == "Warning" or aiwhispr_logging_level == "WARNING"):
+   logging.basicConfig(level = logging.WARNING,format = '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s')
+elif (aiwhispr_logging_level == "Error" or aiwhispr_logging_level == "ERROR"):
+   logging.basicConfig(level = logging.ERROR,format = '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s')
+else:   #DEFAULT logging level is DEBUG
+   logging.basicConfig(level = logging.DEBUG,format = '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s')
 
 class searchHandler:
    model:baseLlmService
@@ -203,10 +217,10 @@ app = Flask(__name__)
 
 @app.route('/')
 def say_hello():
-   return '<center>Welcome. Your local vector embedding service is up</center>'
+   return '<center>Welcome. Your local AIWhispr  service is up</center>'
 
 #This is the search function that does a semantic vector search
-@app.route('/search',methods = ['POST', 'GET'])
+@app.route('/aiwhispr',methods = ['POST', 'GET'])
 def semantic_search():
 
    if request.method == 'POST':

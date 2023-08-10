@@ -23,11 +23,11 @@ import logging
 
 if (aiwhispr_logging_level == "Debug" or aiwhispr_logging_level == "DEBUG"):
    logging.basicConfig(level = logging.DEBUG,format = '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s')
-elif: (aiwhispr_logging_level == "Info" or aiwhispr_logging_level == "INFO"):
+elif (aiwhispr_logging_level == "Info" or aiwhispr_logging_level == "INFO"):
    logging.basicConfig(level = logging.INFO,format = '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s')
-elif: (aiwhispr_logging_level == "Warning" or aiwhispr_logging_level == "WARNING"):
+elif (aiwhispr_logging_level == "Warning" or aiwhispr_logging_level == "WARNING"):
    logging.basicConfig(level = logging.WARNING,format = '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s')
-elif: (aiwhispr_logging_level == "Error" or aiwhispr_logging_level == "ERROR"):
+elif (aiwhispr_logging_level == "Error" or aiwhispr_logging_level == "ERROR"):
    logging.basicConfig(level = logging.ERROR,format = '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s')
 else:   #DEFAULT logging level is DEBUG
    logging.basicConfig(level = logging.DEBUG,format = '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s')
