@@ -90,7 +90,7 @@ srctype= <Can be filepath / s3 / azureblob. A filepath means a locally accessibl
 
 srcpath = <path from which AIWhisper will start reading and indexing the content>
 
-displaypath = <top level path that AIWhispr will use when returning the search results. Example : you can save all you your files under /var/www/html , when the search results are displayed, the top level path is replaced with http://hostname >
+displaypath = '<top level path that AIWhispr will use when returning the search results. Example : you can save all you your files under /var/www/html , when the search results are displayed, the top level path is replaced with http://hostname >'
 
-contentSiteModule = <python module that handles indexing for files/content in the specified srctype.There are are test configuration examples in the same folder for s3 , azureblob.
+contentSiteModule = <python module that handles indexing for files/content in the specified srctype.There are are test configuration examples in the same folder for s3 , azureblob>
 
