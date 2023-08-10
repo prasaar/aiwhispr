@@ -47,10 +47,10 @@ Setup AIWHISPR_LOG_LEVEL environment variable to  one of the following values: D
 If you dont provide AIWHISPR_LOG_LEVEL then the default is DEBUG
 
 
-## Your first configuration
+## Your first setup
 AIWhispr package comes with sample data, nginx configuration, index.html for nginx setup , python (flask) script to help you get started.
 
-1. Configuration 
+1. Configuration file
 
 A configuration file is maintained under $AIWHISPR_HOME/config/sites-available directory. You can use the example_bbc.filepath.cfg to try your first configuration. It has 4 sections inclduing [content-site],[content-site-auth], [vectordb], [local].
 ```
@@ -83,14 +83,57 @@ llmServiceModule=libSbertLlmService
 
 [content-site]
 
-This section is used to configure the source from which AIWhispr will read the files which have to be indexed. 
+Section to configure the source from which AIWhispr will read the files which have to be indexed. 
 sitename=<sets a unique name for this configuration, content indexing>
-
-srctype= <Can be filepath / s3 / azureblob. A filepath means a locally accessible directory path, s3 is for a AWS S3 bucket, azureblob is for a  Azure Blob container >
-
+```
+srctype= <Can be filepath / s3 / azureblob. A filepath means a locally accessible directory path, s3 is for a AWS S3 bucket, azureblob is for a  Azure Blob container.>
 srcpath = <path from which AIWhisper will start reading and indexing the content>
+displaypath = <top level path that AIWhispr will use when returning the search results. Example : you can save all you your files under /var/www/html , when the search results are displayed, the top level path is replaced with http://hostname >
+contentSiteModule = <python module that handles indexing for files/content in the specified srctype.There are are test configuration examples in the same folder for s3 , azureblob. You can extend the base class and write your custom handlers under $AIWHISPR_HOME/python/content-site>
+```
 
-displaypath = '<top level path that AIWhispr will use when returning the search results. Example : you can save all you your files under /var/www/html , when the search results are displayed, the top level path is replaced with http://hostname >'
+[content-site-auth]
+Section to configure access to the source from which files, content will be read.
 
-contentSiteModule = <python module that handles indexing for files/content in the specified srctype.There are are test configuration examples in the same folder for s3 , azureblob>
+```
+
+authtype=<Type of access / authentication. This can be filechecks / aws-key (for AWS Key authentication) / az-storage-key (for Azure Storage Key) / sas (for Azure SAS Token authenticatio)
+```
+
+Examples are available for AWS, Azure in the same directory.
+
+[vectordb]
+Section to configure the vector databaase access and the python module that will handle the storage schema, access.
+
+```
+api-address = <typesense-host-name>
+api-port = <typesense-port>
+api-key = <typesense-api-key>
+vectorDbModule=<python module to handle the vectordb storage schema. You can write your own handlers under $AIWHISPR_HOME/python/vectordb>
+```
+
+[local]
+AIWhispr requires a local working directory which is used to sotre the read files, extract text.The working-dir can be cleaned up after indexing.
+
+The index-dir configuration points to a path where AIWhispr will store a local SQLite3 database which is used when indexing the content. 
+
+Remember to change them from /tmp to a seprate folder in production.
+
+```
+working-dir=/tmp
+index-dir=/tmp
+```
+
+[llm-service]
+Section to configure the large-language-model (LLM) used to create the vector embedding. AIWhispr uses sentence-transformer library.
+You can customise this by writing your own LLM enciding handler under $AIWHISPR_HOME/python/llm-service
+
+The default configuration is:
+
+```
+model-family=sbert
+model-name=all-mpnet-base-v2
+llm-service-api-key=
+llmServiceModule=libSbertLlmService
+```
 
