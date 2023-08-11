@@ -43,9 +43,12 @@ pip3 install flask
 Setup the AIWHISPR_HOME_DIR environment variable as the fullpath to aiwhispr directory setup by git clone
 
 Setup AIWHISPR_LOG_LEVEL environment variable to  one of the following values: DEBUG / INFO / WARNING / ERROR
-
-If you dont provide AIWHISPR_LOG_LEVEL then the default is DEBUG
-
+```
+AIWHISPR_HOME=/<...>/aiwhispr
+AIWHISPR_LOG_LEVEL=DEBUG
+export AIWHISPR_HOME
+export AIWHISPR_LOG_LEVEL
+```
 
 ## Your first setup
 AIWhispr package comes with sample data, nginx configuration, index.html for nginx setup , python (flask) script to help you get started.
