@@ -1,10 +1,10 @@
 # AIWhispr
 
 ## Overview
-AIWhispr is a tool to enable  semantic search on documents 
-- It is easy to install,
-- Simple to cofigure
-- can ingest  multiple file types (txt,csv, pdf, docx,pptx, docx) from AWS S3, Azure Blob Containers, local directory path  
+AIWhispr is a tool to enable semantic search on documents 
+- It is easy to install.
+- Simple to configure.
+- Can handle multiple file formats (txt,csv, pdf, docx,pptx, docx) stored on AWS S3, Azure Blob Containers, local directory path.
 - Delivers fast semantic response to search queries,
 
 ## Contact
@@ -41,9 +41,9 @@ pip3 install uwsgi
 ```
 
 ### Environment variables
-Setup the AIWHISPR_HOME_DIR environment variable as the fullpath to aiwhispr directory setup by git clone
+AIWHISPR_HOME_DIR environment variable should be the fullpath to aiwhispr directory.
 
-Setup AIWHISPR_LOG_LEVEL environment variable to  one of the following values: DEBUG / INFO / WARNING / ERROR
+AIWHISPR_LOG_LEVEL environment variable cane be set to  DEBUG / INFO / WARNING / ERROR
 ```
 AIWHISPR_HOME=/<...>/aiwhispr
 AIWHISPR_LOG_LEVEL=DEBUG
@@ -51,7 +51,7 @@ export AIWHISPR_HOME
 export AIWHISPR_LOG_LEVEL
 ```
 
-**Setup the environment variables in your shell login script example .bashrc**
+**Remember to add the environment variables in your shell login script**
 
 ## Your first setup
 AIWhispr package comes with sample data, nginx configuration, index.html for nginx setup , python (flask) script to help you get started.
@@ -120,11 +120,11 @@ vectorDbModule=<python module to handle the vectordb storage schema. You can wri
 ```
 
 [local]
-AIWhispr requires a local working directory which is used to sotre the read files, extract text.The working-dir can be cleaned up after indexing.
+AIWhispr requires a local working directory which is used to extract text.The working-dir can be cleaned up after indexing.
 
 The index-dir configuration points to a path where AIWhispr will store a local SQLite3 database which is used when indexing the content. 
 
-Remember to change them from /tmp to a seprate folder in production.
+Remember to change them from /tmp to a separate folder in production.
 
 ```
 working-dir=/tmp
@@ -133,7 +133,7 @@ index-dir=/tmp
 
 [llm-service]
 Section to configure the large-language-model (LLM) used to create the vector embedding. AIWhispr uses sentence-transformer library.
-You can customise this by writing your own LLM enciding handler under $AIWHISPR_HOME/python/llm-service
+You can customise this by writing your own LLM encoding handler under $AIWHISPR_HOME/python/llm-service
 
 The default configuration is:
 
@@ -147,7 +147,7 @@ llmServiceModule=libSbertLlmService
 **2. Start Indexing**
 Confirm that the environment variables AIWHISPR_HOME and AIWHISPR_LOG_LEVEL are set and exported. 
 
-For your first run set AIWHISPR_LOG_LEVEL=DEBUG 
+Set AIWHISPR_LOG_LEVEL=DEBUG 
 
 The example assumes that you have setup the content files you want to index under /var/www/html (your webserver root)
 Copy the sample data
@@ -155,7 +155,7 @@ Copy the sample data
 cp -R $AIWHISPR_HOME/examples/data/bbc /var/www/html/
 ```
 
-Index the file content for smeantic search
+Index the file content for semantic search
 ```
 echo $AIWHISPR_HOME
 echo $AIWHISPR_LOG_LEVEL
@@ -164,9 +164,9 @@ $AIWHISPR_HOME/shell/start-indexing-content-site.sh -C $AIWHISPR_HOME/config/con
 **3. Configure nginx, html files, web service gateways**
 
 ###  Nginx config
-$AIWHIISPR_HOME/examples/nginx/aiwhispr-search.nginx.conf has an example of a nginx configuration to run this example
+$AIWHIISPR_HOME/examples/nginx/aiwhispr-search.nginx.conf is an example of a typical nginx configuration.
 
-Copy this file to /etc/nginx/sites-available and then edit it
+Copy this file to /etc/nginx/sites-available.
 ```
 cp $AIWHIISPR_HOME/examples/nginx/aiwhispr-search.nginx.conf /etc/nginx/sites-available/
 ```
@@ -275,11 +275,13 @@ uwsgi --ini $AIWHISPR_HOME/examples/nginx/uwsgi_aiwhispr.ini
 Try the search on http://<yourdomain/IP Address>
 
 Some examples of meaning drive search queries 
+
 "What are the top TV moments in Olympics"
 
 "Which is the best laptop to buy"
 
 "How is inflation impacting the economy"
 
+You can compare the semantic search results against text search results. 
 
 
