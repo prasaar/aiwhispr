@@ -104,11 +104,14 @@ class createContentSite(srcContentSite):
                         content_size = 0
                         content_index_flag = 'N'
 
+                    #content_path is the full path. We will remove the parent_path(src_path) from the content_path while storing in local index and vectordb schema.
+                    content_path_for_results = content_path.replace(self.src_path + '/','',1)
+
                     self.logger.debug("Insert Content Map Values:")
                     self.logger.debug(self.content_site_name)
                     self.logger.debug(self.src_path)
                     self.logger.debug(self.src_path_for_results)
-                    self.logger.debug(content_path)
+                    self.logger.debug(content_path_for_results)
                     self.logger.debug(content_type)
                     self.logger.debug( "%f", content_creation_date)
                     self.logger.debug( "%f", content_last_modified_date) 
@@ -127,7 +130,7 @@ class createContentSite(srcContentSite):
                     self.content_site_name, 
                     self.src_path, 
                     self.src_path_for_results, 
-                    content_path, 
+                    content_path_for_results, 
                     content_type, 
                     content_creation_date, 
                     content_last_modified_date, 
@@ -167,7 +170,7 @@ class createContentSite(srcContentSite):
                                 #Insert the meta data, text chunk, vector emebdding for text chunk in vectordb
                                 self.logger.debug("Inserting the record in vector database for id{%s}", id)
                                 self.vector_db.insert(id = id,
-                                                    content_path = content_path, 
+                                                    content_path = content_path_for_results, 
                                                     last_edit_date = content_last_modified_date, 
                                                     tags = content_tags_from_src, 
                                                     title = "", 
