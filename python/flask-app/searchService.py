@@ -23,6 +23,8 @@ sys.path.append("../vectordb")
 sys.path.append("../common-functions")
 sys.path.append("../common-objects")
 from aiwhisprBaseClasses import baseLlmService, vectorDb 
+import aiwhisprConstants
+
 
 aiwhispr_home =os.environ['AIWHISPR_HOME']
 aiwhispr_logging_level = os.environ['AIWHISPR_LOG_LEVEL']
@@ -116,10 +118,10 @@ class searchHandler:
                display_url = src_path_for_results + '/' + content_path
 
 
-            if len(text_chunk) <= 300:
+            if len(text_chunk) <= aiwhisprConstants.HTMLSRCHDSPLYCHARS:
                display_text_chunk = text_chunk
             else:
-               display_text_chunk = text_chunk[:297] + '...'
+               display_text_chunk = text_chunk[:(aiwhisprConstants.HTMLSRCHDSPLYCHARS -3)] + '...'
             display_html = display_html + '<a href="' + display_url + '">' + content_path + '</a><br>'
             display_html = display_html + '<div><p>' + display_text_chunk + '</p></div><br>'
             
@@ -163,10 +165,10 @@ class searchHandler:
                else:
                   display_url = src_path_for_results + '/' + content_path
 
-               if len(text_chunk) <= 300:
+               if len(text_chunk) <= aiwhisprConstants.HTMLSRCHDSPLYCHARS:
                   display_text_chunk = text_chunk
                else:
-                  display_text_chunk = text_chunk[:297] + '...'
+                  display_text_chunk = text_chunk[:(aiwhisprConstants.HTMLSRCHDSPLYCHARS -3)] + '...'
                display_html = display_html + '<a href="' + display_url + '">' + content_path + '</a><br>'
                display_html = display_html + '<div><p>' + display_text_chunk + '</p></div><br>'
                
