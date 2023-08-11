@@ -108,15 +108,18 @@ class searchHandler:
 
          if output_format == 'html':
             
-            if src_path_for_results[0:4] == 'http':
-               display_url = urllib.parse.quote(src_path_for_results + '/' + content_path)
+            if src_path_for_results[0:6] == 'https:':
+               display_url = 'https:' + urllib.parse.quote(src_path_for_results[6:] + '/' + content_path)
+            elif src_path_for_results[0:5] == 'http:':
+               display_url = 'http:' + urllib.parse.quote(src_path_for_results[5:] + '/' + content_path)
             else:
                display_url = src_path_for_results + '/' + content_path
 
-            if len(text_chunk) <= 200:
+
+            if len(text_chunk) <= 300:
                display_text_chunk = text_chunk
             else:
-               display_text_chunk = text_chunk[:197] + '...'
+               display_text_chunk = text_chunk[:297] + '...'
             display_html = display_html + '<a href="' + display_url + '">' + content_path + '</a><br>'
             display_html = display_html + '<div><p>' + display_text_chunk + '</p></div><br>'
             
@@ -153,15 +156,17 @@ class searchHandler:
                
             if output_format == 'html':
 
-               if src_path_for_results[0:4] == 'http':
-                  display_url = urllib.parse.quote(src_path_for_results + '/' + content_path)
+               if src_path_for_results[0:6] == 'https:':
+                  display_url = 'https:' + urllib.parse.quote(src_path_for_results[6:] + '/' + content_path)
+               elif src_path_for_results[0:5] == 'http:':
+                  display_url = 'http:' + urllib.parse.quote(src_path_for_results[5:] + '/' + content_path)
                else:
                   display_url = src_path_for_results + '/' + content_path
 
-               if len(text_chunk) <= 200:
+               if len(text_chunk) <= 300:
                   display_text_chunk = text_chunk
                else:
-                  display_text_chunk = text_chunk[:197] + '...'
+                  display_text_chunk = text_chunk[:297] + '...'
                display_html = display_html + '<a href="' + display_url + '">' + content_path + '</a><br>'
                display_html = display_html + '<div><p>' + display_text_chunk + '</p></div><br>'
                
