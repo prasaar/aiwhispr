@@ -276,7 +276,9 @@ Try the search on http://<yourdomain/IP Address>
 
 Some examples of meaning drive search queries 
 "What are the top TV moments in Olympics"
-"Which is the best klaptop to buy"
+
+"Which is the best laptop to buy"
+
 "How is inflation impacting the economy"
 
 
