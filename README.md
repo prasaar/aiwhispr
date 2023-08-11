@@ -50,16 +50,17 @@ If you dont provide AIWHISPR_LOG_LEVEL then the default is DEBUG
 ## Your first setup
 AIWhispr package comes with sample data, nginx configuration, index.html for nginx setup , python (flask) script to help you get started.
 
-1. Configuration file
+**1. Configuration file**
 
-A configuration file is maintained under $AIWHISPR_HOME/config/sites-available directory. You can use the example_bbc.filepath.cfg to try your first configuration. It has 4 sections inclduing [content-site],[content-site-auth], [vectordb], [local].
+A configuration file is maintained under $AIWHISPR_HOME/config/content-site/sites-available directory. You can use the example_bbc.filepath.cfg to try your first configuration.
 ```
 [content-site]
 sitename=example_bbc.filepath
 srctype=filepath
 #Assuming that you have copied the $AIWHISPR_HOME/examples under your Webserver's directory orconfigured routing
-srcpath=/var/www/html/examples/bbc
-displaypath=http://<hostname>/examples/bbc
+srcpath=/var/www/html/bbc
+#Remember to change the hostname
+displaypath=http://<hostname>/bbc
 #contentSiteClass is the module that will manage the content site
 contentSiteModule=filepathContentSite
 [content-site-auth]
@@ -137,3 +138,20 @@ llm-service-api-key=
 llmServiceModule=libSbertLlmService
 ```
 
+**2. Start Indexing**
+Confirm that the environment variables AIWHISPR_HOME and AIWHISPR_LOG_LEVEL are set and exported. 
+
+For your first run set AIWHISPR_LOG_LEVEL=DEBUG 
+
+The example assumes that you have setup the content files you want to index under /var/www/html (your webserver root)
+Copy the sample data
+```
+cp -R $AIWHISPR_HOME/examples/data/bbc /var/www/html/
+```
+
+Index the file content for smeantic search
+```
+echo $AIWHISPR_HOME
+echo $AIWHISPR_LOG_LEVEL
+$AIWHISPR_HOME/shell/start-indexing-content-site.sh -C $AIWHISPR_HOME/config/content-site/sites-available/example_bbc.filepath.cfg
+```
