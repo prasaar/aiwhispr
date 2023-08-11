@@ -219,12 +219,12 @@ cp $AIWHISPR_HOME/examples/nginx/index.html  /var/www/html/
 
 ```
 Edit index.html, replace your_domain with your server IP/hostname
-``
-<form action = "http://<your_domain>/search" method = "post">
-`` 
+```
+ <form action = "http://<your_domain>/search" method = "post">
+``` 
 
 Restart nginx
-````
+```
 sudo systemctl restart nginx
 ```
 
