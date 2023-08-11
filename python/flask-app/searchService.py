@@ -252,7 +252,7 @@ if __name__ == '__main__':
    configfile=''
    serviceportnumber=0
 
-   opts, args = getopt.getopt(sys.argv[1:],"hC:P:",["configfile=","serviceportnumber="])
+   opts, args = getopt.getopt(sys.argv[1:],"hC:H:P:",["configfile=","servicehostip==","serviceportnumber="])
    for opt, arg in opts:
       if opt == '-h':
          print('This uses flask so provide full path to python3 for the python script and the config file in command line argument')
@@ -260,9 +260,11 @@ if __name__ == '__main__':
          sys.exit()
       elif opt in ("-C", "--configfile"):
          configfile = arg
+      elif opt in ("-H", "--servicehostip"):
+         servicehostip = arg
       elif opt in ("-P", "--serviceportnumber"):
          serviceportnumber = int(arg)
 
    setup(configfile)
-   app.run(debug=True,host='127.0.0.1', port=serviceportnumber)
+   app.run(debug=True,host=servicehostip, port=serviceportnumber)
 
