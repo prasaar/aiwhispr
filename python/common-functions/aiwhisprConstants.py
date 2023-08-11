@@ -28,5 +28,7 @@ DOCPROCESSORMODULES={
     '.pptx':'aiwhisprMSpptxDocProcessor'
 }
 
+HTMLSRCHDSPLYCHARS=500
+
 #A list of all text file extension types. We will not do an extractText operation on them.
 #TXTFILEXTN = ['.txt', '.csv', '.py', '.js', '.php' , '.sh', '.c' , '.pl', '.cpp', '.cs', '.h', '.java', '.swift']
