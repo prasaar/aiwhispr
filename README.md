@@ -1,11 +1,11 @@
 # AIWhispr
 
 ## Overview
-AIWhispr is a tool to enable semantic search on documents 
+AIWhispr is a tool to enable AI powered semantic search on documents 
 - It is easy to install.
 - Simple to configure.
 - Can handle multiple file formats (txt,csv, pdf, docx,pptx, docx) stored on AWS S3, Azure Blob Containers, local directory path.
-- Delivers fast semantic response to search queries,
+- Delivers fast semantic response to search queries.
 
 ## Contact
 contact@aiwhispr.com
