@@ -34,7 +34,7 @@ pip3 install -U spacy
 python -m spacy download en_core_web_sm
 pip3 install spacy-language-detection
 pip3 install boto3 
-pip3 install shutil
+pip3 install pytest-shutil
 pip3 install pypdf
 pip3 install textract
 pip3 install -U sentence-transformers
