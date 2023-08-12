@@ -170,7 +170,7 @@ $AIWHIISPR_HOME/examples/nginx/aiwhispr-search.nginx.conf is an example of a typ
 
 Copy this file to /etc/nginx/sites-available.
 ```
-cp $AIWHIISPR_HOME/examples/nginx/aiwhispr-search.nginx.conf /etc/nginx/sites-available/
+cp $AIWHISPR_HOME/examples/nginx/aiwhispr-search.nginx.conf /etc/nginx/sites-available/
 ```
 Edit the server_name configuration to reflect your host ip/server name
 
