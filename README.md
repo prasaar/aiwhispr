@@ -43,9 +43,9 @@ pip3 install uwsgi
 ```
 
 ### Environment variables
-AIWHISPR_HOME_DIR environment variable should be the fullpath to aiwhispr directory.
+AIWHISPR_HOME_DIR environment variable should be the full path to aiwhispr directory.
 
-AIWHISPR_LOG_LEVEL environment variable cane be set to  DEBUG / INFO / WARNING / ERROR
+AIWHISPR_LOG_LEVEL environment variable can be set to  DEBUG / INFO / WARNING / ERROR
 ```
 AIWHISPR_HOME=/<...>/aiwhispr
 AIWHISPR_LOG_LEVEL=DEBUG
@@ -65,7 +65,7 @@ A configuration file is maintained under $AIWHISPR_HOME/config/content-site/site
 [content-site]
 sitename=example_bbc.filepath
 srctype=filepath
-#Assuming that you have copied the $AIWHISPR_HOME/examples under your Webserver's directory orconfigured routing
+#Assuming that you have copied the $AIWHISPR_HOME/examples/bbc under your Webserver's root directory
 srcpath=/var/www/html/bbc
 #Remember to change the hostname
 displaypath=http://<hostname>/bbc
@@ -80,7 +80,7 @@ api-port = <typesense-port>
 api-key = <typesense-api-key>
 vectorDbModule=typesenseVectorDb
 [local]
-##Remember to chenage them from /tmp to a seprate folder you have created for aiwhispr indexing 
+##Remember to change them from /tmp to a separate folder you have created for aiwhispr indexing 
 working-dir=/tmp
 index-dir=/tmp
 [llm-service]
@@ -95,10 +95,10 @@ llmServiceModule=libSbertLlmService
 Section to configure the source from which AIWhispr will read the files which have to be indexed. 
 sitename=<sets a unique name for this configuration, content indexing>
 ```
-srctype= <Can be filepath / s3 / azureblob. A filepath means a locally accessible directory path, s3 is for a AWS S3 bucket, azureblob is for a  Azure Blob container.>
+srctype= <Can be filepath / s3 / azureblob. A filepath means a locally accessible directory path, s3 is for an AWS S3 bucket, azureblob is for an Azure Blob container.>
 srcpath = <path from which AIWhisper will start reading and indexing the content>
-displaypath = <top level path that AIWhispr will use when returning the search results. Example : you can save all you your files under /var/www/html , when the search results are displayed, the top level path is replaced with http://hostname >
-contentSiteModule = <python module that handles indexing for files/content in the specified srctype.There are are test configuration examples in the same folder for s3 , azureblob. You can extend the base class and write your custom handlers under $AIWHISPR_HOME/python/content-site>
+displaypath = <top level path that AIWhispr will use when returning the search results. Example : you can save all your files under /var/www/html , when the search results are displayed, the top level path is replaced with http://hostname >
+contentSiteModule = <python module that handles indexing for files/content in the specified srctype.There are test configuration examples in the same folder for s3 , azureblob. You can extend the base class and write your custom handlers under $AIWHISPR_HOME/python/content-site>
 ```
 
 [content-site-auth]
@@ -106,13 +106,13 @@ Section to configure access to the source from which files, content will be read
 
 ```
 
-authtype=<Type of access / authentication. This can be filechecks / aws-key (for AWS Key authentication) / az-storage-key (for Azure Storage Key) / sas (for Azure SAS Token authenticatio)
+authtype=<Type of access / authentication. This can be filechecks / aws-key (for AWS Key authentication) / az-storage-key (for Azure Storage Key) / sas (for Azure SAS Token authentication)
 ```
 
 Examples are available for AWS, Azure in the same directory.
 
 [vectordb]
-Section to configure the vector databaase access and the python module that will handle the storage schema, access.
+Section to configure the vector database access and the python module that will handle the storage schema, access.
 
 ```
 api-address = <typesense-host-name>
@@ -122,7 +122,7 @@ vectorDbModule=<python module to handle the vectordb storage schema. You can wri
 ```
 
 [local]
-AIWhispr requires a local working directory which is used to extract text.The working-dir can be cleaned up after indexing.
+AIWhispr requires a local working directory that is used to extract text.The working-dir can be cleaned up after indexing.
 
 The index-dir configuration points to a path where AIWhispr will store a local SQLite3 database which is used when indexing the content. 
 
@@ -135,7 +135,7 @@ index-dir=/tmp
 
 [llm-service]
 Section to configure the large-language-model (LLM) used to create the vector embedding. AIWhispr uses sentence-transformer library.
-You can customise this by writing your own LLM encoding handler under $AIWHISPR_HOME/python/llm-service
+You can customize this by writing your own LLM encoding handler under $AIWHISPR_HOME/python/llm-service
 
 The default configuration is:
 
@@ -151,7 +151,7 @@ Confirm that the environment variables AIWHISPR_HOME and AIWHISPR_LOG_LEVEL are 
 
 Set AIWHISPR_LOG_LEVEL=DEBUG 
 
-The example assumes that you have setup the content files you want to index under /var/www/html (your webserver root)
+The example assumes that you have set up the content files you want to index under /var/www/html (your webserver root)
 Copy the sample data
 ```
 cp -R $AIWHISPR_HOME/examples/data/bbc /var/www/html/
@@ -166,7 +166,7 @@ $AIWHISPR_HOME/shell/start-indexing-content-site.sh -C $AIWHISPR_HOME/config/con
 **3. Configure nginx, html files, web service gateways**
 
 ###  Nginx config
-$AIWHIISPR_HOME/examples/nginx/aiwhispr-search.nginx.conf is an example of a typical nginx configuration.
+$AIWHISPR_HOME/examples/nginx/aiwhispr-search.nginx.conf is an example of a typical nginx configuration.
 
 Copy this file to /etc/nginx/sites-available.
 ```
@@ -197,7 +197,7 @@ server {
           try_files $uri $uri/ =404;
      }
 
-    #Route http://<domain?/search  through UWSGI to flash app
+    #Route http://<domain>/search  through UWSGI to flash app
     location /search {
         uwsgi_read_timeout 600s;
         uwsgi_send_timeout 600s;
