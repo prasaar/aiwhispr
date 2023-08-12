@@ -12,7 +12,7 @@ AIWhispr is a tool to enable AI powered semantic search on documents
 ## Contact
 contact@aiwhispr.com
 
-## Prerequisites 
+## Prerequisites for Mac OS Install 
 
 ### Download Typesense and install
 AIWhispr uses Typesense to store text, corresponding vector embeddings created by the LLM.
@@ -46,7 +46,7 @@ pip3 install azure-identity
 pip3 install boto3 
 ```
 
-Install python packages for the document->text extraction
+Install python packages for text extraction
 ```
 pip3 install pytest-shutil
 pip3 install pypdf
@@ -59,7 +59,7 @@ pip3 install flask
 pip3 install uwsgi
 ``` 
 
-wsgi installation could fail because anaconda3 installation default lib does not contain "libpython"
+pip wsgi installation could fail if you have  anaconda3 installed. Its default lib does not contain "libpython"
 You can create a soft link similar to below
 
 ```
@@ -83,19 +83,21 @@ export AIWHISPR_LOG_LEVEL
 **Remember to add the environment variables in your shell login script**
 
 ## Your first setup
-AIWhispr package comes with sample data, nginx configuration, index.html for nginx setup , python (flask) script to help you get started.
+AIWhispr package comes with sample data, nginx configuration, index.html for nginx setup , python (flask)and wsgi script to help you get started.
 
 **1. Configuration file**
 
-A configuration file is maintained under $AIWHISPR_HOME/config/content-site/sites-available directory. You can use the example_bbc.filepath.cfg to try your first configuration.
+A configuration file is maintained under $AIWHISPR_HOME/config/content-site/sites-available directory. 
+
+You can use the example_bbc.filepath.macos.cfg to try your first configuration.
 ```
 [content-site]
 sitename=example_bbc.filepath
 srctype=filepath
 #Assuming that you have copied the $AIWHISPR_HOME/examples/bbc under your Webserver's root directory
 srcpath=/opt/homebrew/var/www/bbc
-#Remember to change the hostname
-displaypath=http://<hostname>/bbc
+#Remember to change the hostname if it's internet facing
+displaypath=http://127.0.0.1:8080/bbc
 #contentSiteClass is the module that will manage the content site
 contentSiteModule=filepathContentSite
 [content-site-auth]
@@ -192,64 +194,64 @@ $AIWHISPR_HOME/shell/start-indexing-content-site.sh -C $AIWHISPR_HOME/config/con
 ```
 **3. Configure nginx, html files, web service gateways**
 
-###  Nginx config
-$AIWHISPR_HOME/examples/nginx/aiwhispr-search.nginx.conf is an example of a typical nginx configuration.
+###  Nginx config on Mac
 
-Copy this file to /etc/nginx/sites-available.
+Find the location on your nginx config file
 ```
-cp $AIWHISPR_HOME/examples/nginx/aiwhispr-search.nginx.conf /etc/nginx/sites-available/
+nginx -t
 ```
-Edit the server_name configuration to reflect your host ip/server name
 
-Add index.html as first option under index configuration
-
-Add the location configurations
-
+This should typically show
 ```
-server {
-    listen 80;
-    server_name domain.com www.domain.com;
+nginx: the configuration file /opt/homebrew/etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /opt/homebrew/etc/nginx/nginx.conf test is successful
+```
 
-    root /var/www/html;
+In MacOS nginx listens on the port number 8080.
 
-    # Add index.html 
-    index index.html index.htm index.nginx-debian.html;
+In the server section add the route for /search.
 
-    server_name _;
 
-    #location configurations
-    location / {
-        # First attempt to serve request as file, then
-        # as directory, then fall back to displaying a 404.
-          try_files $uri $uri/ =404;
-     }
+Example:
+```
+...
 
-    #Route http://<domain>/search  through UWSGI to flash app
+    server {
+        listen       8080;
+        server_name  localhost;
+
+        #charset koi8-r;
+
+        #access_log  logs/host.access.log  main;
+
+        location / {
+            root   html;
+            index  index.html index.htm;
+        }
+
+    #Route http://127.0.0.1:8080/search  through UWSGI to flash app
     location /search {
         uwsgi_read_timeout 600s;
         uwsgi_send_timeout 600s;
         include uwsgi_params;
         uwsgi_pass unix:/tmp/aiwhispr.sock;
     }
-}
-```
 
-Create a soft link under /etc/nginx/sites-enabled  and restart your nginx server
-```
-cd /etc/nginx/sites-enabled
-ln -s /etc/nginx/sites-available/aiwhispr-search.nginx.conf  ./aiwhispr-search.nginx.conf
-sudo systemctl restart nginx
+...
+
 ```
 
 ### HTML File (index.html)
-Copy the examples/index.html to Webserver root /var/www/html
+
+**(Please remember to take a backup of the existing index.html file)**
+Copy the examples/index.html to Webserver root /opt/homebrew/var/www/
 ```
-cp $AIWHISPR_HOME/examples/nginx/index.html  /var/www/html/ 
+cp $AIWHISPR_HOME/examples/nginx/index.html  /opt/homebrew/var/www/ 
 
 ```
-Edit index.html, replace your_domain with your server IP/hostname
+Edit index.html, replace your_domain with your server IP/hostname:8080
 ```
- <form action = "http://<your_domain>/search" method = "post">
+ <form action = "http://127.0.0.1:8080/search" method = "post">
 ``` 
 
 Restart nginx
@@ -260,7 +262,7 @@ sudo systemctl restart nginx
 Please note that your browser may have cached the original nginx results locally.
 You can test if the new index.html is served by nginx using curl
 ```
-curl http://<your_domain>
+curl http://127.0.0.1:8080
 ```
 It should return
 ```
@@ -281,7 +283,7 @@ It should return
       </div`>
     </p>
 </header>
-<form action = "http://<replaced with your domain>/search" method = "post">
+<form action = "http://127.0.0.1:8080/search" method = "post">
 ......       
 ......
 
@@ -296,8 +298,24 @@ $AIWHISPR_HOME/shell/start-search-service.sh -H 127.0.0.1 -P 5002 -C $AIWHISPR_H
 
 ###  Start the webServiceResponder example
 Start the example webServiceResponder that responds to search requests from your index.html GET/POST.
+If you are running this in a virtualenv then you will have to add --virtualenv /path_to_virtualenv
 ```
-uwsgi --ini $AIWHISPR_HOME/examples/nginx/uwsgi_aiwhispr.ini   
+OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
+export OBJC_DISABLE_INITIALIZE_FORK_SAFETY
+cd $AIWHISPR_HOME/examples/nginx
+uwsgi --ini $AIWHISPR_HOME/examples/nginx/uwsgi_aiwhispr.ini  [--virtualenv /path_to_virtualenv] 
+```
+
+If you are getting an error 
+
+```
+tried: '/System/Volumes/Preboot/Cryptexes/OS@rpath/libpcre.1.dylib' (no such file), '/usr/local/lib/libpcre.1.dylib' (no such file), '/usr/lib/libpcre.1.dylib' (no such file, not in dyld cache
+```
+then  add homebrew libary path to your library search path
+Example:
+```
+DYLD_LIBRARY_PATH=/opt/homebrew/lib
+export DYLD_LIBRARY_PATH
 ```
 
 ### Ready to go
