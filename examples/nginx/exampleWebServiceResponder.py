@@ -72,6 +72,7 @@ def semantic_search():
 ### END OF FUNCTION SEARCH MASFAQ
 
 if __name__ == '__main__':
-   #Start Flask App on default port 5000
-   app.run(debug=True,host='0.0.0.0')
+   #Start Flask App on port 5005
+   #Default port 5000 is used by another service in macOS
+   app.run(debug=True,host='0.0.0.0', port=5005)
 
