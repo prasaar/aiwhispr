@@ -273,8 +273,10 @@ $AIWHISPR_HOME/shell/start-search-service.sh -H 127.0.0.1 -P 5002 -C $AIWHISPR_H
 
 ###  Start the webServiceResponder example
 Start the example webServiceResponder that responds to search requests from your index.html GET/POST.
+If you are running this in a virtualenv then you will have to add --virtualenv /path_to_virtualenv as a uwsgi command line option
 ```
-uwsgi --ini $AIWHISPR_HOME/examples/nginx/uwsgi_aiwhispr.ini   
+cd $AIWHISPR_HOME/examples/nginx
+uwsgi --ini $AIWHISPR_HOME/examples/nginx/uwsgi_aiwhispr.ini  [--virtualenv /path_to_virtualenv]  
 ```
 
 ### Ready to go
