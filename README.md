@@ -7,6 +7,8 @@ AIWhispr is a tool to enable AI powered semantic search on documents
 - Can handle multiple file formats (txt,csv, pdf, docx,pptx, docx) stored on AWS S3, Azure Blob Containers, local directory path.
 - Delivers fast semantic response to search queries.
 
+![Alt Text](./resources/aiwhispr-example.gif)
+
 ## Contact
 contact@aiwhispr.com
 
