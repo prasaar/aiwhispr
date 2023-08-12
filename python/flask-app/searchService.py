@@ -111,10 +111,8 @@ class searchHandler:
 
          if output_format == 'html':
             
-            if src_path_for_results[0:6] == 'https:':
-               display_url = 'https:' + urllib.parse.quote(src_path_for_results[6:] + '/' + content_path)
-            elif src_path_for_results[0:5] == 'http:':
-               display_url = 'http:' + urllib.parse.quote(src_path_for_results[5:] + '/' + content_path)
+            if src_path_for_results[0:4] == 'http': 
+               display_url = urllib.parse.quote_plus(src_path_for_results,safe='/:')  + '/' + urllib.parse.quote(content_path)
             else:
                display_url = src_path_for_results + '/' + content_path
 
@@ -154,15 +152,14 @@ class searchHandler:
             record_id = chunk_map_record['id']
             content_path = chunk_map_record['content_path']
             src_path = chunk_map_record['src_path']
-            src_path_for_results = chunk_map_record['src_path_for_results']
+            #src_path_for_results = chunk_map_record['src_path_for_results']
+            src_path_for_results = self.src_path_for_results
             text_chunk = chunk_map_record['text_chunk']
                
             if output_format == 'html':
 
-               if src_path_for_results[0:6] == 'https:':
-                  display_url = 'https:' + urllib.parse.quote(src_path_for_results[6:] + '/' + content_path)
-               elif src_path_for_results[0:5] == 'http:':
-                  display_url = 'http:' + urllib.parse.quote(src_path_for_results[5:] + '/' + content_path)
+               if src_path_for_results[0:4] == 'http':
+                  display_url = urllib.parse.quote_plus(src_path_for_results,safe='/:')  + '/' + urllib.parse.quote(content_path)
                else:
                   display_url = src_path_for_results + '/' + content_path
 
