@@ -13,7 +13,7 @@ AIWhispr is a tool to enable AI powered semantic search on documents
 contact@aiwhispr.com
 
 ## Prerequisites 
-
+[For MacOS refer to README_MACOS.md](./README_MACOS.md)
 ### Download Typesense and install
 AIWhispr uses Typesense to store text, corresponding vector embeddings created by the LLM.
 A big Thanks!! to the Typesense team, community. You can follow the installation instructions - 
