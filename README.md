@@ -12,7 +12,7 @@ AIWhispr is a tool to enable AI powered semantic search on documents
 ## Contact
 contact@aiwhispr.com
 
-## Prerequisites 
+## Prerequisites for a Linux install
 [For MacOS refer to README_MACOS.md](./README_MACOS.md)
 ### Download Typesense and install
 AIWhispr uses Typesense to store text, corresponding vector embeddings created by the LLM.
@@ -26,18 +26,18 @@ You will need this later to configure the AIWhispr service.
 
 ### Python packages
 ```
-pip3 install typesense
-pip3 install azure-storage-blob 
-pip3 install azure-identity
 pip3 install -U pip setuptools wheel
 pip3 install -U spacy
 python -m spacy download en_core_web_sm
 pip3 install spacy-language-detection
+pip3 install -U sentence-transformers
+pip3 install typesense
+pip3 install azure-storage-blob 
+pip3 install azure-identity
 pip3 install boto3 
 pip3 install pytest-shutil
 pip3 install pypdf
 pip3 install textract
-pip3 install -U sentence-transformers
 pip3 install flask
 pip3 install uwsgi
 ```
@@ -60,15 +60,17 @@ AIWhispr package comes with sample data, nginx configuration, index.html for ngi
 
 **1. Configuration file**
 
-A configuration file is maintained under $AIWHISPR_HOME/config/content-site/sites-available directory. You can use the example_bbc.filepath.cfg to try your first configuration.
+A configuration file is maintained under $AIWHISPR_HOME/config/content-site/sites-available directory. 
+
+You can use the example_bbc.filepath.cfg to try your first configuration.
 ```
 [content-site]
 sitename=example_bbc.filepath
 srctype=filepath
 #Assuming that you have copied the $AIWHISPR_HOME/examples/bbc under your Webserver's root directory
 srcpath=/var/www/html/bbc
-#Remember to change the hostname
-displaypath=http://<hostname>/bbc
+#Remember to change the hostname if it's internet facing
+displaypath=http://127.0.0.1/bbc
 #contentSiteClass is the module that will manage the content site
 contentSiteModule=filepathContentSite
 [content-site-auth]
@@ -172,7 +174,7 @@ Copy this file to /etc/nginx/sites-available.
 ```
 cp $AIWHISPR_HOME/examples/nginx/aiwhispr-search.nginx.conf /etc/nginx/sites-available/
 ```
-Edit the server_name configuration to reflect your host ip/server name
+Edit the server_name configuration to reflect your host ip (e.g. 127.0.0.1) /host domain name for internet facing server
 
 Add index.html as first option under index configuration
 
@@ -215,6 +217,7 @@ sudo systemctl restart nginx
 ```
 
 ### HTML File (index.html)
+**(Please take a backup of your existing index.html file)**
 Copy the examples/index.html to Webserver root /var/www/html
 ```
 cp $AIWHISPR_HOME/examples/nginx/index.html  /var/www/html/ 
@@ -222,7 +225,7 @@ cp $AIWHISPR_HOME/examples/nginx/index.html  /var/www/html/
 ```
 Edit index.html, replace your_domain with your server IP/hostname
 ```
- <form action = "http://<your_domain>/search" method = "post">
+ <form action = "http://127.0.0.1/search" method = "post">
 ``` 
 
 Restart nginx
@@ -232,8 +235,9 @@ sudo systemctl restart nginx
 
 Please note that your browser may have cached the original nginx results locally.
 You can test if the new index.html is served by nginx using curl
+Example:
 ```
-curl http://<your_domain>
+curl http://127.0.0.1
 ```
 It should return
 ```
@@ -254,7 +258,7 @@ It should return
       </div`>
     </p>
 </header>
-<form action = "http://<replaced with your domain>/search" method = "post">
+<form action = "http://127.0.0.1/search" method = "post">
 ......       
 ......
 
