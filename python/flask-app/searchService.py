@@ -104,7 +104,8 @@ class searchHandler:
          record_id = chunk_map_record['id']
          content_path = chunk_map_record['content_path']
          src_path = chunk_map_record['src_path']
-         src_path_for_results = chunk_map_record['src_path_for_results']
+         #src_path_for_results = chunk_map_record['src_path_for_results']
+         src_path_for_results = self.src_path_for_results
          text_chunk = chunk_map_record['text_chunk']
             
 
