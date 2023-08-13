@@ -20,7 +20,7 @@ A big Thanks!! to the Typesense team, community. You can follow the installation
  
 https://typesense.org/docs/guide/install-typesense.html
 
-Store the "api-key" value from the typesense configuration file ( On MacOS /opt/homebrew/etc/typesense/typesense-server.ini )
+Store the "api-key" value from the typesense configuration file ( On MacOS /opt/homebrew/etc/typesense/typesense.ini )
 
 You will need this later to configure the AIWhispr service.
 
