@@ -293,7 +293,7 @@ It should return
 
 Start the AIWhispr search service on port 5002. 
 ```
-$AIWHISPR_HOME/shell/start-search-service.sh -H 127.0.0.1 -P 5002 -C $AIWHISPR_HOME/config/content-site/sites-available/example_bbc.filepath.cfg
+$AIWHISPR_HOME/shell/start-search-service.sh -H 127.0.0.1 -P 5002 -C $AIWHISPR_HOME/config/content-site/sites-available/example_bbc.filepath.macos.cfg
 ```
 
 ###  Start the webServiceResponder example
