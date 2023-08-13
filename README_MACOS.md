@@ -190,7 +190,7 @@ Index the file content for semantic search
 ```
 echo $AIWHISPR_HOME
 echo $AIWHISPR_LOG_LEVEL
-$AIWHISPR_HOME/shell/start-indexing-content-site.sh -C $AIWHISPR_HOME/config/content-site/sites-available/example_bbc.filepath.cfg
+$AIWHISPR_HOME/shell/start-indexing-content-site.sh -C $AIWHISPR_HOME/config/content-site/sites-available/example_bbc.filepath.macos.cfg
 ```
 **3. Configure nginx, html files, web service gateways**
 
