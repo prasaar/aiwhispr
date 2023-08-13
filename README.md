@@ -27,6 +27,17 @@ You will need this later to configure the AIWhispr service.
 cat /etc/typesense/typesense-server.ini | grep api
 ```
 
+### Environment variables
+AIWHISPR_HOME_DIR environment variable should be the full path to aiwhispr directory.
+
+AIWHISPR_LOG_LEVEL environment variable can be set to  DEBUG / INFO / WARNING / ERROR
+```
+AIWHISPR_HOME=/<...>/aiwhispr
+AIWHISPR_LOG_LEVEL=DEBUG
+export AIWHISPR_HOME
+export AIWHISPR_LOG_LEVEL
+```
+
 ### Python packages
 ```
 pip3 install -U pip setuptools wheel
@@ -43,17 +54,6 @@ pip3 install pypdf
 pip3 install textract
 pip3 install flask
 pip3 install uwsgi
-```
-
-### Environment variables
-AIWHISPR_HOME_DIR environment variable should be the full path to aiwhispr directory.
-
-AIWHISPR_LOG_LEVEL environment variable can be set to  DEBUG / INFO / WARNING / ERROR
-```
-AIWHISPR_HOME=/<...>/aiwhispr
-AIWHISPR_LOG_LEVEL=DEBUG
-export AIWHISPR_HOME
-export AIWHISPR_LOG_LEVEL
 ```
 
 **Remember to add the environment variables in your shell login script**
