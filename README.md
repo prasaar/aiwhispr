@@ -20,9 +20,12 @@ A big Thanks!! to the Typesense team, community. You can follow the installation
  
 https://typesense.org/docs/guide/install-typesense.html
 
-Store the "api-key" value from the typesense configuration file ( On unix /etc/typesense/typesense-server.ini )
+Note down the "api" values from the typesense configuration file typically at /etc/typesense/typesense-server.ini
 
 You will need this later to configure the AIWhispr service.
+```
+cat /etc/typesense/typesense-server.ini | grep api
+```
 
 ### Python packages
 ```
