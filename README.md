@@ -276,7 +276,7 @@ Start the AIWhispr search service on port 5002.
 
 The logs are redirected to /tmp/aiwhispr_search_service.log
 ```
-$AIWHISPR_HOME/shell/start-search-service.sh -H 127.0.0.1 -P 5002 -C $AIWHISPR_HOME/config/content-site/sites-available/example_bbc.filepath.cfg  &>> /tmp/aiwhispr_search_service.log
+$AIWHISPR_HOME/shell/start-search-service.sh -H 127.0.0.1 -P 5002 -C $AIWHISPR_HOME/config/content-site/sites-available/example_bbc.filepath.cfg  &>> /tmp/aiwhispr_search_service.log &
 ```
 
 ###  Start the webServiceResponder example
@@ -287,7 +287,7 @@ If you are running this in a virtualenv then you will have to add --virtualenv /
 The logs are redirected to /tmp/aiwhispr_webServiceResponder.log
 ```
 cd $AIWHISPR_HOME/examples/nginx
-uwsgi --ini $AIWHISPR_HOME/examples/nginx/uwsgi_aiwhispr.ini  [--virtualenv /path_to_virtualenv]   &>> /tmp/aiwhispr_webServiceResponder.log
+uwsgi --ini $AIWHISPR_HOME/examples/nginx/uwsgi_aiwhispr.ini  [--virtualenv /path_to_virtualenv]   &>> /tmp/aiwhispr_webServiceResponder.log &
 ```
 
 ### Ready to go
