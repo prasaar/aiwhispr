@@ -48,11 +48,21 @@ $AIWHISPR_HOME/shell/install_python_packages.sh
 ## Your first setup
 AIWhispr package comes with sample data, nginx configuration, index.html for nginx setup , python (flask) script to help you get started.
 
-**1. Configuration file**
+**1. Setup the example content(files) that you want to index and search**
+In this example the content files you want to index are setup under /var/www/html(nginx webserver root). 
+
+Copy the sample data under webserver root
+```
+cp -R $AIWHISPR_HOME/examples/data/bbc /var/www/html/
+```
+
+**2. Configuration file**
 
 A configuration file is maintained under $AIWHISPR_HOME/config/content-site/sites-available directory. 
 
-You can use the example_bbc.filepath.cfg to try your first configuration.
+You can use 
+
+$AIWHISPR_HOME/config/content-site/sites-available/example_bbc.filepath.cfg 
 ```
 [content-site]
 sitename=example_bbc.filepath
@@ -81,16 +91,16 @@ model-name=all-mpnet-base-v2
 llm-service-api-key=
 llmServiceModule=libSbertLlmService
 ```
-
 [content-site]
 
 Section to configure the source from which AIWhispr will read the files which have to be indexed. 
+```
 sitename=<sets a unique name for this configuration, content indexing>
 ```
-srctype= <Can be filepath / s3 / azureblob. A filepath means a locally accessible directory path, s3 is for an AWS S3 bucket, azureblob is for an Azure Blob container.>
-srcpath = <path from which AIWhisper will start reading and indexing the content>
-displaypath = <top level path that AIWhispr will use when returning the search results. Example : you can save all your files under /var/www/html , when the search results are displayed, the top level path is replaced with http://hostname >
-contentSiteModule = <python module that handles indexing for files/content in the specified srctype.There are test configuration examples in the same folder for s3 , azureblob. You can extend the base class and write your custom handlers under $AIWHISPR_HOME/python/content-site>
+srctype= <Can be filepath / s3 / azureblob. is for an Azure Blob container.(CONFIGURED)>
+srcpath = <path from which AIWhisper will start reading and indexing the content(EDIT)>
+displaypath = <top level path that AIWhispr will use when returning the search results. Example : you can save all your files under /var/www/html , when the search results are displayed, the top level path is replaced with http://hostname (EDIT)>
+contentSiteModule = <python module that handles indexing for files/content in the specified srctype.There are test configuration examples in the same folder for s3 , azureblob. You can extend the base class and write your custom handlers under $AIWHISPR_HOME/python/content-site(CONFIGURED)>
 ```
 
 [content-site-auth]
@@ -138,16 +148,11 @@ llm-service-api-key=
 llmServiceModule=libSbertLlmService
 ```
 
-**2. Start Indexing**
+**3. Start Indexing**
 Confirm that the environment variables AIWHISPR_HOME and AIWHISPR_LOG_LEVEL are set and exported. 
 
 Set AIWHISPR_LOG_LEVEL=DEBUG 
 
-The example assumes that you have set up the content files you want to index under /var/www/html (your webserver root)
-Copy the sample data
-```
-cp -R $AIWHISPR_HOME/examples/data/bbc /var/www/html/
-```
 
 Index the file content for semantic search
 ```
@@ -155,7 +160,7 @@ echo $AIWHISPR_HOME
 echo $AIWHISPR_LOG_LEVEL
 $AIWHISPR_HOME/shell/start-indexing-content-site.sh -C $AIWHISPR_HOME/config/content-site/sites-available/example_bbc.filepath.cfg
 ```
-**3. Configure nginx, html files, web service gateways**
+**4. Configure nginx, html files, web service gateways**
 
 ###  Nginx config
 $AIWHISPR_HOME/examples/nginx/aiwhispr-search.nginx.conf is an example of a typical nginx configuration.
