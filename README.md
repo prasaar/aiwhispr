@@ -49,6 +49,7 @@ $AIWHISPR_HOME/shell/install_python_packages.sh
 AIWhispr package comes with sample data, nginx configuration, index.html for nginx setup , python (flask) script to help you get started.
 
 **1. Setup the example content(files) that you want to index and search**
+
 In this example the content files you want to index are setup under /var/www/html(nginx webserver root). 
 
 Copy the sample data under webserver root
