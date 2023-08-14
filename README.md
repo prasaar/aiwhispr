@@ -188,7 +188,8 @@ Add the location configurations
 ```
 server {
     listen 80;
-    server_name domain.com www.domain.com;
+    #server_name domain.com www.domain.com;
+    server_name 127.0.0.1 ;
 
     root /var/www/html;
 
