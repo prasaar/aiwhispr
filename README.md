@@ -163,6 +163,8 @@ Set AIWHISPR_LOG_LEVEL=DEBUG
 Index the file content for semantic search.
 
 The logs are redirected to /tmp/aiwhispr_index_job.log
+
+This job takes some time becuase it ,sets up the LLM, has to index, create vector embeddings for over 2000 files.
 ```
 echo $AIWHISPR_HOME
 echo $AIWHISPR_LOG_LEVEL
