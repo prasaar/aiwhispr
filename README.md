@@ -97,7 +97,6 @@ llmServiceModule=libSbertLlmService
 Section to configure the source from which AIWhispr will read the files which have to be indexed. 
 ```
 sitename=<sets a unique name for this configuration, content indexing>
-```
 srctype= <Can be filepath / s3 / azureblob. is for an Azure Blob container.(CONFIGURED)>
 srcpath = <path from which AIWhisper will start reading and indexing the content(EDIT)>
 displaypath = <top level path that AIWhispr will use when returning the search results. Example : you can save all your files under /var/www/html , when the search results are displayed, the top level path is replaced with http://hostname (EDIT)>
