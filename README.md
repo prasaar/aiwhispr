@@ -14,6 +14,9 @@ contact@aiwhispr.com
 
 ## Prerequisites for a Linux install
 [For MacOS refer to README_MACOS.md](./README_MACOS.md)
+
+For Windows 10/11 you can follow the same instructions as below on wsl (Windows Subsystem for Linux) 
+
 ### Download Typesense and install
 AIWhispr uses Typesense to store text, corresponding vector embeddings created by the LLM.
 A big Thanks!! to the Typesense team, community. You can follow the installation instructions - 
