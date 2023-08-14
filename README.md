@@ -40,20 +40,7 @@ export AIWHISPR_LOG_LEVEL
 
 ### Python packages
 ```
-pip3 install -U pip setuptools wheel
-pip3 install -U spacy
-python -m spacy download en_core_web_sm
-pip3 install spacy-language-detection
-pip3 install -U sentence-transformers
-pip3 install typesense
-pip3 install azure-storage-blob 
-pip3 install azure-identity
-pip3 install boto3 
-pip3 install pytest-shutil
-pip3 install pypdf
-pip3 install textract
-pip3 install flask
-pip3 install uwsgi
+$AIWHISPR_HOME/shell/install_python_packages.sh
 ```
 
 **Remember to add the environment variables in your shell login script**
