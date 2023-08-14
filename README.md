@@ -64,6 +64,13 @@ A configuration file is maintained under $AIWHISPR_HOME/config/content-site/site
 You can use 
 
 $AIWHISPR_HOME/config/content-site/sites-available/example_bbc.filepath.cfg 
+
+The sections you have to edit typically include 
+
+[vectordb] to add the typesense api-address, api-port, api-key
+
+[econtent-site] if your nginx webserver root is different from /var/www/html , if your webserver is internet facing and listens and you have to provide the hostname for the displaypath configuration instead of 127.0.0.1
+
 ```
 [content-site]
 sitename=example_bbc.filepath
@@ -96,10 +103,10 @@ llmServiceModule=libSbertLlmService
 
 Section to configure the source from which AIWhispr will read the files which have to be indexed. 
 ```
-sitename=<sets a unique name for this configuration, content indexing>
+sitename=<sets a unique name for this configuration, content indexing(CONFIGURED)>
 srctype= <Can be filepath / s3 / azureblob. is for an Azure Blob container.(CONFIGURED)>
-srcpath = <path from which AIWhisper will start reading and indexing the content(EDIT)>
-displaypath = <top level path that AIWhispr will use when returning the search results. Example : you can save all your files under /var/www/html , when the search results are displayed, the top level path is replaced with http://hostname (EDIT)>
+srcpath = <path from which AIWhisper will start reading and indexing the content(CONFIGURED)>
+displaypath = <top level path that AIWhispr will use when returning the search results. Example : you can save all your files under /var/www/html , when the search results are displayed, the top level path is replaced with http://hostname (CONFIGURED FOR localhost)>
 contentSiteModule = <python module that handles indexing for files/content in the specified srctype.There are test configuration examples in the same folder for s3 , azureblob. You can extend the base class and write your custom handlers under $AIWHISPR_HOME/python/content-site(CONFIGURED)>
 ```
 
@@ -107,8 +114,7 @@ contentSiteModule = <python module that handles indexing for files/content in th
 Section to configure access to the source from which files, content will be read.
 
 ```
-
-authtype=<Type of access / authentication. This can be filechecks / aws-key (for AWS Key authentication) / az-storage-key (for Azure Storage Key) / sas (for Azure SAS Token authentication)
+authtype=<Type of authentication for reading the content files. This can be filechecks / aws-key / sas (Azure SAS Token)/ az-storage-key (CONFIGURED)>
 ```
 
 Examples are available for AWS, Azure in the same directory.
@@ -117,10 +123,10 @@ Examples are available for AWS, Azure in the same directory.
 Section to configure the vector database access and the python module that will handle the storage schema, access.
 
 ```
-api-address = <typesense-host-name>
-api-port = <typesense-port>
-api-key = <typesense-api-key>
-vectorDbModule=<python module to handle the vectordb storage schema. You can write your own handlers under $AIWHISPR_HOME/python/vectordb>
+api-address = <typesense-api-adress(EDIT)>
+api-port = <typesense-port(EDIT)>
+api-key = <typesense-api-key(EDIT)>
+vectorDbModule=<python module to handle the vectordb storage schema. You can write your own handlers under $AIWHISPR_HOME/python/vectordb(CONFIGURED)>
 ```
 
 [local]
