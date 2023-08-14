@@ -160,11 +160,13 @@ Confirm that the environment variables AIWHISPR_HOME and AIWHISPR_LOG_LEVEL are 
 Set AIWHISPR_LOG_LEVEL=DEBUG 
 
 
-Index the file content for semantic search
+Index the file content for semantic search.
+
+The logs are redirected to /tmp/aiwhispr_index_job.log
 ```
 echo $AIWHISPR_HOME
 echo $AIWHISPR_LOG_LEVEL
-$AIWHISPR_HOME/shell/start-indexing-content-site.sh -C $AIWHISPR_HOME/config/content-site/sites-available/example_bbc.filepath.cfg
+$AIWHISPR_HOME/shell/start-indexing-content-site.sh -C $AIWHISPR_HOME/config/content-site/sites-available/example_bbc.filepath.cfg &>> /tmp/aiwhispr_index_job.log
 ```
 **4. Configure nginx, html files, web service gateways**
 
@@ -268,16 +270,21 @@ It should return
 ###  Start the AIWhispr search service
 
 Start the AIWhispr search service on port 5002. 
+
+The logs are redirected to /tmp/aiwhispr_search_service.log
 ```
-$AIWHISPR_HOME/shell/start-search-service.sh -H 127.0.0.1 -P 5002 -C $AIWHISPR_HOME/config/content-site/sites-available/example_bbc.filepath.cfg
+$AIWHISPR_HOME/shell/start-search-service.sh -H 127.0.0.1 -P 5002 -C $AIWHISPR_HOME/config/content-site/sites-available/example_bbc.filepath.cfg  &>> /tmp/aiwhispr_search_service.log
 ```
 
 ###  Start the webServiceResponder example
 Start the example webServiceResponder that responds to search requests from your index.html GET/POST.
+
 If you are running this in a virtualenv then you will have to add --virtualenv /path_to_virtualenv as a uwsgi command line option
+
+The logs are redirected to /tmp/aiwhispr_webServiceResponder.log
 ```
 cd $AIWHISPR_HOME/examples/nginx
-uwsgi --ini $AIWHISPR_HOME/examples/nginx/uwsgi_aiwhispr.ini  [--virtualenv /path_to_virtualenv]  
+uwsgi --ini $AIWHISPR_HOME/examples/nginx/uwsgi_aiwhispr.ini  [--virtualenv /path_to_virtualenv]   &>> /tmp/aiwhispr_webServiceResponder.log
 ```
 
 ### Ready to go
