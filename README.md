@@ -69,7 +69,7 @@ The sections you have to edit typically include
 
 [vectordb] to add the typesense api-address, api-port, api-key
 
-[econtent-site] if your nginx webserver root is different from /var/www/html , if your webserver is internet facing and listens and you have to provide the hostname for the displaypath configuration instead of 127.0.0.1
+[content-site] - if your nginx webserver root is different from /var/www/html ; - if your webserver is internet facing you have to provide the hostname for the displaypath configuration instead of 127.0.0.1
 
 ```
 [content-site]
