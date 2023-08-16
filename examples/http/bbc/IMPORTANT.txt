@@ -1,0 +1,3 @@
+This dataset has been downloaded from Kaggle
+https://www.kaggle.com/datasets/shivamkushwaha/bbc-full-text-document-classification
+Please read the license, use the citation in README.txt
