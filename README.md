@@ -120,17 +120,6 @@ The log files for these 3 processes is created in /tmp/
 cd $AIWHISPR_HOME/examples/http; $AIWHISPR_HOME/examples/http/start_http_service.sh
 ```
 
-If you are getting an error
-```
-tried: '/System/Volumes/Preboot/Cryptexes/OS@rpath/libpcre.1.dylib' (no such file), '/usr/local/lib/libpcre.1.dylib' (no such file), '/usr/lib/libpcre.1.dylib' (no such file, not in dyld cache
-```
-then add homebrew libary path to your library search path
-Example:
-```
-DYLD_LIBRARY_PATH=/opt/homebrew/lib
-export DYLD_LIBRARY_PATH
-```
-
 ### Ready to go
 Try the search on http://127.0.0.1:9000/IP Address>
 
@@ -143,4 +132,69 @@ Some examples of meaning drive search queries
 "How is inflation impacting the economy"
 
 You can compare the semantic search results against text search results.
+
+## How can I access through an internet facing IP/host
+
+If you want to access the search site through an internet facing IP/host then then do the following changes
+
+**1. Edit the config file.**
+
+In file $AIWHISPR_HOME/config/content-site/sites-available/example_bbc.filepath.cfg
+
+edit displaypath  configuration
+
+From
+```
+displaypath=http://127.0.0.1:9000/bbc
+```
+
+To
+```
+displaypath=http://<Internet IP/domain>:9000/bbc 
+```
+
+**2. Edit the index.html file for the example**
+
+edit $AIWHISPR_HOME/examples/bbc/index.html 
+
+
+Edit index.html, replace 127.0.0.1  with your server IP/hostname
+
+From
+```
+ <form action = "http://127.0.0.1:9001/search" method = "post">
+```
+
+To
+```
+ <form action = "http://<Internet IP/host>:9001/search" method = "post">
+```
+
+**3. Open the firewall for ports 9000, 9001**
+
+```
+sudo ufw allow 9000
+sudo ufw allow 9001
+```
+On a cloud server, you might have to edit the firewall configs on your cloud providers portal too.
+
+For a secure approach using nginx installation, you can follow  [README_NGINX.md](./README_NGINX.md]
+
+**4. Kill the existing search service processes and restart**
+
+Find the existing processes and issue a kill command to stop them
+```
+ps -ef | grep searchService.py 
+
+ps -ef | grep exampleHttpResponder.py 
+
+ps -ef | grep 'python3 -m http.server 9000'
+```
+
+Restart the processes 
+
+```
+cd $AIWHISPR_HOME/examples/http; $AIWHISPR_HOME/examples/http/start_http_service.sh
+```
+
 
