@@ -14,6 +14,19 @@ contact@aiwhispr.com
 
 ## Prerequisites for Mac OS Install 
 
+### Environment variables
+AIWHISPR_HOME_DIR environment variable should be the full path to aiwhispr directory.
+
+AIWHISPR_LOG_LEVEL environment variable can be set to  DEBUG / INFO / WARNING / ERROR
+```
+AIWHISPR_HOME=/<...>/aiwhispr
+AIWHISPR_LOG_LEVEL=DEBUG
+export AIWHISPR_HOME
+export AIWHISPR_LOG_LEVEL
+```
+
+**Remember to add the environment variables in your shell login script**
+
 ### Download Typesense and install
 AIWhispr uses Typesense to store text, corresponding vector embeddings created by the LLM.
 A big Thanks!! to the Typesense team, community. You can follow the installation instructions - 
@@ -68,19 +81,6 @@ bash-3.2$ ln -s /Library/Frameworks/Python.framework/Versions/3.11/lib/python3.1
 ```
 then retry installing uwsgi python package
 
-
-### Environment variables
-AIWHISPR_HOME_DIR environment variable should be the full path to aiwhispr directory.
-
-AIWHISPR_LOG_LEVEL environment variable can be set to  DEBUG / INFO / WARNING / ERROR
-```
-AIWHISPR_HOME=/<...>/aiwhispr
-AIWHISPR_LOG_LEVEL=DEBUG
-export AIWHISPR_HOME
-export AIWHISPR_LOG_LEVEL
-```
-
-**Remember to add the environment variables in your shell login script**
 
 ## Your first setup
 AIWhispr package comes with sample data, nginx configuration, index.html for nginx setup , python (flask)and wsgi script to help you get started.
