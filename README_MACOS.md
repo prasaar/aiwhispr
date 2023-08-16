@@ -132,7 +132,7 @@ $AIWHISPR_HOME/shell/start-indexing-content-site.sh -C $AIWHISPR_HOME/config/con
 - a python http.server(port 9000)
 ```
 cd $AIWHISPR_HOME/examples/http
-$AIWHISPR_HOME/examples/http/start_search_service.sh
+$AIWHISPR_HOME/examples/http/start_http_service.sh
 ```
 
 If you are getting an error 
