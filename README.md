@@ -81,7 +81,7 @@ api-port= 8108
 api-key= xyz
 [local]
 working-dir=/Users/<username>/aiwhispr/examples/http/working-dir
-index-dir=/Users/arunprasad/python-venv/aiwhispr/examples/http/working-dir
+index-dir=/Users/<username>/python-venv/aiwhispr/examples/http/working-dir
 [llm-service]
 model-family=sbert
 model-name=all-mpnet-base-v2
@@ -155,7 +155,7 @@ displaypath=http://<Internet IP/domain>:9000/bbc
 
 **2. Edit the index.html file for the example**
 
-edit $AIWHISPR_HOME/examples/bbc/index.html 
+edit $AIWHISPR_HOME/examples/http/index.html 
 
 
 Edit index.html, replace 127.0.0.1  with your server IP/hostname

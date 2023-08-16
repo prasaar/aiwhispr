@@ -101,7 +101,7 @@ api-port= 8108
 api-key= xyz
 [local]
 working-dir=/Users/<username>/aiwhispr/examples/http/working-dir
-index-dir=/Users/arunprasad/python-venv/aiwhispr/examples/http/working-dir
+index-dir=/Users/<username>/python-venv/aiwhispr/examples/http/working-dir
 [llm-service]
 model-family=sbert
 model-name=all-mpnet-base-v2
