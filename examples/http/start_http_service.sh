@@ -33,16 +33,20 @@ fi
 
 echo "Start the search service"
 case "${machine}" in
-    Mac) (nohup $AIWHISPR_HOME/shell/start-search-service.sh -H 127.0.0.1 -P 5002 -C $AIWHISPR_HOME/config/content-site/sites-available/example_bbc.filepath.macos.cfg &> /tmp/example_bbc.searchservice.log &; echo $!);;
-    *) (nohup $AIWHISPR_HOME/shell/start-search-service.sh -H 127.0.0.1 -P 5002 -C $AIWHISPR_HOME/config/content-site/sites-available/example_bbc.filepath.cfg &> /tmp/example_bbc.searchservice.log &;echo $!);;
+    Mac) ($AIWHISPR_HOME/shell/start-search-service.sh -H 127.0.0.1 -P 5002 -C $AIWHISPR_HOME/config/content-site/sites-available/example_bbc.filepath.cfg &> /tmp/example_bbc.searchservice.log & );;
+    *) ($AIWHISPR_HOME/shell/start-search-service.sh -H 127.0.0.1 -P 5002 -C $AIWHISPR_HOME/config/content-site/sites-available/example_bbc.filepath.cfg &> /tmp/example_bbc.searchservice.log &);;
 esac
+
+ps -ef | grep "start-search-service.sh"
 
 echo
 echo "Start the exampleHttpResponder"
 cd $AIWHISPR_HOME/examples/http
-(python3 exampleHttpResponder.py &> /tmp/example_bbc.exampleHttpResponder.log &; echo $!);
+(python3 exampleHttpResponder.py &> /tmp/example_bbc.exampleHttpResponder.log &);
+ps -ef | grep "exampleHttpResponder.py"
 
 echo
 echo "Start a python HttpServer at port 9000"
 cd $AIWHISPR_HOME/examples/http
-(python3 -m http.server 9000 &> /tmp/example_bbc.httpServer.log &; echo $!);
+(python3 -m http.server 9000 &> /tmp/example_bbc.httpServer.log &);
+ps -ef | grep 'http.server'

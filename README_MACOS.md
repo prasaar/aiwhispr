@@ -130,9 +130,11 @@ $AIWHISPR_HOME/shell/start-indexing-content-site.sh -C $AIWHISPR_HOME/config/con
 - a flask python script(port:9001) that takes in user query , sends the query  to AIWhispr searchService and formats the results for HTML display
 
 - a python http.server(port 9000)
+
+The log files for these 3 processes is created in /tmp/
+
 ```
-cd $AIWHISPR_HOME/examples/http
-$AIWHISPR_HOME/examples/http/start_http_service.sh
+cd $AIWHISPR_HOME/examples/http; $AIWHISPR_HOME/examples/http/start_http_service.sh
 ```
 
 If you are getting an error 
