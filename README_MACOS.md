@@ -75,7 +75,7 @@ A configuration file is maintained under $AIWHISPR_HOME/config/content-site/site
 We will use the example under examples/http to create a config file to index over 2000+ files which contain BBC news content.
 To create the config file run the following commands. You can enter "N" and choose to go with the default values
 ```
-cd $AIWHISPR_HOME/example/http
+cd $AIWHISPR_HOME/examples/http
 ./configure_example_bbc.sh
 ``` 
 
