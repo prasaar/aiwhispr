@@ -17,6 +17,16 @@ contact@aiwhispr.com
 
 For Windows 10/11 you can follow the same instructions as below on wsl (Windows Subsystem for Linux) 
 
+### Environment variables
+AIWHISPR_HOME_DIR environment variable should be the full path to aiwhispr directory.
+
+AIWHISPR_LOG_LEVEL environment variable can be set to  DEBUG / INFO / WARNING / ERROR
+```
+AIWHISPR_HOME=/<...>/aiwhispr
+AIWHISPR_LOG_LEVEL=DEBUG
+export AIWHISPR_HOME
+export AIWHISPR_LOG_LEVEL
+```
 ### Download Typesense and install
 AIWhispr uses Typesense to store text, corresponding vector embeddings created by the LLM.
 A big Thanks!! to the Typesense team, community. You can follow the installation instructions - 
@@ -28,17 +38,6 @@ Note down the "api" values from the typesense configuration file typically at /e
 You will need this later to configure the AIWhispr service.
 ```
 cat /etc/typesense/typesense-server.ini | grep api
-```
-
-### Environment variables
-AIWHISPR_HOME_DIR environment variable should be the full path to aiwhispr directory.
-
-AIWHISPR_LOG_LEVEL environment variable can be set to  DEBUG / INFO / WARNING / ERROR
-```
-AIWHISPR_HOME=/<...>/aiwhispr
-AIWHISPR_LOG_LEVEL=DEBUG
-export AIWHISPR_HOME
-export AIWHISPR_LOG_LEVEL
 ```
 
 ### Python packages
@@ -54,13 +53,16 @@ $AIWHISPR_HOME/shell/install_python_packages.sh
 A configuration file is maintained under $AIWHISPR_HOME/config/content-site/sites-available
 
 We will use the example under examples/http to create a config file to index over 2000+ files which contain BBC news content.
-To create the config file run the following commands. You can enter "N" and choose to go with the default values
+
+To create the config file run the following commands. 
+
+You can enter "N" and choose to go with the default values
 ```
 cd $AIWHISPR_HOME/examples/http
 ./configure_example_bbc.sh
 ```
 
-It will display a config file
+It will finally display a config file that has been created.
 ```
 #### CONFIG FILE ####
 [content-site]
