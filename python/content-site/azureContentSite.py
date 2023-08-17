@@ -93,94 +93,104 @@ class createContentSite(srcContentSite):
             content_size = blob.size
             content_processed_status = "N"
 
-            if(content_file_suffix != None): 
-                if ( content_file_suffix in aiwhisprConstants.FILEXTNLIST ): 
+            #Check if the content_path should be read and does not trigger a do_not_read
+            contentShouldBeRead = True #Default
+            contentShouldBeRead = self.checkIfContentShouldBeRead(content_path)
+            if contentShouldBeRead == True:
+                self.logger.debug("checkIfContentShouldBeRead=True for %s", content_path)
+            else:
+                self.logger.info("checkIfContentShouldBeRead=False for %s", content_path)
+
+            if contentShouldBeRead == True:  
+
+                if(content_file_suffix != None): 
+                    if ( content_file_suffix in aiwhisprConstants.FILEXTNLIST ): 
+                        content_index_flag = 'Y'
+                if ( (content_index_flag == 'N') and (blob.content_settings.content_type != None) and ( blob.content_settings.content_type[:4] == 'text' ) ):
                     content_index_flag = 'Y'
-            if ( (content_index_flag == 'N') and (blob.content_settings.content_type != None) and ( blob.content_settings.content_type[:4] == 'text' ) ):
-                content_index_flag = 'Y'
 
-            #Decide if the file should be read
-            if content_file_suffix == None:
-                content_file_suffix = 'NONE'
-            if content_type == None:
-                content_type = 'NONE'
-            if content_uniq_id_src == None:
-                content_uniq_id_src = 'NONE'
-            if content_size == None:
-                content_size = 0
+                #Decide if the file should be read
+                if content_file_suffix == None:
+                    content_file_suffix = 'NONE'
+                if content_type == None:
+                    content_type = 'NONE'
+                if content_uniq_id_src == None:
+                    content_uniq_id_src = 'NONE'
+                if content_size == None:
+                    content_size = 0
 
-            self.logger.debug("Insert Content Map Values:")
-            self.logger.debug(self.content_site_name)
-            self.logger.debug(self.src_path)
-            self.logger.debug(self.src_path_for_results)
-            self.logger.debug(content_path)
-            self.logger.debug(content_type)
-            self.logger.debug( str( content_creation_date.timestamp() ))
-            self.logger.debug( str(content_last_modified_date.timestamp() ))
-            self.logger.debug(content_uniq_id_src)
-            self.logger.debug(content_tags_from_src)
-            self.logger.debug(str(content_size))
-            self.logger.debug(content_file_suffix)
-            self.logger.debug(content_index_flag)
-            self.logger.debug(content_processed_status)
+                self.logger.debug("Insert Content Map Values:")
+                self.logger.debug(self.content_site_name)
+                self.logger.debug(self.src_path)
+                self.logger.debug(self.src_path_for_results)
+                self.logger.debug(content_path)
+                self.logger.debug(content_type)
+                self.logger.debug( str( content_creation_date.timestamp() ))
+                self.logger.debug( str(content_last_modified_date.timestamp() ))
+                self.logger.debug(content_uniq_id_src)
+                self.logger.debug(content_tags_from_src)
+                self.logger.debug(str(content_size))
+                self.logger.debug(content_file_suffix)
+                self.logger.debug(content_index_flag)
+                self.logger.debug(content_processed_status)
 
-            rsync_status = 'I'
-            self.logger.debug(rsync_status)
+                rsync_status = 'I'
+                self.logger.debug(rsync_status)
 
-            self.local_index.insert(
-            self.content_site_name, 
-            self.src_path, 
-            self.src_path_for_results, 
-            content_path, 
-            content_type, 
-            content_creation_date.timestamp(), 
-            content_last_modified_date.timestamp(), 
-            content_uniq_id_src, 
-            content_tags_from_src, 
-            content_size, 
-            content_file_suffix, 
-            content_index_flag, 
-            content_processed_status,
-            rsync_status
-            )
+                self.local_index.insert(
+                self.content_site_name, 
+                self.src_path, 
+                self.src_path_for_results, 
+                content_path, 
+                content_type, 
+                content_creation_date.timestamp(), 
+                content_last_modified_date.timestamp(), 
+                content_uniq_id_src, 
+                content_tags_from_src, 
+                content_size, 
+                content_file_suffix, 
+                content_index_flag, 
+                content_processed_status,
+                rsync_status
+                )
 
-            if content_index_flag == 'Y':
-                #Download the file
-                download_file_path = self.getDownloadPath(content_path)
-                self.logger.debug('Downloaded File Name: ' + download_file_path)
-                self.downloader.download_blob_to_file(self.blob_service_client, self.container_name, content_path, download_file_path) 
-                docProcessor =  initializeDocumentProcessor.initialize(content_file_suffix,download_file_path)
+                if content_index_flag == 'Y':
+                    #Download the file
+                    download_file_path = self.getDownloadPath(content_path)
+                    self.logger.debug('Downloaded File Name: ' + download_file_path)
+                    self.downloader.download_blob_to_file(self.blob_service_client, self.container_name, content_path, download_file_path) 
+                    docProcessor =  initializeDocumentProcessor.initialize(content_file_suffix,download_file_path)
 
-                if ( docProcessor != None ):
-                    #Extract text
-                    docProcessor.extractText()
-                    #Create text chunks
-                    chunk_id_dict = docProcessor.createChunks()
-                    self.logger.debug("%d chunks created for %s", len(chunk_id_dict), download_file_path)
-                    #For each chunk, read text, create vector embedding and insert in vectordb
-                    for id in chunk_id_dict.keys():
-                        text_chunk_no = chunk_id_dict[id]
-                        self.logger.debug("id:{%s} text_chunk_no:{%d}", id, text_chunk_no)
-                        #Now encode the text chunk. id is the file path to the text chunk
-                        text_f = open(id)
-                        text_chunk_read = text_f.read()
-                        vec_emb = self.llm_service.encode(text_chunk_read)
-                        self.logger.debug("Vector encoding dimension is {%d}", len(vec_emb))
-                        text_f.close()
+                    if ( docProcessor != None ):
+                        #Extract text
+                        docProcessor.extractText()
+                        #Create text chunks
+                        chunk_id_dict = docProcessor.createChunks()
+                        self.logger.debug("%d chunks created for %s", len(chunk_id_dict), download_file_path)
+                        #For each chunk, read text, create vector embedding and insert in vectordb
+                        for id in chunk_id_dict.keys():
+                            text_chunk_no = chunk_id_dict[id]
+                            self.logger.debug("id:{%s} text_chunk_no:{%d}", id, text_chunk_no)
+                            #Now encode the text chunk. id is the file path to the text chunk
+                            text_f = open(id)
+                            text_chunk_read = text_f.read()
+                            vec_emb = self.llm_service.encode(text_chunk_read)
+                            self.logger.debug("Vector encoding dimension is {%d}", len(vec_emb))
+                            text_f.close()
 
-                        #Insert the meta data, text chunk, vector emebdding for text chunk in vectordb
-                        self.logger.debug("Inserting the record in vector database for id{%s}", id)
-                        self.vector_db.insert(id = id,
-                                                content_path = content_path, 
-                                                last_edit_date = content_last_modified_date.timestamp() , 
-                                                tags = content_tags_from_src, 
-                                                title = "", 
-                                                text_chunk = text_chunk_read, 
-                                                text_chunk_no = text_chunk_no, 
-                                                vector_embedding = vec_emb)
-                
-                else:
-                    self.logger.debug('Content Index Flag was "Y" but we did not get a valid document processor')
-        
+                            #Insert the meta data, text chunk, vector emebdding for text chunk in vectordb
+                            self.logger.debug("Inserting the record in vector database for id{%s}", id)
+                            self.vector_db.insert(id = id,
+                                                    content_path = content_path, 
+                                                    last_edit_date = content_last_modified_date.timestamp() , 
+                                                    tags = content_tags_from_src, 
+                                                    title = "", 
+                                                    text_chunk = text_chunk_read, 
+                                                    text_chunk_no = text_chunk_no, 
+                                                    vector_embedding = vec_emb)
+                    
+                    else:
+                        self.logger.debug('Content Index Flag was "Y" but we did not get a valid document processor')
+            
         contentrows = self.local_index.getContentProcessedStatus("N") 
         self.logger.debug("Total Number of rows in ContentIndex with ProcessedStatus = N:" + str( len(contentrows)) )
