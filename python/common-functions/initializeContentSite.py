@@ -24,7 +24,9 @@ def initialize(content_site_module:str,
                index_log_directory:str,
                site_auth:siteAuth,
                vector_db:vectorDb,
-               llm_service:baseLlmService):
+               llm_service:baseLlmService,
+               do_not_read_dir_list:list = [], 
+               do_not_read_file_list:list = []):
         logger = logging.getLogger(__name__)
         #Dynamically import module and instantiate
         contentSiteMgr = import_module(content_site_module)
@@ -35,4 +37,6 @@ def initialize(content_site_module:str,
                                                   index_log_directory=index_log_directory,
                                                   site_auth=site_auth,
                                                   vector_db = vector_db,
-                                                  llm_service = llm_service)
+                                                  llm_service = llm_service,
+                                                  do_not_read_dir_list=do_not_read_dir_list,
+                                                  do_not_read_file_list=do_not_read_file_list)

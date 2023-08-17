@@ -49,11 +49,46 @@ def index(configfile):
     src_path = config.get('content-site','srcpath')
     src_path_for_results = config.get('content-site','displaypath')
     content_site_module = config.get('content-site','contentSiteModule')
+    
+    doNotReadDirList = ''
+    doNotReadFileList = ''
+    
+    try:
+        doNotReadDirList = config.get('content-site','doNotReadDirList')  #Make it easy to skip directories : a comma separated list of directories not to read
+    except configparser.NoOptionError as exc:
+        logger.info("doNotReadDirList option not defined")
+        doNotReadDirList = ''
+    except:
+        logger.error("Problem when reading doNotReadDirList option from config file")
+        doNotReadDirList = ''
+
+    try:
+        doNotReadFileList = config.get('content-site','doNotReadFileList')#Make it easy to skip filename patters: a comma separated list of filename pattern not to read
+    except configparser.NoOptionError as exc:
+        logger.info("doNotReadFileList option not defined")
+        doNotReadFileList = ''
+    except:
+        logger.error("Problem when reading doNotReadFileList option from config file")
+        doNotReadFileList = ''
+
+    do_not_read_dir_list=[]
+    do_not_read_file_list = []
+
+    if len(doNotReadDirList) > 0:
+        for d in doNotReadDirList.split(','):
+            do_not_read_dir_list.append(d)
+    if len(doNotReadFileList) > 0:
+        for pattern_str in doNotReadFileList.split(','):
+            do_not_read_file_list.append(pattern_str)
+
     logger.info('Site Name is '+ content_site_name)
     logger.info('Site Source Type is '+ src_type)
     logger.info('Site Source Path is '+ src_path)
     logger.info('Site Source Display Path is '+ src_path_for_results)
     logger.info('Content Site Module is: %s', content_site_module)
+    logger.info('doNotReadDirList is %s', doNotReadDirList)
+    logger.info('doNotReadFileList is %s', doNotReadFileList)
+
     #Read the vector database configs
     vectordb_hostname = config.get('vectordb', 'api-address')
     vectordb_portnumber = config.get('vectordb', 'api-port')
@@ -180,7 +215,9 @@ def index(configfile):
                                                    index_log_directory=index_log_directory,
                                                    site_auth=site_auth,
                                                    vector_db = vector_db,
-                                                   llm_service = llm_service)
+                                                   llm_service = llm_service,
+                                                   do_not_read_dir_list = do_not_read_dir_list,
+                                                   do_not_read_file_list = do_not_read_file_list)
     
     contentSite.connect()
     contentSite.index()

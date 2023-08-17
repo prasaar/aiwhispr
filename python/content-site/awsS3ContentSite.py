@@ -32,8 +32,8 @@ class createContentSite(srcContentSite):
             
     downloader:awsS3Downloader
 
-    def __init__(self,content_site_name:str,src_path:str,src_path_for_results:str,working_directory:str,index_log_directory:str,site_auth:siteAuth,vector_db:vectorDb,llm_service:baseLlmService):
-       srcContentSite.__init__(self,content_site_name=content_site_name,src_type="s3",src_path=src_path,src_path_for_results=src_path_for_results,working_directory=working_directory,index_log_directory=index_log_directory,site_auth=site_auth,vector_db=vector_db, llm_service = llm_service)
+    def __init__(self,content_site_name:str,src_path:str,src_path_for_results:str,working_directory:str,index_log_directory:str,site_auth:siteAuth,vector_db:vectorDb,llm_service:baseLlmService, do_not_read_dir_list:list = [], do_not_read_file_list:list = []):
+       srcContentSite.__init__(self,content_site_name=content_site_name,src_type="s3",src_path=src_path,src_path_for_results=src_path_for_results,working_directory=working_directory,index_log_directory=index_log_directory,site_auth=site_auth,vector_db=vector_db, llm_service = llm_service, do_not_read_dir_list=do_not_read_dir_list,do_not_read_file_list=do_not_read_file_list)
        self.s3_bucket_name = src_path.split('/')[2]
        self.downloader = awsS3Downloader()
        self.logger = logging.getLogger(__name__)
@@ -121,91 +121,100 @@ class createContentSite(srcContentSite):
                 content_size = bucket_object['Size']
                 content_processed_status = "N"
 
-                #Decide if the file should be read
-                if(content_file_suffix != None): 
-                    if ( content_file_suffix in aiwhisprConstants.FILEXTNLIST ): 
-                        content_index_flag = 'Y'
+                #Check if the content_path should be read and does not trigger a do_not_read
+                contentShouldBeRead = True #Default
+                contentShouldBeRead = self.checkIfContentShouldBeRead(content_path)
+                if contentShouldBeRead == True:
+                    self.logger.debug("checkIfContentShouldBeRead=True for %s", content_path)
+                else:
+                    self.logger.info("checkIfContentShouldBeRead=False for %s", content_path)
 
-                if content_file_suffix == None:
-                    content_file_suffix = 'NONE'
+                if contentShouldBeRead == True:  
+                    #Decide if the file should be read
+                    if(content_file_suffix != None): 
+                        if ( content_file_suffix in aiwhisprConstants.FILEXTNLIST ): 
+                            content_index_flag = 'Y'
 
-                if content_size == None:
-                    content_size = 0
-                
-                rsync_status = 'I'
-                ####DEBUG####
-                self.logger.debug("Insert Content Map Values:")
-                self.logger.debug(self.content_site_name)
-                self.logger.debug(self.src_path)
-                self.logger.debug(self.src_path_for_results)
-                self.logger.debug(content_path)
-                self.logger.debug(content_type)
-                self.logger.debug( str( content_creation_date.timestamp() ))
-                self.logger.debug( str(content_last_modified_date.timestamp() ))
-                self.logger.debug(content_uniq_id_src)
-                self.logger.debug(content_tags_from_src)
-                self.logger.debug(str(content_size))
-                self.logger.debug(content_file_suffix)
-                self.logger.debug(content_index_flag)
-                self.logger.debug(content_processed_status)                
-                self.logger.debug(rsync_status)
-                ####DEBUG-END####
+                    if content_file_suffix == None:
+                        content_file_suffix = 'NONE'
 
-                #Insert in local index 
-                self.local_index.insert(
-                self.content_site_name, 
-                self.src_path, 
-                self.src_path_for_results, 
-                content_path, 
-                content_type, 
-                content_creation_date.timestamp(), 
-                content_last_modified_date.timestamp(), 
-                content_uniq_id_src, 
-                content_tags_from_src, 
-                content_size, 
-                content_file_suffix, 
-                content_index_flag, 
-                content_processed_status,
-                rsync_status
-                )
+                    if content_size == None:
+                        content_size = 0
+                    
+                    rsync_status = 'I'
+                    ####DEBUG####
+                    self.logger.debug("Insert Content Map Values:")
+                    self.logger.debug(self.content_site_name)
+                    self.logger.debug(self.src_path)
+                    self.logger.debug(self.src_path_for_results)
+                    self.logger.debug(content_path)
+                    self.logger.debug(content_type)
+                    self.logger.debug( str( content_creation_date.timestamp() ))
+                    self.logger.debug( str(content_last_modified_date.timestamp() ))
+                    self.logger.debug(content_uniq_id_src)
+                    self.logger.debug(content_tags_from_src)
+                    self.logger.debug(str(content_size))
+                    self.logger.debug(content_file_suffix)
+                    self.logger.debug(content_index_flag)
+                    self.logger.debug(content_processed_status)                
+                    self.logger.debug(rsync_status)
+                    ####DEBUG-END####
 
-                if content_index_flag == 'Y':
-                    #Download the file
-                    download_file_path = self.getDownloadPath(content_path)
-                    self.logger.debug('Downloaded File Name: ' + download_file_path)
-                    self.downloader.download_s3object_to_file(self.s3_client, self.s3_bucket_name, content_path, download_file_path)                     
-                    docProcessor =  initializeDocumentProcessor.initialize(content_file_suffix,download_file_path)
+                    #Insert in local index 
+                    self.local_index.insert(
+                    self.content_site_name, 
+                    self.src_path, 
+                    self.src_path_for_results, 
+                    content_path, 
+                    content_type, 
+                    content_creation_date.timestamp(), 
+                    content_last_modified_date.timestamp(), 
+                    content_uniq_id_src, 
+                    content_tags_from_src, 
+                    content_size, 
+                    content_file_suffix, 
+                    content_index_flag, 
+                    content_processed_status,
+                    rsync_status
+                    )
 
-                    if (docProcessor != None ):
-                        #Extract text
-                        docProcessor.extractText()
-                        #Create text chunks
-                        chunk_id_dict = docProcessor.createChunks()
-                        self.logger.debug("%d chunks created for %s", len(chunk_id_dict), download_file_path)
-                        #For each chunk, read text, create vector embedding and insert in vectordb
-                        for id in chunk_id_dict.keys():
-                            text_chunk_no = chunk_id_dict[id]
-                            self.logger.debug("id:{%s} text_chunk_no:{%d}", id, text_chunk_no)
-                            #Now encode the text chunk. id is the file path to the text chunk
-                            text_f = open(id)
-                            text_chunk_read = text_f.read()
-                            vec_emb = self.llm_service.encode(text_chunk_read)
-                            self.logger.debug("Vector encoding dimension is {%d}", len(vec_emb))
-                            text_f.close()
+                    if content_index_flag == 'Y':
+                        #Download the file
+                        download_file_path = self.getDownloadPath(content_path)
+                        self.logger.debug('Downloaded File Name: ' + download_file_path)
+                        self.downloader.download_s3object_to_file(self.s3_client, self.s3_bucket_name, content_path, download_file_path)                     
+                        docProcessor =  initializeDocumentProcessor.initialize(content_file_suffix,download_file_path)
 
-                            #Insert the meta data, text chunk, vector emebdding for text chunk in vectordb
-                            self.logger.debug("Inserting the record in vector database for id{%s}", id)
-                            self.vector_db.insert(id = id,
-                                                  content_path = content_path, 
-                                                  last_edit_date = content_last_modified_date.timestamp() , 
-                                                  tags = content_tags_from_src, 
-                                                  title = "", 
-                                                  text_chunk = text_chunk_read, 
-                                                  text_chunk_no = text_chunk_no, 
-                                                  vector_embedding = vec_emb)
-                            
-                    else:
-                        self.logger.debug('Content Index Flag was "Y" but we did not get a valid document processor')
+                        if (docProcessor != None ):
+                            #Extract text
+                            docProcessor.extractText()
+                            #Create text chunks
+                            chunk_id_dict = docProcessor.createChunks()
+                            self.logger.debug("%d chunks created for %s", len(chunk_id_dict), download_file_path)
+                            #For each chunk, read text, create vector embedding and insert in vectordb
+                            for id in chunk_id_dict.keys():
+                                text_chunk_no = chunk_id_dict[id]
+                                self.logger.debug("id:{%s} text_chunk_no:{%d}", id, text_chunk_no)
+                                #Now encode the text chunk. id is the file path to the text chunk
+                                text_f = open(id)
+                                text_chunk_read = text_f.read()
+                                vec_emb = self.llm_service.encode(text_chunk_read)
+                                self.logger.debug("Vector encoding dimension is {%d}", len(vec_emb))
+                                text_f.close()
+
+                                #Insert the meta data, text chunk, vector emebdding for text chunk in vectordb
+                                self.logger.debug("Inserting the record in vector database for id{%s}", id)
+                                self.vector_db.insert(id = id,
+                                                    content_path = content_path, 
+                                                    last_edit_date = content_last_modified_date.timestamp() , 
+                                                    tags = content_tags_from_src, 
+                                                    title = "", 
+                                                    text_chunk = text_chunk_read, 
+                                                    text_chunk_no = text_chunk_no, 
+                                                    vector_embedding = vec_emb)
+                                
+                        else:
+                            self.logger.debug('Content Index Flag was "Y" but we did not get a valid document processor')
 
                    
 

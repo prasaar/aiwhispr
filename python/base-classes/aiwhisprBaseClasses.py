@@ -16,6 +16,7 @@ from spacy_language_detection import LanguageDetector
 import logging
 
 import shutil
+import re
 
 
 sys.path.append("../common-functions")
@@ -158,6 +159,9 @@ class srcContentSite:
     site_auth:siteAuth
     vector_db:vectorDb
     llm_service:baseLlmService
+    do_not_read_dir_list:[]
+    do_not_read_file_list:[]
+
     
 
     baseLogger = logging.getLogger(__name__)
@@ -174,7 +178,7 @@ class srcContentSite:
     #Common init signature
     #We have defined a common signature for bases and expect derived classes also to follow this signature.
     #the Derives classes are isntatiated dynamically so it's important we have a common signature.
-    def __init__(self, content_site_name:str, src_type:str, src_path:str, src_path_for_results:str, working_directory:str, index_log_directory:str, site_auth:siteAuth, vector_db:vectorDb, llm_service:baseLlmService ):
+    def __init__(self, content_site_name:str, src_type:str, src_path:str, src_path_for_results:str, working_directory:str, index_log_directory:str, site_auth:siteAuth, vector_db:vectorDb, llm_service:baseLlmService, do_not_read_dir_list:list = [], do_not_read_file_list:list = []):
         self.content_site_name = content_site_name
         self.src_type = src_type
         self.src_path = src_path
@@ -184,6 +188,8 @@ class srcContentSite:
         self.site_auth = site_auth
         self.vector_db = vector_db
         self.llm_service = llm_service
+        self.do_not_read_dir_list = do_not_read_dir_list
+        self.do_not_read_file_list = do_not_read_file_list
         
     #These operations shold be implemented is the sub(child) classes
     #public function
@@ -208,6 +214,32 @@ class srcContentSite:
         letters = string.ascii_letters
         result_str = ''.join(random.choice(letters) for i in range(length))
         return result_str
+    
+    #This funtions checks if the content path should be read based on rules configured in config file
+    #public function
+    def checkIfContentShouldBeRead(self,content_path:str)->Boolean:
+        contentCanBeReadFlag = True
+        #Check if the do_not_read list has some rules, if yes then check
+        if ( len(self.do_not_read_file_list) > 0 or len(self.do_not_read_dir_list) > 0 ):  ##If any rule is defined then check else return True
+            self.baseLogger.debug("Do Not Read list exits")
+            dirpath,filename = os.path.split(content_path)
+    
+            if (len(dirpath)> 0 and (dirpath in self.do_not_read_dir_list) ):  ##Check in directory lists
+                self.baseLogger.info("Found directory %s in the do_not_read_dir_list", dirpath)
+                contentCanBeReadFlag = False
+            else:   ##Else check in file list
+                if (len(filename) > 0):
+                    ##The do_not_read_file_list can be patterns.
+                    for pattern_str in self.do_not_read_file_list:
+                        pattern = re.compile(pattern_str)
+                        match_results= re.search(pattern, filename)
+                        if (match_results != None):
+                            self.baseLogger.info("Found filename %s matching a pattern in the do_not_read_file_list", filename)
+                            contentCanBeReadFlag = False
+                            break
+
+        return contentCanBeReadFlag
+                        
         
     #This funtion creates the download path
     #private function

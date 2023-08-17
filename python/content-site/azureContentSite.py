@@ -27,8 +27,9 @@ class createContentSite(srcContentSite):
             
     downloader:azureBlobDownloader
 
-    def __init__(self,content_site_name:str,src_path:str,src_path_for_results:str,working_directory:str,index_log_directory:str,site_auth:siteAuth,vector_db:vectorDb,llm_service:baseLlmService):
-       srcContentSite.__init__(self,content_site_name=content_site_name,src_type="azureblob",src_path=src_path,src_path_for_results=src_path_for_results,working_directory=working_directory,index_log_directory=index_log_directory,site_auth=site_auth,vector_db=vector_db,llm_service=llm_service)
+    def __init__(self,content_site_name:str,src_path:str,src_path_for_results:str,working_directory:str,index_log_directory:str,site_auth:siteAuth,vector_db:vectorDb,llm_service:baseLlmService, do_not_read_dir_list:list = [], do_not_read_file_list:list = []):
+       
+       srcContentSite.__init__(self,content_site_name=content_site_name,src_type="azureblob",src_path=src_path,src_path_for_results=src_path_for_results,working_directory=working_directory,index_log_directory=index_log_directory,site_auth=site_auth,vector_db=vector_db,llm_service=llm_service, do_not_read_dir_list=do_not_read_dir_list, do_not_read_file_list=do_not_read_file_list)
        self.azure_account_url = src_path.split('/')[2]
        self.container_name= src_path.split('/')[3]
        self.downloader = azureBlobDownloader()
