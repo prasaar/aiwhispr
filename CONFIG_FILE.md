@@ -13,7 +13,9 @@ sitename=<unique name; it has to be unique if you are using multiple configurati
           Cannot contain whitespace, special characters except '.'  >
 
 srctype= <Can be filepath / s3 / azureblob >
+
 srcpath = <path from which AIWhispr will start reading and indexing files>
+
 displaypath = <top level path that AIWhispr will use when returning the search results. 
               Example : you can save all your files under /var/www/html , 
               when the search results are displayed, 
@@ -21,14 +23,31 @@ displaypath = <top level path that AIWhispr will use when returning the search r
 
 contentSiteModule = <python module that handles indexing for files/content in the specified srctype.
                     There are test configuration examples for s3 , azureblob. 
-                    You can extend the base class and write your custom handlers under $AIWHISPR_HOME/python/content-site>
+                    Custom modules can go under $AIWHISPR_HOME/python/content-site>
+
+doNotReadDirList=<A comma seprated list of directories that should not be read.
+                  If srctype=filepath then the full path to the directory is required
+                  example: doNotReadDirList=//var/www/html/bbc/sport
+                  For 3 / azure blob dont included the Bucket Name / Container Name>
+
+doNotReadFileList=<A comma seprated list of filenames/filename pattersn that should not be read>
 ```
 
 **[content-site-auth]**
 Section to configure access to the source from which files, content will be read.
 
 ```
-authtype=<Type of authentication for reading the content files. This can be filechecks / aws-key / sas (Azure SAS Token)/ az-storage-key (CONFIGURED)>
+authtype=<Type of authentication for reading the content files. 
+          This can be filechecks / aws-key / sas / az-storage-key 
+          filechecks : is applicable for srctype=filepath
+          sas : is applicable for Azure SAS token
+          az-storage-key: is applicable for Azure Storage Key
+          aws-key: is applicable for AWS S3 (Signed / Unsigned) >
+
+key=<Specify the key value if authtype=aws-key/az-storage-key
+    set this to UNISGNED to for AWS S3 unsigned access>
+
+sastoken=<Azure SAS Token: applciable when authtype=sas>
 ```
 
 Examples are available for AWS, Azure in the same directory.
@@ -37,14 +56,16 @@ Examples are available for AWS, Azure in the same directory.
 Section to configure the vector database access and the python module that will handle the storage schema, access.
 
 ```
-api-address = <typesense-api-adress(EDIT)>
-api-port = <typesense-port(EDIT)>
-api-key = <typesense-api-key(EDIT)>
-vectorDbModule=<python module to handle the vectordb storage schema. You can write your own handlers under $AIWHISPR_HOME/python/vectordb(CONFIGURED)>
+api-address = <vectordb-api-adress>
+api-port = <vectordb-api-port(EDIT)>
+api-key = <vectordb-api-key(EDIT)>
+vectorDbModule=<python module to handle the vectordb storage schema. 
+                You can write your own handlers under $AIWHISPR_HOME/python/vectordb>
 ```
 
 **[local]**
-AIWhispr requires a local working directory that is used to extract text.The working-dir can be cleaned up after indexing.
+AIWhispr requires a local working directory that is used to extract text.
+The working-dir can be cleaned up after indexing.
 
 The index-dir configuration points to a path where AIWhispr will store a local SQLite3 database which is used when indexing the content. 
 
@@ -56,7 +77,8 @@ index-dir=/tmp
 ```
 
 **[llm-service]**
-Section to configure the large-language-model (LLM) used to create the vector embedding. AIWhispr uses sentence-transformer library.
+Section to configure the large-language-model (LLM) used to create the vector embedding. 
+AIWhispr uses sentence-transformer library.
 You can customize this by writing your own LLM encoding handler under $AIWHISPR_HOME/python/llm-service
 
 The default configuration is:
