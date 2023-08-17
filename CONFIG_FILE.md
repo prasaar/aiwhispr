@@ -8,7 +8,7 @@ The configuration file has 5 sections
 **[content-site]**
 
 Section to configure the source from which AIWhispr will read the files which have to be indexed. 
-``
+```
 sitename=<unique name; it has to be unique if you are using multiple configuration files. 
           Cannot contain whitespace, special characters except '.'  >
 
