@@ -8,12 +8,20 @@ The configuration file has 5 sections
 **[content-site]**
 
 Section to configure the source from which AIWhispr will read the files which have to be indexed. 
-```
-sitename=<sets a unique name for this configuration, content indexing(CONFIGURED)>
-srctype= <Can be filepath / s3 / azureblob. is for an Azure Blob container.(CONFIGURED)>
-srcpath = <path from which AIWhisper will start reading and indexing the content(CONFIGURED)>
-displaypath = <top level path that AIWhispr will use when returning the search results. Example : you can save all your files under /var/www/html , when the search results are displayed, the top level path is replaced with http://hostname (CONFIGURED FOR localhost)>
-contentSiteModule = <python module that handles indexing for files/content in the specified srctype.There are test configuration examples in the same folder for s3 , azureblob. You can extend the base class and write your custom handlers under $AIWHISPR_HOME/python/content-site(CONFIGURED)>
+``
+sitename=<unique name; it has to be unique if you are using multiple configuration files. 
+          Cannot contain whitespace, special characters except '.'  >
+
+srctype= <Can be filepath / s3 / azureblob >
+srcpath = <path from which AIWhispr will start reading and indexing files>
+displaypath = <top level path that AIWhispr will use when returning the search results. 
+              Example : you can save all your files under /var/www/html , 
+              when the search results are displayed, 
+              the top level path is replaced with http://hostname >
+
+contentSiteModule = <python module that handles indexing for files/content in the specified srctype.
+                    There are test configuration examples for s3 , azureblob. 
+                    You can extend the base class and write your custom handlers under $AIWHISPR_HOME/python/content-site>
 ```
 
 **[content-site-auth]**
