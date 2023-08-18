@@ -42,8 +42,9 @@ class createVectorDb(vectorDb):
                 self.vectorDbClient = QdrantClient(":memory:") # Create in-memory Qdrant instance
 
             elif self.vectordb_hostname[0:5] == 'path:'  :
-                self.logger.debug("Creating Qdrant in specified local path: %s", self.vectordb_hostname)
-                self.vectorDbClient = QdrantClient(path=(self.vectordb_hostname)[6:]) #Create local-db Qdrant instance
+                self.logger.debug("Creating Qdrant in specified local path: %s", self.vectordb_hostname[5:] )
+
+                self.vectorDbClient = QdrantClient(path=(self.vectordb_hostname)[5:]) #Create local-db Qdrant instance
 
             elif self.vectordb_hostname[0:6] == 'https:'  or self.vectordb_hostname[0:5] == 'http:' :
                 self.logger.debug("Create Qdrant http(s) connection to hostname: %s , portnumber: %s with key: %s", self.vectordb_hostname, self.vectordb_portnumber, self.vectordb_key)
@@ -64,9 +65,8 @@ class createVectorDb(vectorDb):
         #Now check if the collection already eixts, if not then recreate it
         collectionExistsFlag =  False
         try:
-
             collections_list = self.vectorDbClient.get_collections()
-            for collection in collections_list :
+            for collection in collections_list.collections :
                 if collection.name == 'content_chunk_map' :
                     collectionExistsFlag = True
                     break
@@ -80,14 +80,27 @@ class createVectorDb(vectorDb):
             #create the collection in Qdrant
             #We are not creating an 'id' (unique id)  field. It will be provided in insert statements by the client
             #We expect id to be in the format <site-name>/<extracted-file_directory-name>/<chunk-files-directory>/<chunk-id>
-            create_response = self.vectorDbClient.recreate_collection(
+            create_response = self.vectorDbClient.create_collection(
                 collection_name =  "content_chunk_map",
-                vectors_config={
-                    "vector_embedding": models.VectorParams(size=768, distance=models.Distance.COSINE)
-                } )
-            
+                vectors_config= models.VectorParams(size=768, distance=models.Distance.COSINE,on_disk = True), 
+                on_disk_payload = True )
+                 
             if(create_response == True):
-                self.logger.info("Created collection")
+                self.logger.info("Created collection, now creating payload index")
+                try: 
+                    self.vectorDbClient.create_payload_index(collection_name="content_chunk_map", 
+                                field_name="text_chunk", 
+                                field_schema=models.TextIndexParams(
+                                type="text",
+                                tokenizer=models.TokenizerType.WORD,
+                                min_token_len=2,
+                                max_token_len=15,
+                                lowercase=True,
+                            )
+                    )
+                except:
+                    self.logger.error("Could not create payload index")
+
             else:
                 self.logger.error("Could not create collection")
 
@@ -121,6 +134,8 @@ class createVectorDb(vectorDb):
                 'text_chunk_no' : text_chunk_no,
                 'vector_embedding_date': vector_embedding_date
             }
+
+            self.logger.debug("Inserting a record in Qdrant vectordb: %s with vector embedding of size: %d", json.dumps(content_chunk_map_record), len(vector_embedding) )
 
             self.vectorDbClient.upsert(
                 collection_name="content_chunk_map",
