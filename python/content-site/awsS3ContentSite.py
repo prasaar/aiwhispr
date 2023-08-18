@@ -189,19 +189,21 @@ class createContentSite(srcContentSite):
                             #Extract text
                             docProcessor.extractText()
                             #Create text chunks
-                            chunk_id_dict = docProcessor.createChunks()
-                            self.logger.debug("%d chunks created for %s", len(chunk_id_dict), download_file_path)
+                            chunk_dict = docProcessor.createChunks()
+                            self.logger.debug("%d chunks created for %s", len(chunk_dict), download_file_path)
                             #For each chunk, read text, create vector embedding and insert in vectordb
-                            for id in chunk_id_dict.keys():
-                                text_chunk_no = chunk_id_dict[id]
-                                self.logger.debug("id:{%s} text_chunk_no:{%d}", id, text_chunk_no)
-                                #Now encode the text chunk. id is the file path to the text chunk
-                                text_f = open(id)
+                            ##the chunk_dict dictionary will have key=/filepath_to_the_file_containing_text_chunk, value=integer value of the chunk number.
+                            for chunk_file_path in chunk_dict.keys():
+                                text_chunk_no = chunk_dict[chunk_file_path]
+                                self.logger.debug("chunk_file_path:{%s} text_chunk_no:{%d}", chunk_file_path, text_chunk_no)
+                                #Now encode the text chunk. chunk_file_path is the file path to the text chunk
+                                text_f = open(chunk_file_path)
                                 text_chunk_read = text_f.read()
                                 vec_emb = self.llm_service.encode(text_chunk_read)
                                 self.logger.debug("Vector encoding dimension is {%d}", len(vec_emb))
                                 text_f.close()
 
+                                id = self.generate_uuid()
                                 #Insert the meta data, text chunk, vector emebdding for text chunk in vectordb
                                 self.logger.debug("Inserting the record in vector database for id{%s}", id)
                                 self.vector_db.insert(id = id,

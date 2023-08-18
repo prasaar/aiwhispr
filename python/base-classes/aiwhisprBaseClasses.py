@@ -18,6 +18,8 @@ import logging
 import shutil
 import re
 
+import uuid
+
 
 sys.path.append("../common-functions")
 import aiwhisprConstants
@@ -208,6 +210,10 @@ class srcContentSite:
     def display(self):
         pass
 
+    #public function
+    def generate_uuid(self):
+        return str(uuid.uuid1())
+    
     #private function
     def get_random_string(self,length:int):
         # choose from all lowercase letter
@@ -382,8 +388,8 @@ class srcDocProcessor:
         self.baseLogger.debug('MAXCHUNK SIZE is :' + str(self.MAXCHUNKSIZE))
         self.baseLogger.debug('Creating Chunks for ' + self.extracted_text_file_path)
         #This function should be called only after the extractText function has been called
-        ## ##the chunks will be 1.txt , 2.txt ......
-        chunk_id_dict = {}
+        ## ##this dictionary will have key=/filepath_to_the_file_containing_text_chunk, value=integer value of the chunk number.
+        chunk_dict = {}
 
         try:
         
@@ -429,7 +435,7 @@ class srcDocProcessor:
                                 chunk_file_path = os.path.join(self.text_chunks_dir, str(self.no_of_chunks) + '.txt')
                                 self.baseLogger.debug('Text chunk full with this line.Write the text chunk no: ' + str(self.no_of_chunks) + ' to ' + chunk_file_path )
                                 self.saveTextChunk(chunk_file_path,current_text_chunk)
-                                chunk_id_dict[chunk_file_path] = self.no_of_chunks
+                                chunk_dict[chunk_file_path] = self.no_of_chunks
                                 ##The text chunk bucket has been saved. So reset current_text_chunk
                                 current_text_chunk = ''
                                 word_ctr = 0
@@ -452,7 +458,7 @@ class srcDocProcessor:
                                     chunk_file_path = os.path.join(self.text_chunks_dir, str(self.no_of_chunks) + '.txt')
                                     self.baseLogger.debug('Text chunk full.Write the text chunk no: ' + str(self.no_of_chunks) + ' to ' + chunk_file_path )
                                     self.saveTextChunk(chunk_file_path,current_text_chunk)
-                                    chunk_id_dict[chunk_file_path] = self.no_of_chunks
+                                    chunk_dict[chunk_file_path] = self.no_of_chunks
                                     current_text_chunk = ''
                                     word_ctr = 0
                                     self.baseLogger.debug('Text chunk full. Added chunk number: ' + str(self.no_of_chunks))
@@ -471,14 +477,14 @@ class srcDocProcessor:
                     chunk_file_path = os.path.join(self.text_chunks_dir, str(self.no_of_chunks) + '.txt')
                     self.baseLogger.debug('Write the last text chunk no: ' + str(self.no_of_chunks) + ' to ' + chunk_file_path )
                     self.saveTextChunk(chunk_file_path, current_text_chunk)
-                    chunk_id_dict[chunk_file_path] = self.no_of_chunks
+                    chunk_dict[chunk_file_path] = self.no_of_chunks
                     self.baseLogger.debug('Added last chunk number: ' + str(self.no_of_chunks))
         except Exception as exc:
             self.baseLogger.error('We have a problem when creating text chunks for ' + self.extracted_text_file_path)
             self.baseLogger.error('Check text file encoding and also check if the extracted file was created')
         finally:
             self.baseLogger.info('Completed extracting text chunks')
-            return chunk_id_dict
+            return chunk_dict
 
 
 

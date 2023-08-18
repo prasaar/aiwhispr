@@ -115,6 +115,20 @@ class createVectorDb(vectorDb):
             vector_embedding_date = time.time()
 
              ##Insert record in typesense collection
+            self.logger.debug("Inserting record in VectorDB")
+            self.logger.debug("id:%s",id)
+            self.logger.debug("content_site_name:%s", self.content_site_name )
+            self.logger.debug("src_path:%s", self.src_path)
+            self.logger.debug("src_path_for_results:%s", self.src_path_for_results)
+            self.logger.debug("content_path:%s", content_path)
+            self.logger.debug("last_edit_date:%f", last_edit_date)
+            self.logger.debug("tags:%s", tags)
+            self.logger.debug("title:%s", title)
+            self.logger.debug("text_chunk.. first char:%s", text_chunk[0:1])
+            self.logger.debug("text_chunk_no:%d", text_chunk_no)
+            self.logger.debug("vector_embedding(size):%d", len(vector_embedding))
+            self.logger.debug("vector_embedding_date:%f", vector_embedding_date)
+
             content_chunk_map_record = {
                 'id' :  id,
                 'content_site_name' : self.content_site_name,
