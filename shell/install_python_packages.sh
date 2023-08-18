@@ -31,6 +31,8 @@ echo "pip3 install flask"
 pip3 install flask
 echo "pip3 install uwsgi"
 pip3 install uwsgi
+echo "pip3 install qdrant-client"
+pip3 install qdrant-client
 
 
 echo "###List of python packages after install ####"
