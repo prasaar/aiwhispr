@@ -88,7 +88,7 @@ class searchHandler:
       self.logger.debug("vector embedding:{%s}",vector_as_string)
 
       if textsearch_flag == 'Y':
-         search_results = self.vector_db.search(self.content_site_name,query_embedding_vector_as_list, self.limit_hits,input_query)
+         search_results = self.vector_db.search(self.content_site_name,query_embedding_vector_as_list, self.limit_hits ,input_query)
       else:
          search_results = self.vector_db.search(self.content_site_name,query_embedding_vector_as_list, self.limit_hits)
       
@@ -96,10 +96,45 @@ class searchHandler:
       display_html = '<div class="aiwhisprSemanticSearchResults">'
       display_json = []
 
+      
+
+      """""
+        We should receive a JSON Object in the format 
+        {"results": [ semantic_results{} ,text_results{}  ]}
+       
+         semantic_results / text_results will be a format 
+         {
+         "found" : int
+         "type"  : semantic / text / image 
+         "hits"  : []
+         }
+             
+             hits[]  will be a list Example : hits[ {"result":{},   {"result":{} }]
+            "result": {
+               id: UUID,
+               content_site_name: str,
+               content_path:str,
+               src_path:str,
+               src_path_for_results,
+               tags:str,
+               text_chunk:str,
+               text_chunk_no:int,
+               title:int,
+               last_edit_date:float,
+               vector_embedding_date:float,
+               match_score: float,
+            }
+      """""
+      
+      self.logger.debug('SearchService received search results from vectordb:')
+      self.logger.debug(json.dumps(search_results))
+
       no_of_semantic_hits = search_results['results'][0]['found']
+     
+
       i = 0
       while i < no_of_semantic_hits:
-         chunk_map_record = search_results['results'][0]['hits'][i]['document']
+         chunk_map_record = search_results['results'][0]['hits'][i]
          content_site_name = chunk_map_record['content_site_name']
          record_id = chunk_map_record['id']
          content_path = chunk_map_record['content_path']
@@ -147,7 +182,7 @@ class searchHandler:
          no_of_text_hits = len(search_results['results'][1]['hits'])
          
          while j < no_of_text_hits:
-            chunk_map_record = search_results['results'][1]['hits'][j]['document']
+            chunk_map_record = search_results['results'][1]['hits'][j]
             content_site_name = chunk_map_record['content_site_name']
             record_id = chunk_map_record['id']
             content_path = chunk_map_record['content_path']
