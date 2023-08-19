@@ -168,9 +168,10 @@ class createVectorDb(vectorDb):
     def search(self,content_site_name,vector_embedding, limit_hits, input_text_query = ''):
         
         vector_as_string = ','. join(str(e) for e in vector_embedding)
-        
+        include_text_results = False
         if len(input_text_query) > 0 :
             self.logger.debug('Will do multisearch, vector and text')
+            include_text_results = True
             search_requests = {
                     'searches': [
                     {
@@ -204,5 +205,105 @@ class createVectorDb(vectorDb):
         }
 
         search_results = self.vectorDbClient.multi_search.perform(search_requests, common_search_params)
-        return search_results
+
+        """""
+        We will send  a JSON Object in the format 
+        {"results": [ semantic_results{} ,text_results{}  ]}
+       
+         semantic_results / text_results will be a format 
+         {
+         "found" : int
+         "type"  : semantic / text / image 
+         "hits"  : []
+         }
+             
+             hits[]  will be a list Example : hits[ {"result":{},   {"result":{} }]
+            "result": {
+               id: UUID,
+               content_site_name: str,
+               content_path:str,
+               src_path:str,
+               src_path_for_results,
+               tags:str,
+               text_chunk:str,
+               text_chunk_no:int,
+               title:int,
+               last_edit_date:float,
+               vector_embedding_date:float,
+               match_score: float,
+            }
+        """""
+
+        json_results = {} #Dict
+        json_results['results'] = []
+
+        self.logger.debug('Received Typesense Search Results:')
+        self.logger.debug(json.dumps(search_results))
+
+        semantic_results = {} #Dict
+        text_results = {} #Dict
+        semantic_hits = []
+        text_hits = []
+
+        no_of_semantic_hits = search_results['results'][0]['found']
+        semantic_results['found'] = no_of_semantic_hits
+        semantic_results['type'] = 'semantic'
+
+        i = 0
+        while i < no_of_semantic_hits:
+            result = {} #Dict to hold a single result
+            
+            chunk_map_record = search_results['results'][0]['hits'][i]['document']
+            
+            result['match_score'] =  search_results['results'][0]['hits'][i]['vector_distance']
+            result['content_site_name'] = chunk_map_record['content_site_name']
+            result['id'] = chunk_map_record['id']
+            result['content_path'] = chunk_map_record['content_path']
+            result['src_path'] = chunk_map_record['src_path']
+            #result['src_path_for_results'] = chunk_map_record['src_path_for_results']
+            result['src_path_for_results'] = self.src_path_for_results
+            result['text_chunk'] = chunk_map_record['text_chunk']
+            result['text_chunk_no'] = chunk_map_record['text_chunk_no'],
+            result['title'] = chunk_map_record['title']
+            result['last_edit_date'] = chunk_map_record['last_edit_date']
+            result['vector_embedding_date'] = chunk_map_record['vector_embedding_date']
+            
+            semantic_hits.append(result)
+            i = i + 1 
+
+        semantic_results['hits'] = semantic_hits
+        json_results['results'].append(semantic_results)
+        
+        if include_text_results == True:
+            
+            no_of_text_hits = search_results['results'][1]['found']
+            text_results['found'] = no_of_text_hits
+            text_results['type'] = 'text'
+            i = 0
+            while i < no_of_text_hits:
+                result = {} #Dict to hold a single result
+                
+                chunk_map_record = search_results['results'][1]['hits'][i]['document']
+                
+                result['match_score'] =  search_results['results'][1]['hits'][i]['text_match']
+                result['content_site_name'] = chunk_map_record['content_site_name']
+                result['id'] = chunk_map_record['id']
+                result['content_path'] = chunk_map_record['content_path']
+                result['src_path'] = chunk_map_record['src_path']
+                #result['src_path_for_results'] = chunk_map_record['src_path_for_results']
+                result['src_path_for_results'] = self.src_path_for_results
+                result['text_chunk'] = chunk_map_record['text_chunk']
+                result['text_chunk_no'] = chunk_map_record['text_chunk_no'],
+                result['title'] = chunk_map_record['title']
+                result['last_edit_date'] = chunk_map_record['last_edit_date']
+                result['vector_embedding_date'] = chunk_map_record['vector_embedding_date']
+                
+                text_hits.append(result)
+                i = i + 1 
+
+            text_results['hits'] = text_hits
+            json_results['results'].append(text_results)
+
+        
+        return json_results
 
