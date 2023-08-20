@@ -111,7 +111,7 @@ $AIWHISPR_HOME/shell/start-indexing-content-site.sh -C $AIWHISPR_HOME/config/con
 
 3 services will be started under this shell script.
 
-- the AIWhispr searchServic(port:5002) which intefaces with the vectordb
+- the AIWhispr searchService(port:5002) which intefaces with the vectordb
 
 - a flask python script(port:9001) that takes in user query , sends the query  to AIWhispr searchService and formats the results for HTML display
 
