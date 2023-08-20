@@ -36,7 +36,7 @@ vectordbApiPort=`cat "${typesenseConfigFile}" | grep api-port | cut -d "=" -f2`
 vectordbKey=`cat "${typesenseConfigFile}" | grep api-key | cut -d "=" -f2`
 
 
-configFile="${AIWHISPR_HOME}"/config/content-site/sites-available/example_bbc.filepath.cfg
+configFile="${AIWHISPR_HOME}"/config/content-site/sites-available/example_bbc.filepath.typesense.cfg
 if [ -f "${configFile}" ]; then  
 echo "A config file already exists at ${configFile}"
 echo "Do you want to continue?[Y/N] (capital characters only)"
@@ -48,7 +48,7 @@ fi
 fi  
 
 echo "Rewriting existing config file"
-tmpConfigFile="/tmp/example_bbc.filepath.cfg.tmp"
+tmpConfigFile="/tmp/example_bbc.filepath.typesense.cfg.tmp"
 
 echo 
 echo "#### Review the path which contains the files your want to index ####"
@@ -129,7 +129,7 @@ echo
 echo
 echo "Now creating a temporary config file in "$tmpConfigFile
 echo "[content-site]" > $tmpConfigFile
-echo "sitename=example_bbc.filepath" >> $tmpConfigFile
+echo "sitename=example_bbc.filepath.typesense" >> $tmpConfigFile
 echo "srctype=filepath" >> $tmpConfigFile
 echo "srcpath="$srcpath >> $tmpConfigFile
 echo "displaypath=http://127.0.0.1:9000/bbc" >> $tmpConfigFile
