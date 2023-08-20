@@ -68,7 +68,7 @@ It will finally display a config file that has been created.
 [content-site]
 sitename=example_bbc.filepath.typesense
 srctype=filepath
-srcpath=/<userhome>/aiwhispr/examples/http/bbc
+srcpath=/<aiwhispr_home>/aiwhispr/examples/http/bbc
 displaypath=http://127.0.0.1:9000/bbc
 contentSiteModule=filepathContentSite
 [content-site-auth]
@@ -80,8 +80,8 @@ api-address= 0.0.0.0
 api-port= 8108
 api-key= xyz
 [local]
-working-dir=/<userhome>/aiwhispr/examples/http/working-dir
-index-dir=/<userhome>/aiwhispr/examples/http/working-dir
+working-dir=/<aiwhispr_home>/aiwhispr/examples/http/working-dir
+index-dir=/<aiwhispr_home>/aiwhispr/examples/http/working-dir
 [llm-service]
 model-family=sbert
 model-name=all-mpnet-base-v2
@@ -91,7 +91,7 @@ llmServiceModule=libSbertLlmService
 
 Check that config file has been created.
 ```
-ls $AIWHISPR_HOME/config/content-site/sites-available/example_bbc.filepath.cfg
+ls $AIWHISPR_HOME/config/content-site/sites-available/example_bbc.filepath.typesense.cfg
 ```
 
 For more details about sections in the config file please refer to [CONFIG_FILE.md](./CONFIG_FILE.md)
