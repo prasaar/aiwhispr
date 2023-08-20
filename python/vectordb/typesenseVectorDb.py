@@ -217,8 +217,9 @@ class createVectorDb(vectorDb):
          "hits"  : []
          }
              
-             hits[]  will be a list Example : hits[ {"result":{},   {"result":{} }]
-            "result": {
+            hits[]  will be a list Example : hits[ {result},   {result}]
+            Format of result dict 
+            {
                id: UUID,
                content_site_name: str,
                content_path:str,

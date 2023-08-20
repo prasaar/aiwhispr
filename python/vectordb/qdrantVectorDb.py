@@ -37,22 +37,19 @@ class createVectorDb(vectorDb):
         #First create the connection
         try:
             self.logger.debug("Creating a Qdrant Connection")
-            if self.vectordb_hostname == ':memory:' :
-                self.logger.debug('Creating Qdrant in memory')
-                self.vectorDbClient = QdrantClient(":memory:") # Create in-memory Qdrant instance
+            #if self.vectordb_hostname == ':memory:' :
+            #    self.logger.debug('Creating Qdrant in memory')
+            #    self.vectorDbClient = QdrantClient(":memory:") # Create in-memory Qdrant instance
 
-            elif self.vectordb_hostname[0:5] == 'path:'  :
+            if self.vectordb_hostname[0:5] == 'path:'  :
                 self.logger.debug("Creating Qdrant in specified local path: %s", self.vectordb_hostname[5:] )
-
                 self.vectorDbClient = QdrantClient(path=(self.vectordb_hostname)[5:]) #Create local-db Qdrant instance
-
             elif self.vectordb_hostname[0:6] == 'https:'  or self.vectordb_hostname[0:5] == 'http:' :
                 self.logger.debug("Create Qdrant http(s) connection to hostname: %s , portnumber: %s with key: %s", self.vectordb_hostname, self.vectordb_portnumber, self.vectordb_key)
                 if (len(self.vectordb_key) > 0 ): 
                     self.vectorDbClient = QdrantClient(url=self.vectordb_hostname + ':' + self.vectordb_portnumber,api_key=self.vectordb_key) #Create connection to http/https host with key
                 else:
                     self.vectorDbClient = QdrantClient(url=self.vectordb_hostname + ':' + self.vectordb_portnumber) #Create connection to http/http host without key
-
             else: #Assuming IP/hostname with PortNumber
                 self.logger.debug("Create Qdrant http connection to hostname: %s , portnumber: %s with key: %s", self.vectordb_hostname, self.vectordb_portnumber, self.vectordb_key)
                 if (len(self.vectordb_key) > 0 ): 
@@ -62,7 +59,7 @@ class createVectorDb(vectorDb):
         except:
             self.logger.error("Could not create Qdrant connection to Qdrant Server hostname: %s , portnumber: %s with key: %s", self.vectordb_hostname, self.vectordb_portnumber, self.vectordb_key)
 
-        #Now check if the collection already eixts, if not then recreate it
+        #Now check if the collection already exists, if not then recreate it
         collectionExistsFlag =  False
         try:
             collections_list = self.vectorDbClient.get_collections()
@@ -172,8 +169,43 @@ class createVectorDb(vectorDb):
 
 
     def search(self,content_site_name,vector_embedding, limit_hits, input_text_query = ''):
+      
+        """""
+        We will send  a JSON Object in the format 
+        {"results": [ semantic_results{} ,text_results{}  ]}
+       
+         semantic_results / text_results will be a format 
+         {
+         "found" : int
+         "type"  : semantic / text / image 
+         "hits"  : []
+         }
+             
+            hits[]  will be a list Example : hits[ {result},   {result}]
+               Format of result dict
+               {
+               id: UUID,
+               content_site_name: str,
+               content_path:str,
+               src_path:str,
+               src_path_for_results,
+               tags:str,
+               text_chunk:str,
+               text_chunk_no:int,
+               title:int,
+               last_edit_date:float,
+               vector_embedding_date:float,
+               match_score: float,
+            }
+        """""
         #vector_as_string = ','. join(str(e) for e in vector_embedding)
-        search_results = client.search(
+
+        include_text_results = False
+        if len(input_text_query) > 0 :
+            include_text_results = True
+
+        #We will first do a semantic search
+        search_results = self.vectorDbClient.search(
             collection_name="content_chunk_map",
             query_filter=models.Filter(
                 must=[
@@ -191,5 +223,103 @@ class createVectorDb(vectorDb):
             ),
             query_vector=vector_embedding,
             limit=limit_hits,
+            with_payload=True
         )
-        return search_results
+
+       
+        json_results = {} #Dict
+        json_results['results'] = []
+
+        semantic_results = {} #Dict
+        text_results = {} #Dict
+        semantic_hits = []
+        text_hits = []
+
+        no_of_semantic_hits = len(search_results)
+        semantic_results['found'] = no_of_semantic_hits
+        semantic_results['type'] = 'semantic'
+
+        i = 0
+        while i < no_of_semantic_hits:
+            result = {} #Dict to hold a single result
+            
+            chunk_map_record = search_results[i].payload
+            
+            result['id'] = search_results[i].id
+            result['match_score'] =  search_results[i].score
+            result['content_site_name'] = chunk_map_record['content_site_name']
+            result['content_path'] = chunk_map_record['content_path']
+            result['src_path'] = chunk_map_record['src_path']
+            #result['src_path_for_results'] = chunk_map_record['src_path_for_results']
+            result['src_path_for_results'] = self.src_path_for_results
+            result['text_chunk'] = chunk_map_record['text_chunk']
+            result['text_chunk_no'] = chunk_map_record['text_chunk_no'],
+            result['title'] = chunk_map_record['title']
+            result['last_edit_date'] = chunk_map_record['last_edit_date']
+            result['vector_embedding_date'] = chunk_map_record['vector_embedding_date']
+            
+            semantic_hits.append(result)
+            i = i + 1 
+
+        semantic_results['hits'] = semantic_hits
+        json_results['results'].append(semantic_results)
+
+        if include_text_results == True:
+
+            #We have to do a text match search , by changing the filter condition
+
+            search_results = self.vectorDbClient.search(
+            collection_name="content_chunk_map",
+            query_filter=models.Filter(
+                must=[
+                    models.FieldCondition(
+                        key="content_site_name",
+                        match=models.MatchValue(
+                            value=content_site_name,
+                        )
+                    ),
+                    models.FieldCondition(
+                        key="text_chunk",
+                        match=models.MatchValue(
+                            value=input_text_query,  ##Match on the input text query
+                        )
+                    )
+
+                ]
+            ),
+            query_vector=vector_embedding,
+            limit=limit_hits,
+            with_payload=True
+            )
+
+            no_of_text_hits = len(search_results)
+            text_results['found'] = no_of_text_hits
+            text_results['type'] = 'text'
+            i = 0
+            while i < no_of_text_hits:
+                result = {} #Dict to hold a single result
+                
+                chunk_map_record = search_results[i].payload
+                
+                result['id'] = search_results[i].id
+                result['match_score'] =  search_results[i].score
+                result['content_site_name'] = chunk_map_record['content_site_name']
+                
+                result['content_path'] = chunk_map_record['content_path']
+                result['src_path'] = chunk_map_record['src_path']
+                #result['src_path_for_results'] = chunk_map_record['src_path_for_results']
+                result['src_path_for_results'] = self.src_path_for_results
+                result['text_chunk'] = chunk_map_record['text_chunk']
+                result['text_chunk_no'] = chunk_map_record['text_chunk_no'],
+                result['title'] = chunk_map_record['title']
+                result['last_edit_date'] = chunk_map_record['last_edit_date']
+                result['vector_embedding_date'] = chunk_map_record['vector_embedding_date']
+                
+                text_hits.append(result)
+                i = i + 1 
+
+            text_results['hits'] = text_hits
+            json_results['results'].append(text_results)
+
+
+        return json_results
