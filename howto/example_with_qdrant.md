@@ -99,7 +99,7 @@ Check that config file has been created.
 ls $AIWHISPR_HOME/config/content-site/sites-available/example_bbc.filepath.qdrant.cfg
 ```
 
-For more details about sections in the config file please refer to [CONFIG_FILE.md](./CONFIG_FILE.md)
+For more details about sections in the config file please refer to [CONFIG_FILE.md](../CONFIG_FILE.md)
 
 **2. Start Indexing**
 Confirm that the environment variables AIWHISPR_HOME and AIWHISPR_LOG_LEVEL are set and exported.

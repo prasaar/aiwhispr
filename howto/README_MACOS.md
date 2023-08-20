@@ -79,14 +79,14 @@ To create the config file run the following commands.
 You can enter "N" and choose to go with the default values
 ```
 cd $AIWHISPR_HOME/examples/http
-./configure_example_bbc.sh
+./configure_example_bbc_typesense.sh
 ``` 
 
 It will finally display a config file which has been created.
 ```
 #### CONFIG FILE ####
 [content-site]
-sitename=example_bbc.filepath
+sitename=example_bbc.filepath.typesense
 srctype=filepath
 srcpath=/Users/<username>/aiwhispr/examples/http/bbc
 displaypath=http://127.0.0.1:9000/bbc
@@ -111,24 +111,24 @@ llmServiceModule=libSbertLlmService
 
 Check that config file has been created.
 ```
-ls $AIWHISPR_HOME/config/content-site/sites-available/example_bbc.filepath.cfg
+ls $AIWHISPR_HOME/config/content-site/sites-available/example_bbc.filepath.typesense.cfg
 ```
 
-For more details about sections in the config file please refer to [CONFIG_FILE.md](./CONFIG_FILE.md)
+For more details about sections in the config file please refer to [CONFIG_FILE.md](../CONFIG_FILE.md)
 
 **2. Start Indexing**
 Confirm that the environment variables AIWHISPR_HOME and AIWHISPR_LOG_LEVEL are set and exported. 
 
 Index the file content for semantic search. This will take some time as it has to process over 2000 files.
 ```
-$AIWHISPR_HOME/shell/start-indexing-content-site.sh -C $AIWHISPR_HOME/config/content-site/sites-available/example_bbc.filepath.cfg
+$AIWHISPR_HOME/shell/start-indexing-content-site.sh -C $AIWHISPR_HOME/config/content-site/sites-available/example_bbc.filepath.typesense.cfg
 ```
 
 **3. Start the AIWhispr search service**
 
 3 services will be started under this shell script.
 
-- the AIWhispr searchServic(port:5002) which intefaces with the vectordb
+- the AIWhispr searchService(port:5002) which intefaces with the vectordb
 
 - a flask python script(port:9001) that takes in user query , sends the query  to AIWhispr searchService and formats the results for HTML display
 
@@ -137,7 +137,7 @@ $AIWHISPR_HOME/shell/start-indexing-content-site.sh -C $AIWHISPR_HOME/config/con
 The log files for these 3 processes is created in /tmp/
 
 ```
-cd $AIWHISPR_HOME/examples/http; $AIWHISPR_HOME/examples/http/start_http_service.sh
+cd $AIWHISPR_HOME/examples/http; $AIWHISPR_HOME/examples/http/start_search_filepath_typesense.sh
 ```
 
 If you are getting an error 
