@@ -12,7 +12,10 @@ AIWhispr is a tool to enable AI powered semantic search on documents
 ## Contact
 contact@aiwhispr.com
 
-## Prerequisites for a Linux install
+## Prerequisites for a Linux install with Typesense
+
+[For Linux install with Qdrant vector database, refer to example_with_qdrant.md](./howto/example_with_qdrant.md)
+
 [For MacOS refer to README_MACOS.md](./README_MACOS.md)
 
 For Windows 10/11 you can follow the same instructions as below on wsl (Windows Subsystem for Linux) 
