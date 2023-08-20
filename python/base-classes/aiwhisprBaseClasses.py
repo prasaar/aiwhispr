@@ -1,6 +1,5 @@
 ##This file implements all the base classes in aiwhispr
 ##We dont use typical __ because there is no real private variable in python
-from pyexpat import model
 import random
 import string
 import os
