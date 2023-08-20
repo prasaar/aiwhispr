@@ -59,16 +59,16 @@ To create the config file run the following commands.
 You can enter "N" and choose to go with the default values
 ```
 cd $AIWHISPR_HOME/examples/http
-./configure_example_bbc.sh
+./configure_example_filepath_typesense.sh
 ```
 
 It will finally display a config file that has been created.
 ```
 #### CONFIG FILE ####
 [content-site]
-sitename=example_bbc.filepath
+sitename=example_bbc.filepath.typesense
 srctype=filepath
-srcpath=/Users/<username>/aiwhispr/examples/http/bbc
+srcpath=/<userhome>/aiwhispr/examples/http/bbc
 displaypath=http://127.0.0.1:9000/bbc
 contentSiteModule=filepathContentSite
 [content-site-auth]
@@ -80,8 +80,8 @@ api-address= 0.0.0.0
 api-port= 8108
 api-key= xyz
 [local]
-working-dir=/Users/<username>/aiwhispr/examples/http/working-dir
-index-dir=/Users/<username>/python-venv/aiwhispr/examples/http/working-dir
+working-dir=/<userhome>/aiwhispr/examples/http/working-dir
+index-dir=/<userhome>/aiwhispr/examples/http/working-dir
 [llm-service]
 model-family=sbert
 model-name=all-mpnet-base-v2
@@ -101,7 +101,7 @@ Confirm that the environment variables AIWHISPR_HOME and AIWHISPR_LOG_LEVEL are 
 
 Index the file content for semantic search. This will take some time as it has to process over 2000 files.
 ```
-$AIWHISPR_HOME/shell/start-indexing-content-site.sh -C $AIWHISPR_HOME/config/content-site/sites-available/example_bbc.filepath.cfg
+$AIWHISPR_HOME/shell/start-indexing-content-site.sh -C $AIWHISPR_HOME/config/content-site/sites-available/example_bbc.filepath.typesense.cfg
 ```
 
 **3. Start the AIWhispr search service**
@@ -117,7 +117,7 @@ $AIWHISPR_HOME/shell/start-indexing-content-site.sh -C $AIWHISPR_HOME/config/con
 The log files for these 3 processes is created in /tmp/
 
 ```
-cd $AIWHISPR_HOME/examples/http; $AIWHISPR_HOME/examples/http/start_http_service.sh
+cd $AIWHISPR_HOME/examples/http; $AIWHISPR_HOME/examples/http/start_search_filepath_typesense.sh
 ```
 
 ### Ready to go
