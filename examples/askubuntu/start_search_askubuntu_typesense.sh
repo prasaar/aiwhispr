@@ -12,7 +12,8 @@ then
    exit 1
 fi
 
-cd $AIWHISPR_HOME/examples/http
+EXAMPLE_HOME=$AIWHISPR_HOME/examples/askubuntu
+cd $EXAMPLE_HOME
 
 unameOut="$(uname -s)"
 case "${unameOut}" in
@@ -41,12 +42,12 @@ ps -ef | grep "start-search-service.sh"
 
 echo
 echo "Start the exampleHttpResponder"
-cd $AIWHISPR_HOME/examples/http
+cd $EXAMPLE_HOME
 (python3 exampleHttpResponder.py &> /tmp/askubuntu.exampleHttpResponder.log &);
 ps -ef | grep "exampleHttpResponder.py"
 
 echo
 echo "Start a python HttpServer at port 9000"
-cd $AIWHISPR_HOME/examples/http
+cd $EXAMPLE_HOME
 (python3 -m http.server 9000 &> /tmp/askubuntu.httpServer.log &);
 ps -ef | grep 'http.server'
