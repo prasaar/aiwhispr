@@ -182,7 +182,7 @@ class createVectorDb(vectorDb):
                     {
                         'collection': 'content_chunk_map',
                         'q': input_text_query,
-                        'query_by': 'text_chunk,content_path',
+                        'query_by': 'text_chunk,content_path,title',
                         'sort_by': '_text_match:desc'
                     }
                     ]
@@ -246,7 +246,7 @@ class createVectorDb(vectorDb):
         semantic_hits = []
         text_hits = []
 
-        no_of_semantic_hits = search_results['results'][0]['found']
+        no_of_semantic_hits = len(search_results['results'][0]['hits'])
         semantic_results['found'] = no_of_semantic_hits
         semantic_results['type'] = 'semantic'
 
@@ -277,7 +277,7 @@ class createVectorDb(vectorDb):
         
         if include_text_results == True:
             
-            no_of_text_hits = search_results['results'][1]['found']
+            no_of_text_hits = len(search_results['results'][1]['hits'])
             text_results['found'] = no_of_text_hits
             text_results['type'] = 'text'
             i = 0

@@ -142,7 +142,7 @@ class searchHandler:
          #src_path_for_results = chunk_map_record['src_path_for_results']
          src_path_for_results = self.src_path_for_results
          text_chunk = chunk_map_record['text_chunk']
-            
+         title = chunk_map_record['title']
 
          if output_format == 'html':
             
@@ -156,7 +156,12 @@ class searchHandler:
                display_text_chunk = text_chunk
             else:
                display_text_chunk = text_chunk[:(aiwhisprConstants.HTMLSRCHDSPLYCHARS -3)] + '...'
-            display_html = display_html + '<a href="' + display_url + '">' + content_path + '</a><br>'
+            
+            if len(title) > 0: #Display title with link to content
+                display_html = display_html + '<a href="' + display_url + '">' + title + '</a><br>'
+            else:  #display the content path
+               display_html = display_html + '<a href="' + display_url + '">' + content_path + '</a><br>'
+            
             display_html = display_html + '<div><p>' + display_text_chunk + '</p></div><br>'
             
          if output_format == 'json':
@@ -168,6 +173,7 @@ class searchHandler:
             json_record['src_path_for_results'] = src_path_for_results
             json_record['text_chunk'] = text_chunk
             json_record['search_type'] = 'semantic'
+            json_record['title'] = title
             ##Add this dict record in the list
             display_json.append(json_record)
       
@@ -179,8 +185,11 @@ class searchHandler:
          display_html = display_html + '<div class="aiwhisprTextSearchResults">'
          
          j = 0
-         no_of_text_hits = len(search_results['results'][1]['hits'])
-         
+         if len(search_results['results']) > 1: #Check that  text results are there.
+                no_of_text_hits = len(search_results['results'][1]['hits'])
+         else:
+            self.logger.info('No Text Results returned')
+
          while j < no_of_text_hits:
             chunk_map_record = search_results['results'][1]['hits'][j]
             content_site_name = chunk_map_record['content_site_name']
@@ -190,6 +199,7 @@ class searchHandler:
             #src_path_for_results = chunk_map_record['src_path_for_results']
             src_path_for_results = self.src_path_for_results
             text_chunk = chunk_map_record['text_chunk']
+            title = chunk_map_record['title']
                
             if output_format == 'html':
 
@@ -202,7 +212,12 @@ class searchHandler:
                   display_text_chunk = text_chunk
                else:
                   display_text_chunk = text_chunk[:(aiwhisprConstants.HTMLSRCHDSPLYCHARS -3)] + '...'
-               display_html = display_html + '<a href="' + display_url + '">' + content_path + '</a><br>'
+
+               if len(title) > 0: #Display title with link to content
+                  display_html = display_html + '<a href="' + display_url + '">' + title + '</a><br>'
+               else:  #display the content path
+                  display_html = display_html + '<a href="' + display_url + '">' + content_path + '</a><br>'
+
                display_html = display_html + '<div><p>' + display_text_chunk + '</p></div><br>'
                
             if output_format == 'json':
@@ -214,6 +229,7 @@ class searchHandler:
                json_record['src_path_for_results'] = src_path_for_results
                json_record['text_chunk'] = text_chunk
                json_record['search_type'] = 'text'
+               json_record['title'] = title
                ##Add this dict record in the list
                display_json.append(json_record)
          
