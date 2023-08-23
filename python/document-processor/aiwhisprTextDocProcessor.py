@@ -20,6 +20,9 @@ class getDocProcessor(srcDocProcessor):
     def __init__(self,downloaded_file_path):
         srcDocProcessor.__init__(self,downloaded_file_path)
         
+    def __init__(self):
+        srcDocProcessor.__init__(self)
+
     #public function
     def extractText(self):
         ##Since the downloaded file is a text file we dont have to extract anything.

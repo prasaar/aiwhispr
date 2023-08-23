@@ -18,9 +18,12 @@ sys.path.append("../common-functions")
 sys.path.append("../base-classes")
 
 import initializeDocumentProcessor
+import aiwhisprTextDocProcessor
+
 from aiwhisprLocalIndex import aiwhisprLocalIndex
 from aiwhisprBaseClasses import siteAuth,vectorDb,srcContentSite, baseLlmService
 from textDownloader import textDownloader
+
 
 import aiwhisprConstants 
 
@@ -50,7 +53,10 @@ class createContentSite(srcContentSite):
        srcContentSite.__init__(self,content_site_name=content_site_name,src_type="s3",src_path=src_path,src_path_for_results=src_path_for_results,working_directory=working_directory,index_log_directory=index_log_directory,site_auth=site_auth,vector_db=vector_db,llm_service=llm_service,do_not_read_dir_list=do_not_read_dir_list, do_not_read_file_list=do_not_read_file_list)
        self.downloader = textDownloader()
        self.logger = logging.getLogger(__name__)
-            
+       #Since all content is text, we will initiate the text document processor at start. 
+       # This will save time by avoiding multiple module import
+       self.docProcessor =  aiwhisprTextDocProcessor.getDocProcessor()
+     
     def connect(self):
        
        #Check if the top level directory exists
@@ -172,11 +178,11 @@ class createContentSite(srcContentSite):
             download_file_path = self.getDownloadPath(qa_post['content_path'])
             self.logger.debug('Downloaded File Name: ' + download_file_path)
             self.downloader.write_content(text_content = qa_post['post_body_for_llm'], download_file_path = download_file_path)
-            docProcessor =  initializeDocumentProcessor.initialize(content_file_suffix = '.txt' ,downloaded_file_path = download_file_path)
                             
-            if (docProcessor != None ):
+            if (self.docProcessor != None ):
+                self.docProcessor.setDownloadPath(download_file_path)
                 #Extract text
-                docProcessor.extractText()
+                self.docProcessor.extractText()
                 #Create text chunks
                 chunk_dict = docProcessor.createChunks()
                 self.logger.debug("%d chunks created for %s", len(chunk_dict), download_file_path)
