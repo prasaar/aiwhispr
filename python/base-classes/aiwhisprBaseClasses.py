@@ -333,11 +333,6 @@ class srcDocProcessor:
             self.baseLogger.critical('File does not exist : '  + file_path)
             return file_size
         
-    def __init__(self): #Self init will only instantiate the NLP model for setence validation
-        self.nlp_model = spacy.load("en_core_web_sm")
-        Language.factory("language_detector", func=self.get_lang_detector)
-        self.nlp_model.add_pipe('language_detector', last=True)
-
         
     def __init__(self, downloaded_file_path):
  
@@ -345,26 +340,29 @@ class srcDocProcessor:
         Language.factory("language_detector", func=self.get_lang_detector)
         self.nlp_model.add_pipe('language_detector', last=True)
 
-        self.downloaded_file_path = downloaded_file_path
-        self.downloaded_file_size = self.getFileSize(self.downloaded_file_path)
-        self.downloaded_file_dir = pathlib.PurePath(self.downloaded_file_path).parent
-        self.downloaded_filename = pathlib.PurePath(self.downloaded_file_path).name
-
-        #create directory for extracted text, text chunks
-        ts = str( time.time() )
-        
-        self.extracted_text_file_dir = os.path.join(self.downloaded_file_dir, 'extract' + self.get_random_string(4) + ts)
-        os.makedirs(self.extracted_text_file_dir)
-        self.baseLogger.debug("Created a temporary directory path for extracted text file name: " +self. extracted_text_file_dir)
-        ##the extracted text file name will replace any space " " in its name with "_" and will have .txt suffix 
-        self.extracted_text_file_path = os.path.join(self.extracted_text_file_dir, self.downloaded_filename.replace(' ','_') ) + '.txt'      
-        
-        self.text_chunks_dir = os.path.join(self.downloaded_file_dir, 'chunks'+ self.get_random_string(4) + ts )
-        os.makedirs(self.text_chunks_dir)
-        self.baseLogger.debug("Created directory for text chunks: " + self.text_chunks_dir)
+        if len(downloaded_file_path) > 0: ##A download path has been given as part of the constructor 
+            self.downloaded_file_path = downloaded_file_path
+            self.downloaded_file_size = self.getFileSize(self.downloaded_file_path)
+            self.downloaded_file_dir = pathlib.PurePath(self.downloaded_file_path).parent
+            self.downloaded_filename = pathlib.PurePath(self.downloaded_file_path).name
+    
+            #create directory for extracted text, text chunks
+            ts = str( time.time() )
+            
+            self.extracted_text_file_dir = os.path.join(self.downloaded_file_dir, 'extract' + self.get_random_string(4) + ts)
+            os.makedirs(self.extracted_text_file_dir)
+            self.baseLogger.debug("Created a temporary directory path for extracted text file name: " +self. extracted_text_file_dir)
+            ##the extracted text file name will replace any space " " in its name with "_" and will have .txt suffix 
+            self.extracted_text_file_path = os.path.join(self.extracted_text_file_dir, self.downloaded_filename.replace(' ','_') ) + '.txt'      
+            
+            self.text_chunks_dir = os.path.join(self.downloaded_file_dir, 'chunks'+ self.get_random_string(4) + ts )
+            os.makedirs(self.text_chunks_dir)
+            self.baseLogger.debug("Created directory for text chunks: " + self.text_chunks_dir)
+        else:
+            self.baseLogger.info("The documentProcessor has been created without any downloaded_file_path")
 
     #public function    
-    def setDownloadPath(self, downloaded_file_path):
+    def setDownloadFilePath(self, downloaded_file_path):
  
         self.downloaded_file_path = downloaded_file_path
         self.downloaded_file_size = self.getFileSize(self.downloaded_file_path)

@@ -180,11 +180,11 @@ class createContentSite(srcContentSite):
             self.downloader.write_content(text_content = qa_post['post_body_for_llm'], download_file_path = download_file_path)
                             
             if (self.docProcessor != None ):
-                self.docProcessor.setDownloadPath(download_file_path)
+                self.docProcessor.setDownloadFilePath(download_file_path)
                 #Extract text
                 self.docProcessor.extractText()
                 #Create text chunks
-                chunk_dict = docProcessor.createChunks()
+                chunk_dict = self.docProcessor.createChunks()
                 self.logger.debug("%d chunks created for %s", len(chunk_dict), download_file_path)
                 #For each chunk, read text, create vector embedding and insert in vectordb
                 ##the chunk_dict dictionary will have key=/filepath_to_the_file_containing_text_chunk, value=integer value of the chunk number.

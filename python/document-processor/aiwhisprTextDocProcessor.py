@@ -17,12 +17,9 @@ import logging
 class getDocProcessor(srcDocProcessor):
     logger = logging.getLogger(__name__)
 
-    def __init__(self,downloaded_file_path):
+    def __init__(self,downloaded_file_path = ''): #A textDocProcessor can be startted with no file path if we are processing strings from in-mem objects
         srcDocProcessor.__init__(self,downloaded_file_path)
         
-    def __init__(self):
-        srcDocProcessor.__init__(self)
-
     #public function
     def extractText(self):
         ##Since the downloaded file is a text file we dont have to extract anything.
