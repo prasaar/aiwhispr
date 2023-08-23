@@ -34,8 +34,8 @@ fi
 
 echo "Start the search service"
 case "${machine}" in
-    Mac) ($AIWHISPR_HOME/shell/start-search-service.sh -H 127.0.0.1 -P 5002 -C $AIWHISPR_HOME/config/content-site/sites-available/example_askubuntu.xml.typesense.cfg &> /tmp/example_askubuntu.xml.typesense.log & );;
-    *) ($AIWHISPR_HOME/shell/start-search-service.sh -H 127.0.0.1 -P 5002 -C $AIWHISPR_HOME/config/content-site/sites-available/example_askubuntu.xml.typesense.cfg &> /tmp/example_askubuntu.xml.typesense.log &);;
+    Mac) ($AIWHISPR_HOME/shell/start-search-service.sh -H 127.0.0.1 -P 5002 -C $AIWHISPR_HOME/config/content-site/sites-available/example_askubuntu.xml.typesense.cfg &> /tmp/search.example_askubuntu.xml.typesense.log & );;
+    *) ($AIWHISPR_HOME/shell/start-search-service.sh -H 127.0.0.1 -P 5002 -C $AIWHISPR_HOME/config/content-site/sites-available/example_askubuntu.xml.typesense.cfg &> /tmp/search.example_askubuntu.xml.typesense.log &);;
 esac
 
 ps -ef | grep "start-search-service.sh"

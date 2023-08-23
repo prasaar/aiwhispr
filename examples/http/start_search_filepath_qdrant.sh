@@ -33,8 +33,8 @@ fi
 
 echo "Start the search service"
 case "${machine}" in
-    Mac) ($AIWHISPR_HOME/shell/start-search-service.sh -H 127.0.0.1 -P 5002 -C $AIWHISPR_HOME/config/content-site/sites-available/example_bbc.filepath.qdrant.cfg &> /tmp/example_bbc.filepath.qdrant.searchservice.log & );;
-    *) ($AIWHISPR_HOME/shell/start-search-service.sh -H 127.0.0.1 -P 5002 -C $AIWHISPR_HOME/config/content-site/sites-available/example_bbc.filepath.qdrant.cfg &> /tmp/example_bbc.filepath.qdrant.searchservice.log &);;
+    Mac) ($AIWHISPR_HOME/shell/start-search-service.sh -H 127.0.0.1 -P 5002 -C $AIWHISPR_HOME/config/content-site/sites-available/example_bbc.filepath.qdrant.cfg &> /tmp/search.example_bbc.filepath.qdrant.log & );;
+    *) ($AIWHISPR_HOME/shell/start-search-service.sh -H 127.0.0.1 -P 5002 -C $AIWHISPR_HOME/config/content-site/sites-available/example_bbc.filepath.qdrant.cfg &> /tmp/search.example_bbc.filepath.qdrant.log &);;
 esac
 
 ps -ef | grep "start-search-service.sh"
