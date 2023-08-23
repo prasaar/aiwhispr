@@ -47,6 +47,13 @@ cat /etc/typesense/typesense-server.ini | grep api
 ```
 $AIWHISPR_HOME/shell/install_python_packages.sh
 ```
+If uwsgi install is failing then ensure you have gcc, python-dev , python3-dev installed.
+```
+sudo apt-get install gcc 
+sudo apt install python-dev
+sudo apt install python3-dev
+pip3 install uwsgi
+```
 
 **Remember to add the environment variables in your shell login script**
 
