@@ -200,6 +200,7 @@ class createVectorDb(vectorDb):
             include_text_results = True
 
         #We will first do a semantic search
+        
         search_results = self.vectorDbClient.search(
             collection_name="content_chunk_map",
             query_filter=models.Filter(
@@ -233,7 +234,7 @@ class createVectorDb(vectorDb):
         no_of_semantic_hits = len(search_results)
         semantic_results['found'] = no_of_semantic_hits
         semantic_results['type'] = 'semantic'
-
+        self.logger.debug("Qdrant: semantic search  found %d results", no_of_semantic_hits)
         i = 0
         while i < no_of_semantic_hits:
             result = {} #Dict to hold a single result
@@ -262,7 +263,7 @@ class createVectorDb(vectorDb):
         if include_text_results == True:
 
             #We have to do a text match search , by changing the filter condition
-
+            self.logger.debug("Will do a text search on collection")
             search_results = self.vectorDbClient.search(
             collection_name="content_chunk_map",
             query_filter=models.Filter(
@@ -275,8 +276,8 @@ class createVectorDb(vectorDb):
                     ),
                     models.FieldCondition(
                         key="text_chunk",
-                        match=models.MatchValue(
-                            value=input_text_query,  ##Match on the input text query
+                        match=models.MatchText(
+                            text=input_text_query  ##Match on the input text query
                         )
                     )
 
@@ -290,6 +291,7 @@ class createVectorDb(vectorDb):
             no_of_text_hits = len(search_results)
             text_results['found'] = no_of_text_hits
             text_results['type'] = 'text'
+            self.logger.debug("Qdrant: text search  found %d results for input query: %s",no_of_text_hits, input_text_query)
             i = 0
             while i < no_of_text_hits:
                 result = {} #Dict to hold a single result
