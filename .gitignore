@@ -1,1 +1,3 @@
 __pycache__
+examples/askubuntu/*.xml
+config/content-site/sites-available/example*.cfg
