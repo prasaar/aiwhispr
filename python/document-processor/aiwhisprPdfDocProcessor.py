@@ -18,14 +18,14 @@ import logging
 class getDocProcessor(srcDocProcessor):
     logger = logging.getLogger(__name__)
 
-    def __init__(self,downloaded_file_path):
+    def __init__(self,downloaded_file_path=''):
         srcDocProcessor.__init__(self,downloaded_file_path)
         
     #public function
     def extractText(self):
         #This is a PDF Document text extractor
 
-        self.logger.debug('This is a pdf file. We will extract text')
+        self.logger.debug('This is a pdf file from which we will extract text')
         
         pdf_filepath = self.downloaded_file_path
         txt_filepath = self.extracted_text_file_path

@@ -18,7 +18,7 @@ import logging
 class getDocProcessor(srcDocProcessor):
     logger = logging.getLogger(__name__)
 
-    def __init__(self,downloaded_file_path):
+    def __init__(self,downloaded_file_path = ''):
         srcDocProcessor.__init__(self,downloaded_file_path)
         
     #public function
