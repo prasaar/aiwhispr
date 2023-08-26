@@ -19,6 +19,8 @@ import re
 
 import uuid
 
+import pickle
+
 
 sys.path.append("../common-functions")
 import aiwhisprConstants
@@ -52,15 +54,16 @@ class baseLlmService:
 #If you want to include other types of authentication then inherit from this class and you can process the cofigurations from kwargs
 class siteAuth:
 
-    auth_type:str
-    site_userid:str
-    site_password:str
-    sas_token:str
-    az_key:str
-    aws_access_key_id:str
-    aws_secret_access_key:str
-    check_file_permission:str
-    auth_config: dict
+    auth_type:str = ''
+    site_userid:str = ''
+    site_password:str = ''
+    sas_token:str = ''
+    az_key:str = ''
+    aws_access_key_id:str = ''
+    aws_secret_access_key:str = ''
+    check_file_permission:str = ''
+    auth_config: dict = {}
+
     logger = logging.getLogger(__name__)
     
     def __init__(self,auth_type:str,**kwargs):
@@ -178,7 +181,7 @@ class srcContentSite:
         
     #Common init signature
     #We have defined a common signature for bases and expect derived classes also to follow this signature.
-    #the Derives classes are isntatiated dynamically so it's important we have a common signature.
+    #the Derives classes are instantiated dynamically so it's important we have a common signature.
     def __init__(self, content_site_name:str, src_type:str, src_path:str, src_path_for_results:str, working_directory:str, index_log_directory:str, site_auth:siteAuth, vector_db:vectorDb, llm_service:baseLlmService, do_not_read_dir_list:list = [], do_not_read_file_list:list = []):
         self.content_site_name = content_site_name
         self.src_type = src_type
@@ -191,6 +194,52 @@ class srcContentSite:
         self.llm_service = llm_service
         self.do_not_read_dir_list = do_not_read_dir_list
         self.do_not_read_file_list = do_not_read_file_list
+
+        #This will contain the description of the setup
+        self.self_description = {}
+
+        self.self_description['content_site'] = {}
+        self.self_description['content_site']['content_site_name'] = self.content_site_name
+        self.self_description['content_site']['src_type'] = self.src_type
+        self.self_description['content_site']['src_path'] = self.src_path
+        self.self_description['content_site']['src_path_for_results'] = self.src_path_for_results
+        self.self_description['content_site']['do_not_read_dir_list'] = self.do_not_read_dir_list
+        self.self_description['content_site']['do_not_read_file_list'] = self.do_not_read_file_list
+        
+        self.self_description['local'] = {}
+        self.self_description['local']['working_directory'] = self.working_directory
+        self.self_description['local']['index_log_directory'] = self.index_log_directory 
+
+        self.self_description['site_auth'] = {}
+        self.self_description['site_auth']['auth_type'] = self.site_auth.auth_type
+        self.self_description['site_auth']['site_userid'] = self.site_auth.site_userid
+        self.self_description['site_auth']['site_password'] = self.site_auth.site_password
+        self.self_description['site_auth']['sas_token'] = self.site_auth.sas_token
+        self.self_description['site_auth']['az_key'] = self.site_auth.az_key
+        self.self_description['site_auth']['aws_access_key_id'] = self.site_auth.aws_access_key_id
+        self.self_description['site_auth']['aws_secret_access_key'] = self.site_auth.aws_secret_access_key
+        self.self_description['site_auth']['check_file_permission'] = self.site_auth.check_file_permission
+        self.self_description['site_auth']['auth_config'] = self.site_auth.auth_config
+    
+        self.self_description['llm_service'] = {}
+        self.self_description['llm_service']['vectordb_hostname'] = self.vector_db.vectordb_hostname
+        self.self_description['llm_service']['vectordb_portnumber'] = self.vector_db.vectordb_portnumber
+        self.self_description['llm_service']['vectordb_key'] =  self.vector_db.vectordb_key
+        self.self_description['llm_service']['content_site_name'] =  self.vector_db.content_site_name 
+        self.self_description['llm_service']['src_path'] =  self.vector_db.src_path
+        self.self_description['llm_service']['src_path_for_results'] =  self.vector_db.src_path_for_results
+
+
+        #Pickle the self description
+        self.pickle_file_path = os.path.join(self.self_description['local']['working_directory'], self.content_site_name + '.pkl')
+        self.baseLogger.debug("Pickle File Path:%s", self.pickle_file_path) 
+        self.baseLogger.debug("Pickling :%s in binary", str(self.self_description) ) 
+        fpickle = open(self.pickle_file_path,'wb') #'wb' instead 'w' for binary file
+        pickle.dump(self.self_description, fpickle, -1) #-1 specifies highest binary protocol
+        fpickle.close()
+
+        #End of self description. This will allow configs to be passed for multiprocessing
+        
         
     #These operations shold be implemented is the sub(child) classes
     #public function
