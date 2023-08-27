@@ -4,9 +4,9 @@ helpFunction()
 {
    echo ""
    echo "Usage: $0 -k TypesenseAdminKey -h TypesenseHost -p TypesensePort "
-   echo -e "\t-k Provide the TypesenseAdminKey"
-   echo -e "\t-h IP Address of the Typesense Server"
-   echo -e "\t-p Port number of the typesense server"
+   echo -e "\t-K Provide the TypesenseAdminKey"
+   echo -e "\t-H IP Address of the Typesense Server"
+   echo -e "\t-P Port number of the typesense server"
    exit 1 # Exit script after printing help
 }
 
@@ -32,4 +32,4 @@ echo "$key"
 echo "$hostname"
 echo "$portnumber"
 
-curl -H X-TYPESENSE-API-KEY:"$key" -X POST http://"$hostname":"$portnumber"/operations/db/compact
+curl -H x-typesense-api-key:"$key" -X POST http://"$hostname":"$portnumber"/operations/db/compact
