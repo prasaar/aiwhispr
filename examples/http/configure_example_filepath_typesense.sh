@@ -125,6 +125,26 @@ fi
 echo
 fi
 
+indexDir="${AIWHISPR_HOME}"/examples/http/index-dir
+echo "Current  index-dir="$indexDir
+echo "Do you want to change this [Y/N]" 
+read changeFlag
+if [ "${changeFlag}" = "Y" ]
+then
+echo
+echo "Enter new index-dir. It should be a full path to a directory"
+read indexDir
+echo "Using index-dir="$indexDir
+if [ -d "${indexDir}" ]
+then
+echo "Checked directory exists. Please ensure that read/ write permissions are set"
+else
+echo "Directory does not exist. Exiting...."
+exit 1
+fi
+echo
+fi
+
 echo
 echo
 echo "Now creating a temporary config file in "$tmpConfigFile
@@ -147,7 +167,7 @@ echo "api-key="$vectordbKey >> $tmpConfigFile
 
 echo "[local]" >> $tmpConfigFile
 echo "working-dir="$workingDir >> $tmpConfigFile
-echo "index-dir="$workingDir >> $tmpConfigFile
+echo "index-dir="$indexDir >> $tmpConfigFile
 
 echo "[llm-service]" >> $tmpConfigFile
 echo "model-family=sbert" >> $tmpConfigFile
