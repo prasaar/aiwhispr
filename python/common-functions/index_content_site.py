@@ -22,15 +22,15 @@ print("LOGGING_LEVEL", aiwhispr_logging_level)
 import logging
 
 if (aiwhispr_logging_level == "Debug" or aiwhispr_logging_level == "DEBUG"):
-   logging.basicConfig(level = logging.DEBUG,format = '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s')
+   logging.basicConfig(level = logging.DEBUG,format = '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] [%(process)d] %(message)s')
 elif (aiwhispr_logging_level == "Info" or aiwhispr_logging_level == "INFO"):
-   logging.basicConfig(level = logging.INFO,format = '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s')
+   logging.basicConfig(level = logging.INFO,format = '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] [%(process)d] %(message)s')
 elif (aiwhispr_logging_level == "Warning" or aiwhispr_logging_level == "WARNING"):
-   logging.basicConfig(level = logging.WARNING,format = '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s')
+   logging.basicConfig(level = logging.WARNING,format = '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] [%(process)d] %(message)s')
 elif (aiwhispr_logging_level == "Error" or aiwhispr_logging_level == "ERROR"):
-   logging.basicConfig(level = logging.ERROR,format = '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s')
+   logging.basicConfig(level = logging.ERROR,format = '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] [%(process)d] %(message)s')
 else:   #DEFAULT logging level is DEBUG
-   logging.basicConfig(level = logging.DEBUG,format = '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s')
+   logging.basicConfig(level = logging.DEBUG,format = '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] [%(process)d] %(message)s')
 
 curr_dir = os.path.dirname(os.path.realpath(__file__))
 os.chdir(curr_dir)

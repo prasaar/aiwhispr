@@ -101,11 +101,26 @@ def index(configfile):
     logger.info('VectorDB Module is '+ vectordb_module)
     
 
-    #Read config for local working 
+    #Read config for local section 
     working_directory = config.get('local','working-dir')
     index_log_directory = config.get('local','index-dir')
     logger.info('Local working directory  is '+working_directory)
     logger.info('Local index directory is '+index_log_directory)
+    try:
+        indexing_processes = config.get('local','indexing-processes')
+        if indexing_processes == '' or indexing_processes == None:
+           no_of_processes = 1
+        else:
+           no_of_processes = int(indexing_processes)
+    except configparser.NoOptionError as exc:
+        logger.info("indexing-process option is not defined, so assuming a single process")
+        no_of_processes = 1
+    except:
+        logger.error("Problem when reading no_of_indexing_process")
+        no_of_processes = 1
+    logger.info('Local number of indexing process to run '  + str(no_of_processes) )
+
+
 
     #Read config for the LLM Service
     model_family = config.get('llm-service', 'model-family')
@@ -219,5 +234,5 @@ def index(configfile):
                                                    do_not_read_dir_list = do_not_read_dir_list,
                                                    do_not_read_file_list = do_not_read_file_list)
     
-    contentSite.connect()
-    contentSite.index()
+    #contentSite.connect()
+    contentSite.index(no_of_processes = no_of_processes)

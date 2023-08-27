@@ -1,12 +1,13 @@
 import sqlite3
 import logging
+import os
 
 class aiwhisprLocalIndex:
    def __init__(self,index_log_directory,content_site_name):
       self.index_log_directory = index_log_directory
       self.content_site_name = content_site_name
-      dbfilename=index_log_directory+ '/' + content_site_name + '.db'
-      
+      dbfilename=os.path.join(index_log_directory ,  content_site_name + '.db')
+
       self.logger = logging.getLogger(__name__)
       
       self.connection = sqlite3.connect(dbfilename)

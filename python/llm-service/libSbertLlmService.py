@@ -28,7 +28,8 @@ class createLlmService(baseLlmService):
 
    def __init__(self,model_family, model_name, llm_service_api_key):
       baseLlmService.__init__(self, model_family,model_name, llm_service_api_key)
-
+      self.module_name = 'libSbertLlmService'
+      
    def connect(self):
       self.model = self.model_service.SentenceTransformer(self.model_name)
 

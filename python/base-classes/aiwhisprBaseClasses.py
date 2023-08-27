@@ -23,13 +23,15 @@ import pickle
 
 
 sys.path.append("../common-functions")
+sys.path.append("../common-objects")
 import aiwhisprConstants
-
+from aiwhisprLocalIndex import aiwhisprLocalIndex
 
 #BASE CLASS: baseLlmService
 class baseLlmService:
     model_family:str
     model_name:str
+    module_name:str
 
     def __init__(self, model_family:str, model_name:str, llm_service_api_key:str):
         model_family:str
@@ -98,6 +100,7 @@ class vectorDb:
     content_site_name:str 
     src_path:str 
     src_path_for_results:str
+    module_name:str
 
     def __init__(self,vectordb_hostname,vectordb_portnumber, vectordb_key, content_site_name:str,src_path:str,src_path_for_results:str):
         self.vectordb_hostname = vectordb_hostname
@@ -165,8 +168,10 @@ class srcContentSite:
     llm_service:baseLlmService
     do_not_read_dir_list:[]
     do_not_read_file_list:[]
+    no_of_processes:int
+    download_these_files_list:[]  #a list of path to files that contain the content_paths that should be indexed
+    local_index:aiwhisprLocalIndex  #local index, it will store the metadata
 
-    
 
     baseLogger = logging.getLogger(__name__)
     #Init without siteAuth e.g. local file directory
@@ -194,51 +199,9 @@ class srcContentSite:
         self.llm_service = llm_service
         self.do_not_read_dir_list = do_not_read_dir_list
         self.do_not_read_file_list = do_not_read_file_list
+        #Create an empty list
+        self.download_these_files_list = []
 
-        #This will contain the description of the setup
-        self.self_description = {}
-
-        self.self_description['content_site'] = {}
-        self.self_description['content_site']['content_site_name'] = self.content_site_name
-        self.self_description['content_site']['src_type'] = self.src_type
-        self.self_description['content_site']['src_path'] = self.src_path
-        self.self_description['content_site']['src_path_for_results'] = self.src_path_for_results
-        self.self_description['content_site']['do_not_read_dir_list'] = self.do_not_read_dir_list
-        self.self_description['content_site']['do_not_read_file_list'] = self.do_not_read_file_list
-        
-        self.self_description['local'] = {}
-        self.self_description['local']['working_directory'] = self.working_directory
-        self.self_description['local']['index_log_directory'] = self.index_log_directory 
-
-        self.self_description['site_auth'] = {}
-        self.self_description['site_auth']['auth_type'] = self.site_auth.auth_type
-        self.self_description['site_auth']['site_userid'] = self.site_auth.site_userid
-        self.self_description['site_auth']['site_password'] = self.site_auth.site_password
-        self.self_description['site_auth']['sas_token'] = self.site_auth.sas_token
-        self.self_description['site_auth']['az_key'] = self.site_auth.az_key
-        self.self_description['site_auth']['aws_access_key_id'] = self.site_auth.aws_access_key_id
-        self.self_description['site_auth']['aws_secret_access_key'] = self.site_auth.aws_secret_access_key
-        self.self_description['site_auth']['check_file_permission'] = self.site_auth.check_file_permission
-        self.self_description['site_auth']['auth_config'] = self.site_auth.auth_config
-    
-        self.self_description['llm_service'] = {}
-        self.self_description['llm_service']['vectordb_hostname'] = self.vector_db.vectordb_hostname
-        self.self_description['llm_service']['vectordb_portnumber'] = self.vector_db.vectordb_portnumber
-        self.self_description['llm_service']['vectordb_key'] =  self.vector_db.vectordb_key
-        self.self_description['llm_service']['content_site_name'] =  self.vector_db.content_site_name 
-        self.self_description['llm_service']['src_path'] =  self.vector_db.src_path
-        self.self_description['llm_service']['src_path_for_results'] =  self.vector_db.src_path_for_results
-
-
-        #Pickle the self description
-        self.pickle_file_path = os.path.join(self.self_description['local']['working_directory'], self.content_site_name + '.pkl')
-        self.baseLogger.debug("Pickle File Path:%s", self.pickle_file_path) 
-        self.baseLogger.debug("Pickling :%s in binary", str(self.self_description) ) 
-        fpickle = open(self.pickle_file_path,'wb') #'wb' instead 'w' for binary file
-        pickle.dump(self.self_description, fpickle, -1) #-1 specifies highest binary protocol
-        fpickle.close()
-
-        #End of self description. This will allow configs to be passed for multiprocessing
         
         
     #These operations shold be implemented is the sub(child) classes
@@ -247,7 +210,7 @@ class srcContentSite:
         pass
 
     #public function
-    def index(self):
+    def index(self, no_of_processes = 1):
         pass
 
     #public function
@@ -295,10 +258,11 @@ class srcContentSite:
         return contentCanBeReadFlag
                         
         
-    #This funtion creates the download path
+    #This funtion creates the download path. When called with a pid_suffix(by index_in_parallel) it adds the pid_suffix to the temp directory name 
     #private function
-    def getDownloadPath(self,content_path:str) -> str:
+    def getDownloadPath(self,content_path:str, pid_suffix = '') -> str:  
         filename = pathlib.PurePath(content_path).name
+
         site_working_directory_subdir = os.path.join( self.working_directory , self.content_site_name)
         isDirExist = os.path.exists(site_working_directory_subdir)
         if not isDirExist:
@@ -306,6 +270,9 @@ class srcContentSite:
                self.baseLogger.debug('Created working directory ' + site_working_directory_subdir)
 
         directory_path = os.path.join(site_working_directory_subdir , self.get_random_string(8) )
+        if len(pid_suffix) > 0:
+            directory_path = directory_path + '_' + pid_suffix
+
         isDirExist = os.path.exists(directory_path) 
         if not isDirExist:
             os.makedirs(directory_path)
@@ -328,6 +295,134 @@ class srcContentSite:
                 shutil.move(site_working_directory_subdir, site_working_directory_subdir_bkup )
             except:
                 self.baseLogger.error("Could not move %s to %s", site_working_directory_subdir, site_working_directory_subdir_bkup )
+
+    def createDownloadDirectory(self):
+        #Create the download directory before the multiprocess starts
+        site_working_directory_subdir = os.path.join( self.working_directory , self.content_site_name)
+        isDirExist = os.path.exists(site_working_directory_subdir)
+        if not isDirExist:
+               os.makedirs(site_working_directory_subdir)
+               self.baseLogger.debug('Created working directory ' + site_working_directory_subdir)
+
+
+    def create_download_these_files_list(self):
+        contentrows = self.local_index.getContentProcessedStatus("N") 
+        no_of_rows = len(contentrows)
+        self.baseLogger.debug("Total Number of rows in ContentIndex with ProcessedStatus = N: %d" , no_of_rows )
+        if self.no_of_processes == None:
+            self.baseLogger.error("The number of processes is not set, so setting it to 1")
+            self.no_of_processes = 1
+        
+        no_of_files = self.no_of_processes
+        i = 0
+        while i < no_of_files:
+            fpath = os.path.join(self.index_log_directory,  self.content_site_name + '.contentpath.list.' + str(i))
+            self.download_these_files_list.append(fpath)
+            i = i + 1
+        
+        #Open these files
+        file_writers = []
+        i = 0
+        while i < no_of_files:
+            f = open(self.download_these_files_list[i], "w")
+            file_writers.append(f)
+            i = i + 1
+        
+        #Fetch each row[content_path] and put it in a file
+        j = 0
+        for row in contentrows:
+            """
+            SELECT 
+                content_site_name,
+                src_path,
+                src_path_for_results,
+                content_path,
+                content_type,
+                content_creation_date,
+                content_last_modified_date,
+                content_uniq_id_src,
+                content_tags_from_src,
+                content_size,
+                content_file_suffix, 
+                content_index_flag,
+                content_processed_status 
+            """
+            file_writers[j].write(row[0] + '|')
+            file_writers[j].write(row[1] + '|')
+            file_writers[j].write(row[2] + '|')
+            file_writers[j].write(row[3] + '|')
+            file_writers[j].write(row[4] + '|')
+            file_writers[j].write(str(row[5]) + '|')
+            file_writers[j].write(str(row[6]) + '|')
+            file_writers[j].write(row[7] + '|')
+            file_writers[j].write(row[8] + '|')
+            file_writers[j].write(str( row[9])  + '|')
+            file_writers[j].write(row[10] + '|')
+            file_writers[j].write(row[11] + '|')
+            file_writers[j].write(row[12] + '|')
+            file_writers[j].write('\n')
+
+            j = j + 1
+            if j == no_of_files:
+                j = 0
+        
+        #Now close the files
+        for file_writer in file_writers:
+            file_writer.close()
+        
+    def pickle_me(self):
+        #This will contain the description of the setup
+        self.self_description = {}
+        self.self_description['content_site'] = {}
+        self.self_description['content_site']['content_site_name'] = self.content_site_name
+        self.self_description['content_site']['src_type'] = self.src_type
+        self.self_description['content_site']['src_path'] = self.src_path
+        self.self_description['content_site']['src_path_for_results'] = self.src_path_for_results
+        self.self_description['content_site']['do_not_read_dir_list'] = self.do_not_read_dir_list
+        self.self_description['content_site']['do_not_read_file_list'] = self.do_not_read_file_list
+        
+        self.self_description['local'] = {}
+        self.self_description['local']['working_directory'] = self.working_directory
+        self.self_description['local']['index_log_directory'] = self.index_log_directory 
+        self.self_description['local']['no_of_processes'] = self.no_of_processes
+
+        self.self_description['site_auth'] = {}
+        self.self_description['site_auth']['auth_type'] = self.site_auth.auth_type
+        self.self_description['site_auth']['site_userid'] = self.site_auth.site_userid
+        self.self_description['site_auth']['site_password'] = self.site_auth.site_password
+        self.self_description['site_auth']['sas_token'] = self.site_auth.sas_token
+        self.self_description['site_auth']['az_key'] = self.site_auth.az_key
+        self.self_description['site_auth']['aws_access_key_id'] = self.site_auth.aws_access_key_id
+        self.self_description['site_auth']['aws_secret_access_key'] = self.site_auth.aws_secret_access_key
+        self.self_description['site_auth']['check_file_permission'] = self.site_auth.check_file_permission
+        self.self_description['site_auth']['auth_config'] = self.site_auth.auth_config
+    
+        self.self_description['vector_db'] = {}
+        self.self_description['vector_db']['vectordb_hostname'] = self.vector_db.vectordb_hostname
+        self.self_description['vector_db']['vectordb_portnumber'] = self.vector_db.vectordb_portnumber
+        self.self_description['vector_db']['vectordb_key'] =  self.vector_db.vectordb_key
+        self.self_description['vector_db']['module_name'] =  self.vector_db.module_name 
+
+        self.self_description['llm_service'] = {}
+        self.self_description['llm_service']['model_family'] = self.llm_service.model_family
+        self.self_description['llm_service']['model_name'] = self.llm_service.model_name
+        self.self_description['llm_service']['llm_service_api_key'] = self.llm_service.llm_service_api_key
+        self.self_description['llm_service']['module_name'] = self.llm_service.module_name
+        
+        
+        self.self_description['download_these_files_list'] = self.download_these_files_list
+
+        #Pickle the self description and store it in a file in index_log_directory
+        self.pickle_file_path = os.path.join(self.self_description['local']['index_log_directory'], self.content_site_name + '.pkl')
+        self.baseLogger.debug("Pickle File Path:%s", self.pickle_file_path) 
+        self.baseLogger.debug("Pickling :%s in binary", str(self.self_description) ) 
+        fpickle = open(self.pickle_file_path,'wb') #'wb' instead 'w' for binary file
+        pickle.dump(self.self_description, fpickle, -1) #-1 specifies highest binary protocol
+        fpickle.close()
+        return  self.pickle_file_path
+
+        #End of self description. This will allow configs to be passed for multiprocessing
+        
 
 #BASE CLASS: srcDocProcessor for Document Processors which extract text, then chunk the text
 class srcDocProcessor:

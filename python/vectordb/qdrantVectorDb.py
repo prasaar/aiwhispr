@@ -30,6 +30,7 @@ class createVectorDb(vectorDb):
                           src_path = src_path,
                           src_path_for_results = src_path_for_results)
         self.vectorDbClient:QdrantClient
+        self.module_name='qdrantVectorDb'
         self.logger = logging.getLogger(__name__)
 
     def connect(self):
