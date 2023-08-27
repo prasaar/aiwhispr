@@ -1,3 +1,5 @@
 __pycache__
 examples/askubuntu/*.xml
 config/content-site/sites-available/example*.cfg
+examples/http/index-dir/example_bbc*
+examples/http/working-dir/example_bbc*
