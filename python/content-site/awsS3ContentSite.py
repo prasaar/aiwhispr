@@ -361,8 +361,6 @@ class createContentSite(srcContentSite):
             job.start()
             jobs.append(job)
             i = i + 1 
-        #for myjob in jobs:
-        #    myjob.join()
        
             
                 
