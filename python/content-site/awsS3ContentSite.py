@@ -161,7 +161,7 @@ def index_from_list(pickle_file_path,process_list = 0):
                 else:
                     logger.error("Did not find a document processor for document{%s}, with file suffix:{%s}",download_file_path,content_file_suffix)
            
-    logger.debug("PID:{%d} finished indexing the files is the list from %s ", mypid, file_with_content_path_list )
+    logger.info("PID:{%d} finished indexing the files is the list from %s ", mypid, file_with_content_path_list )
 
 ##End of index_in_parallel
 

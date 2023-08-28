@@ -115,7 +115,7 @@ def index_from_list(pickle_file_path,process_list = 0):
                 content_processed_status = "N"
 
                 #Download the file
-                download_file_path = contentSite.getDownloadPath(content_path)
+                download_file_path = contentSite.getDownloadPath(content_path = content_path, pid_suffix = str(mypid))
                 logger.debug('Downloaded File Name: ' + download_file_path)
                 contentSite.downloader.download_content_file(content_path, download_file_path)                     
                 docProcessor =  initializeDocumentProcessor.initialize(content_file_suffix,download_file_path)
@@ -152,7 +152,7 @@ def index_from_list(pickle_file_path,process_list = 0):
                 else:
                     logger.error("Did not find a document processor for document{%s}, with file suffix:{%s}",download_file_path,content_file_suffix)
 
-    logger.debug("PID:{%d} finished indexing the files is the list from %s ", mypid, file_with_content_path_list )
+    logger.info("PID:{%d} finished indexing the files is the list from %s ", mypid, file_with_content_path_list )
 
 
 class createContentSite(srcContentSite):
