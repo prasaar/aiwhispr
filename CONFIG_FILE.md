@@ -69,11 +69,23 @@ The working-dir can be cleaned up after indexing.
 
 The index-dir configuration points to a path where AIWhispr will store a local SQLite3 database which is used when indexing the content. 
 
-Remember to change them from /tmp to a separate folder in production.
+Remember to change them from /tmp to a separate folder in production. 
 
+Keep the index-dir and working-dir in seprate directories which in production for a clean setup.
+
+indexing-processes=<int:no_of_parallel_spawned_processes_for_indexing>
+
+should be be less thant then number of CPU's on the machine on which you run indexing.
+
+Spawning of of multiple indexing processes is effective when you have GPU's and CPU.
+
+If you have only CPU's  then this should be set to 50% of the CPU's on the machine so that you have enough CPU's for other processes.
+
+Example: on a 4 CPU machine, set  indexing-processes=2
 ```
 working-dir=/tmp
 index-dir=/tmp
+indexing-processes=<int:should_be_less_than_no_of_cpu>
 ```
 
 **[llm-service]**
