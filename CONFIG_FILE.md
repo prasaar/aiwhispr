@@ -73,18 +73,18 @@ Remember to change them from /tmp to a separate folder in production.
 
 Keep the index-dir and working-dir in seprate directories which in production for a clean setup.
 
-indexing-processes is configured  to an integer value 1 or greater. It should not be greater than the number of CPU's on the machine
+indexing-processes is configured  to an integer value 1 or greater. It should not be greater than the number of CPU's on the machine.
 AIWhispr spawns multiple processes for indexing based on this value.
 
-Spawning of of multiple indexing processes is effective when you have GPU's and CPU.
+Spawning of of multiple indexing processes is effective when you have GPU's and CPU's.
 
-If you have only CPU's  then this should be set to 50% of the CPU's on the machine so that you have enough CPU's for other processes.
+If you have only CPU's  then this should be set to 1 or 50% of the CPU's on the machine to ensure you have enough CPU's for other processes.
 
 Example: on a 4 CPU machine, set  indexing-processes=2
 ```
 working-dir=/tmp
 index-dir=/tmp
-indexing-processes=<int:should_be_less_than_no_of_cpu>
+indexing-processes=<int:should_be_1_or_less_than_no_of_cpu>
 ```
 
 **[llm-service]**
