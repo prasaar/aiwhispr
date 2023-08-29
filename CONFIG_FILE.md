@@ -73,9 +73,8 @@ Remember to change them from /tmp to a separate folder in production.
 
 Keep the index-dir and working-dir in seprate directories which in production for a clean setup.
 
-indexing-processes=<int:no_of_parallel_spawned_processes_for_indexing>
-
-should be be less thant then number of CPU's on the machine on which you run indexing.
+indexing-processes is configured  to an integer value 1 or greater. It should not be greater than the number of CPU's on the machine
+AIWhispr spawns multiple processes for indexing based on this value.
 
 Spawning of of multiple indexing processes is effective when you have GPU's and CPU.
 
