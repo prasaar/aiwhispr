@@ -33,7 +33,8 @@ echo "pip3 install uwsgi"
 pip3 install uwsgi
 echo "pip3 install qdrant-client"
 pip3 install qdrant-client
-
+echo "pip3 install --upgrade google-cloud-storage"
+pip3 install --upgrade google-cloud-storage
 
 echo "###List of python packages after install ####"
 pip3 list 

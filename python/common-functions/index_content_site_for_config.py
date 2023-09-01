@@ -199,6 +199,25 @@ def index(configfile):
                         site_auth=siteAuth(auth_type=auth_type,aws_access_key_id=aws_access_key_id,aws_secret_access_key=aws_secret_access_key)
                 case other:
                     logger.error('Dont know how to handle for s3,auth type %s', auth_type)
+        case 'google-cloud':
+            auth_type = config.get('content-site-auth','authtype')
+            logger.debug('Site Authentication Type is '+ auth_type)
+            match auth_type:
+                case 'google-cred-key':
+                    google_cred_path = config.get('content-site-auth','google-cred-path')
+                    google_project_id = config.get('content-site-auth','google-project-id')
+                    google_storage_api_key = config.get('content-site-auth','google-storage-api-key')
+                    logger.debug('google_cred_path : %s google_project_id : %s google_storage_api_key: %s', google_cred_path, google_project_id, google_storage_api_key)
+                    if(len(google_cred_path) == 0 or len(google_project_id) == 0 or len(google_storage_api_key) == 0):
+                        logger.error('Could not read google-cred-path, google-project-id, google-storage-api-key')
+                    else:
+                        site_auth=siteAuth(auth_type=auth_type, 
+                                           google_cred_path=google_cred_path ,
+                                           google_project_id=google_project_id,
+                                           google_storage_api_key=google_storage_api_key
+                                           )
+                case other:
+                    logger.error('Dont know how to handle authentication for google-cloud,auth type %s', auth_type)
         case other: ##Could be custom config-site. So read the site-auth configs as it is as pass them as a dictionary  
             logger.debug('Site Authentication Type is '+ auth_type)
             #eturn a list of name, value pairs for the options in the content-site-auth section

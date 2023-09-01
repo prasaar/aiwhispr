@@ -64,6 +64,10 @@ class siteAuth:
     aws_access_key_id:str = ''
     aws_secret_access_key:str = ''
     check_file_permission:str = ''
+    google_cred_path:str=''
+    google_project_id:str=''
+    google_storage_api_key:str=''
+
     auth_config: dict = {}
 
     logger = logging.getLogger(__name__)
@@ -85,6 +89,11 @@ class siteAuth:
                 self.logger.debug("aws-key:aws_access_key_id=%s,aws_secret_access_key=%s",kwargs['aws_access_key_id'], kwargs['aws_secret_access_key'] )
                 self.aws_access_key_id = kwargs['aws_access_key_id']
                 self.aws_secret_access_key = kwargs['aws_secret_access_key']
+            case 'google-cred-key':
+                self.logger.debug("google_cred_path=%s,google_project_id=%s,google_storage_api_key=%s",kwargs['google_cred_path'], kwargs['google_project_id'], kwargs['google_storage_api_key'] )
+                self.google_cred_path = kwargs['google_cred_path']
+                self.google_project_id = kwargs['google_project_id']
+                self.google_storage_api_key = kwargs['google_storage_api_key']
             case other:
                 self.logger.debug('Dont know how to handle the auth type %s', self.auth_type)
                 self.auth_config = kwargs['auth_config']
@@ -395,6 +404,9 @@ class srcContentSite:
         self.self_description['site_auth']['aws_access_key_id'] = self.site_auth.aws_access_key_id
         self.self_description['site_auth']['aws_secret_access_key'] = self.site_auth.aws_secret_access_key
         self.self_description['site_auth']['check_file_permission'] = self.site_auth.check_file_permission
+        self.self_description['site_auth']['google_cred_path'] = self.site_auth.google_cred_path
+        self.self_description['site_auth']['google_project_id'] = self.site_auth.google_project_id
+        self.self_description['site_auth']['google_storage_api_key'] = self.site_auth.google_storage_api_key    
         self.self_description['site_auth']['auth_config'] = self.site_auth.auth_config
     
         self.self_description['vector_db'] = {}
