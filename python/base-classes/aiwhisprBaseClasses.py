@@ -333,7 +333,7 @@ class srcContentSite:
         file_writers = []
         i = 0
         while i < no_of_files:
-            f = open(self.download_these_files_list[i], "w")
+            f = open(self.download_these_files_list[i], "wb")
             file_writers.append(f)
             i = i + 1
         
@@ -356,20 +356,20 @@ class srcContentSite:
                 content_index_flag,
                 content_processed_status 
             """
-            file_writers[j].write(row[0] + '|')
-            file_writers[j].write(row[1] + '|')
-            file_writers[j].write(row[2] + '|')
-            file_writers[j].write(row[3] + '|')
-            file_writers[j].write(row[4] + '|')
-            file_writers[j].write(str(row[5]) + '|')
-            file_writers[j].write(str(row[6]) + '|')
-            file_writers[j].write(row[7] + '|')
-            file_writers[j].write(row[8] + '|')
-            file_writers[j].write(str( row[9])  + '|')
-            file_writers[j].write(row[10] + '|')
-            file_writers[j].write(row[11] + '|')
-            file_writers[j].write(row[12] + '|')
-            file_writers[j].write('\n')
+            file_writers[j].write(row[0].encode("utf-8") + '|'.encode("utf-8") )
+            file_writers[j].write(row[1].encode("utf-8")  + '|'.encode("utf-8") )
+            file_writers[j].write(row[2].encode("utf-8")  + '|'.encode("utf-8") )
+            file_writers[j].write(row[3].encode("utf-8")  + '|'.encode("utf-8") )
+            file_writers[j].write(row[4].encode("utf-8")  + '|'.encode("utf-8") )
+            file_writers[j].write(str(row[5]).encode("utf-8")  + '|'.encode("utf-8") )
+            file_writers[j].write(str(row[6]).encode("utf-8")  + '|'.encode("utf-8") )
+            file_writers[j].write(row[7].encode("utf-8")  + '|'.encode("utf-8") )
+            file_writers[j].write(row[8].encode("utf-8")  + '|'.encode("utf-8") )
+            file_writers[j].write(str( row[9]).encode("utf-8")   + '|'.encode("utf-8") )
+            file_writers[j].write(row[10].encode("utf-8")  + '|'.encode("utf-8") )
+            file_writers[j].write(row[11].encode("utf-8")  + '|'.encode("utf-8") )
+            file_writers[j].write(row[12].encode("utf-8")  + '|'.encode("utf-8") )
+            file_writers[j].write('\n'.encode("utf-8") )
 
             j = j + 1
             if j == no_of_files:
@@ -492,6 +492,12 @@ class srcDocProcessor:
         
     def __init__(self, downloaded_file_path):
  
+        spacy_on_gpu = spacy.prefer_gpu()
+        if spacy_on_gpu:
+            self.baseLogger.info("spacy module will use gpu")
+        else:
+            self.baseLogger.info("spacy module will use cpu")
+
         self.nlp_model = spacy.load("en_core_web_sm")
         Language.factory("language_detector", func=self.get_lang_detector)
         self.nlp_model.add_pipe('language_detector', last=True)

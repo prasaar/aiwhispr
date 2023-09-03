@@ -94,7 +94,7 @@ def index_from_list(pickle_file_path,process_list = 0):
     #              For each text chunk get the vector embedding
     #              Insert the text chunk, associated meta data and vector embedding into the vector database
     #Now start reading the site and list all the files
-    file_download_list = open(file_with_content_path_list, 'r')
+    file_download_list = open(file_with_content_path_list, 'r', encoding="utf-8")
     continue_reading_file_list = True
     content_path = ''
     while continue_reading_file_list:  # Get next line from file
