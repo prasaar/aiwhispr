@@ -62,9 +62,7 @@ def index_from_list(pickle_file_path,process_list = 0):
 
     #Instantiate the vector db object. This will return a vectorDb derived class based on the module name
     vector_db = initializeVectorDb.initialize(vectordb_module=self_description['vector_db']['module_name'],
-                                             vectordb_hostname = self_description['vector_db']['vectordb_hostname'], 
-                                             vectordb_portnumber = self_description['vector_db']['vectordb_portnumber'], 
-                                             vectordb_key = self_description['vector_db']['vectordb_key'],
+                                             vectordb_config = self_description['vector_db']['vectordb_config'], 
                                              content_site_name = self_description['content_site']['content_site_name'],
                                              src_path = self_description['content_site']['src_type'], 
                                              src_path_for_results = self_description['content_site']['src_path_for_results'] 
