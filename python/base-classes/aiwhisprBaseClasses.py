@@ -102,31 +102,25 @@ class siteAuth:
 
 #BASE CLASS: vectorDb:
 class vectorDb:
-    vectordb_type:str
-    vectordb_hostname:str
-    vectordb_portnumber:str
-    vectordb_key:str
+    
+    vectordb_config:dict
+    module_name:str
     content_site_name:str 
     src_path:str 
     src_path_for_results:str
-    module_name:str
 
-    def __init__(self,vectordb_hostname,vectordb_portnumber, vectordb_key, content_site_name:str,src_path:str,src_path_for_results:str):
-        self.vectordb_hostname = vectordb_hostname
-        self.vectordb_portnumber = vectordb_portnumber
-        self.vectordb_key = vectordb_key
+
+    def __init__(self, vectordb_config:{}, content_site_name:str,src_path:str,src_path_for_results:str, module_name:str):
+        self.vectordb_config = vectordb_config
         self.content_site_name = content_site_name
-        self.src_path = src_path
-        self.src_path_for_results = src_path_for_results
+        self.src_path=src_path
+        self.src_path_for_results=src_path_for_results
+        self.module_name=module_name
 
         self.baseLogger = logging.getLogger(__name__)
-        self.baseLogger.debug("vectordb_hostname = %s", self.vectordb_hostname)
-        self.baseLogger.debug("vectordb_portnumber = %s", self.vectordb_portnumber)
-        self.baseLogger.debug("vectordb_key = %s", self.vectordb_key)
-        self.baseLogger.debug("content_site_name = %s", self.content_site_name)
-        self.baseLogger.debug("src_path = %s", self.src_path)
-        self.baseLogger.debug("src_path_for_results = %s", self.src_path_for_results)
-        
+        for key in vectordb_config.keys():
+            self.baseLogger.debug("Key:Value Pair in VectorDB Config [%s][%s]", key, vectordb_config[key])
+    
 
     #We are defining the signature in base class to show that we are folling a particular schema
     #A schema change has to be managed carefully across the application.
@@ -410,17 +404,14 @@ class srcContentSite:
         self.self_description['site_auth']['auth_config'] = self.site_auth.auth_config
     
         self.self_description['vector_db'] = {}
-        self.self_description['vector_db']['vectordb_hostname'] = self.vector_db.vectordb_hostname
-        self.self_description['vector_db']['vectordb_portnumber'] = self.vector_db.vectordb_portnumber
-        self.self_description['vector_db']['vectordb_key'] =  self.vector_db.vectordb_key
+        self.self_description['vector_db']['vectordb_config'] = self.vector_db.vectordb_config  ## Assign the vectordb_config dict
         self.self_description['vector_db']['module_name'] =  self.vector_db.module_name 
-
+        
         self.self_description['llm_service'] = {}
         self.self_description['llm_service']['model_family'] = self.llm_service.model_family
         self.self_description['llm_service']['model_name'] = self.llm_service.model_name
         self.self_description['llm_service']['llm_service_api_key'] = self.llm_service.llm_service_api_key
         self.self_description['llm_service']['module_name'] = self.llm_service.module_name
-        
         
         self.self_description['download_these_files_list'] = self.download_these_files_list
 

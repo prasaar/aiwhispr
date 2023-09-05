@@ -16,17 +16,13 @@ sys.path.append("../vectordb")
 import logging
 
 def initialize(vectordb_module:str,
-    vectordb_hostname:str,
-    vectordb_portnumber:str,
-    vectordb_key:str,
+    vectordb_config:dict,
     content_site_name:str,
     src_path:str,
     src_path_for_results:str):
         #Dynamically import module and instantiate
         vectorDbMgr = import_module(vectordb_module)
-        return   vectorDbMgr.createVectorDb(vectordb_hostname = vectordb_hostname,
-                                            vectordb_portnumber = vectordb_portnumber,
-                                            vectordb_key = vectordb_key,
+        return   vectorDbMgr.createVectorDb(vectordb_config = vectordb_config,
                                             content_site_name = content_site_name,
                                             src_path = src_path, 
                                             src_path_for_results = src_path_for_results)

@@ -90,17 +90,11 @@ def index(configfile):
     logger.info('doNotReadFileList is %s', doNotReadFileList)
 
     #Read the vector database configs
-    vectordb_hostname = config.get('vectordb', 'api-address')
-    vectordb_portnumber = config.get('vectordb', 'api-port')
-    vectordb_key = config.get('vectordb', 'api-key')
-    #db-type can be typesense,qdrant 
+    vectordb_config = dict(config.items('vectordb'))
     vectordb_module = config.get('vectordb','vectorDbModule')
-    logger.info('VectorDB Server Host is ' + vectordb_hostname)
-    logger.info('VectorDB Server Port is '+ vectordb_portnumber)
-    logger.debug('VectorDB Server Key is ' + vectordb_key)
     logger.info('VectorDB Module is '+ vectordb_module)
+    logger.info('Vectordb Config is : %s', str(vectordb_config))
     
-
     #Read config for local section 
     working_directory = config.get('local','working-dir')
     index_log_directory = config.get('local','index-dir')
@@ -225,14 +219,12 @@ def index(configfile):
             site_auth=siteAuth(auth_type=auth_type,auth_config=auth_config)
 
     #Instantiate the vector db object. This will return a vectorDb derived class based on the module name
-    vector_db = initializeVectorDb.initialize(vectordb_module=vectordb_module,
-                                             vectordb_hostname = vectordb_hostname, 
-                                             vectordb_portnumber = vectordb_portnumber, 
-                                             vectordb_key = vectordb_key,
-                                             content_site_name = content_site_name,
-                                             src_path = src_path, 
-                                             src_path_for_results = src_path_for_results
-                                             )
+    vector_db = initializeVectorDb.initialize( vectordb_module = vectordb_module,
+                                            vectordb_config = vectordb_config,
+                                            content_site_name = content_site_name,
+                                            src_path = src_path, 
+                                            src_path_for_results = src_path_for_results
+                                            )
     
     llm_service = initializeLlmService.initialize(llm_service_module = llm_service_module, 
                                                   model_family = model_family, 
