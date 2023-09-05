@@ -22,16 +22,20 @@ import logging
 
 class createVectorDb(vectorDb):
 
-    def __init__(self,vectordb_hostname,vectordb_portnumber, vectordb_key, content_site_name:str,src_path:str,src_path_for_results:str):
+    def __init__(self,vectordb_config:{}, content_site_name:str,src_path:str,src_path_for_results:str):
+        
         vectorDb.__init__(self,
-                          vectordb_hostname = vectordb_hostname,
-                          vectordb_portnumber = vectordb_portnumber, 
-                          vectordb_key = vectordb_key, 
-                          content_site_name = content_site_name,
-                          src_path = src_path,
-                          src_path_for_results = src_path_for_results)
+                        vectordb_config = vectordb_config,
+                        content_site_name = content_site_name,
+                        src_path = src_path,
+                        src_path_for_results = src_path_for_results,
+                        module_name = 'typesenseVectorDb')
+        
+        self.vectordb_hostname = vectordb_config['api-address']
+        self.vectordb_portnumber = vectordb_config['api-port']
+        self.vectordb_key = vectordb_config['api-key']
+
         self.vectorDbClient:typesense.Client
-        self.module_name='typesenseVectorDb'
         self.logger = logging.getLogger(__name__)
 
     def connect(self):
