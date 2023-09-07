@@ -53,13 +53,11 @@ class searchHandler:
    src_path_for_results:str
    logger=logging.getLogger(__name__)
 
-   def setup(self,llm_service_module:str, vectordb_module:str, model_family:str, model_name:str, llm_service_api_key:str, vectordb_hostname:str, vectordb_portnumber:str,vectordb_key:str, content_site_name:str,src_path:str,src_path_for_results:str):
+   def setup(self,llm_service_module:str, vectordb_module:str, model_family:str, model_name:str, llm_service_api_key:str, vectordb_config:dict, content_site_name:str,src_path:str,src_path_for_results:str):
       llmServiceMgr = import_module(llm_service_module)
       vectorDbMgr = import_module(vectordb_module)
 
-      self.vector_db = vectorDbMgr.createVectorDb(vectordb_hostname = vectordb_hostname,
-                                          vectordb_portnumber = vectordb_portnumber,
-                                          vectordb_key = vectordb_key,
+      self.vector_db = vectorDbMgr.createVectorDb(vectordb_config=vectordb_config,
                                           content_site_name = content_site_name,
                                           src_path = src_path,
                                           src_path_for_results = src_path_for_results)
@@ -258,16 +256,14 @@ def setup(configfile):
     src_path = config.get('content-site','srcpath')
     src_path_for_results = config.get('content-site','displaypath')
     ##VectorDB Service
-    vectordb_hostname = config.get('vectordb', 'api-address')
-    vectordb_portnumber = config.get('vectordb', 'api-port')
-    vectordb_key = config.get('vectordb', 'api-key')
+    vectordb_config = dict(config.items('vectordb'))
     vectordb_module = config.get('vectordb','vectorDbModule')
     ##LLM Service
     model_family =config.get('llm-service','model-family')
     model_name = config.get('llm-service','model-name')
     llm_service_module = config.get('llm-service', 'llmServiceModule')
     llm_service_api_key = config.get('llm-service', 'llm-service-api-key')
-    mySearchHandler[0].setup(llm_service_module, vectordb_module, model_family, model_name, llm_service_api_key, vectordb_hostname, vectordb_portnumber,vectordb_key, content_site_name,src_path,src_path_for_results)
+    mySearchHandler[0].setup(llm_service_module, vectordb_module, model_family, model_name, llm_service_api_key, vectordb_config, content_site_name,src_path,src_path_for_results)
 
 app = Flask(__name__)
 
