@@ -76,9 +76,9 @@ class createVectorDb(vectorDb):
                   {"name": "src_path_for_results", "dataType": ['text']},
                   {"name": "content_path", "dataType": ['text']},
                   {"name": "last_edit_date", "dataType": ['number'] },
-                  {"name": "tags", "dataType": ['text']},
-                  {"name": "title", "dataType": ['text'] },
-                  {"name": "text_chunk", "dataType": ['text']},
+                  {"name": "tags", "dataType": ['text'], "tokenization": "word"},
+                  {"name": "title", "dataType": ['text'], "tokenization": "word" },
+                  {"name": "text_chunk", "dataType": ['text'], "tokenization": "word"},
                   {"name": "text_chunk_no", "dataType": ['int']},
                   {"name": "vector_embedding_date", "dataType": ['number']},
 
@@ -274,17 +274,19 @@ class createVectorDb(vectorDb):
            
             search_response = ( self.vectorDbClient.query
             .get("ContentChunkMap",["content_site_name", "src_path", "src_path_for_results", "content_path", "last_edit_date", "tags", "title", "text_chunk", "text_chunk_no", "vector_embedding_date"])
+            .with_bm25(query=input_text_query, properties=["text_chunk", "title", "tags"])
             .with_where({
                 "path": ["content_site_name"],
-                "operator": "Equal",
-                "valueText": self.content_site_name
+               "operator": "Equal",
+               "valueText": self.content_site_name
             })
-            .with_bm25(query=input_text_query)
             .with_limit(limit_hits)
             .with_additional(["score","id"])
             .do()
             )
             search_results=search_response['data']['Get']['ContentChunkMap']
+
+            self.logger.debug("SearchResponse %s", search_response)
 
             no_of_text_hits = len(search_results)
             text_results['found'] = no_of_text_hits
