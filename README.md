@@ -1,7 +1,7 @@
 # AIWhispr
 
 ## Overview
-AIWhispr is a tool to enable AI powered semantic search on documents 
+AIWhispr is a no/low code tool to enable AI powered semantic search.
 - It is easy to install.
 - Simple to configure.
 - Delivers fast semantic response to search queries.
