@@ -114,17 +114,11 @@ def index(configfile):
         no_of_processes = 1
     logger.info('Local number of indexing process to run '  + str(no_of_processes) )
 
-
-
     #Read config for the LLM Service
-    model_family = config.get('llm-service', 'model-family')
-    model_name = config.get('llm-service', 'model-name')
-    llm_service_api_key = config.get('llm-service', 'llm-service-api-key')
+    llm_service_config = dict(config.items('llm-service'))
     llm_service_module = config.get('llm-service', 'llmServiceModule')
-    logger.info("LLM Model Family is %s", model_family)
-    logger.info("LLM Model Name is %s", model_name)
-    logger.debug("LLM Api Key is %s", llm_service_api_key)
     logger.info("LLM Service Module Name is %s", llm_service_module)
+    logger.info('LLM Service Config is : %s', str(llm_service_config))
     
     #Read configs for the site-authentication
     #Source Type are the root directory hosting types from where we read the path/files
@@ -227,9 +221,7 @@ def index(configfile):
                                             )
     
     llm_service = initializeLlmService.initialize(llm_service_module = llm_service_module, 
-                                                  model_family = model_family, 
-                                                  model_name = model_name,
-                                                  llm_service_api_key = llm_service_api_key)
+                                                  llm_service_config = llm_service_config)
                             
     #Initialize the content site handler. The returned oject is content site specific (azure, aws,filepath) handler
     contentSite = initializeContentSite.initialize(content_site_module=content_site_module,

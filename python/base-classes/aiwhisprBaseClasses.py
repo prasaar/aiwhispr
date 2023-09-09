@@ -29,19 +29,14 @@ from aiwhisprLocalIndex import aiwhisprLocalIndex
 
 #BASE CLASS: baseLlmService
 class baseLlmService:
-    model_family:str
-    model_name:str
+    
+    llm_service_config:dict
     module_name:str
 
-    def __init__(self, model_family:str, model_name:str, llm_service_api_key:str):
-        model_family:str
-        model_name:str
-        llm_service_api_key:str
+    def __init__(self, llm_service_config:dict, module_name:str):
+        self.llm_service_config = llm_service_config
+        self.module_name = module_name
         
-        self.model_family = model_family
-        self.model_name = model_name
-        self.llm_service_api_key = llm_service_api_key
-    
     #public function
     def connect(self):
         pass
@@ -404,13 +399,11 @@ class srcContentSite:
         self.self_description['site_auth']['auth_config'] = self.site_auth.auth_config
     
         self.self_description['vector_db'] = {}
-        self.self_description['vector_db']['vectordb_config'] = self.vector_db.vectordb_config  ## Assign the vectordb_config dict
+        self.self_description['vector_db']['vectordb_config'] = self.vector_db.vectordb_config 
         self.self_description['vector_db']['module_name'] =  self.vector_db.module_name 
         
         self.self_description['llm_service'] = {}
-        self.self_description['llm_service']['model_family'] = self.llm_service.model_family
-        self.self_description['llm_service']['model_name'] = self.llm_service.model_name
-        self.self_description['llm_service']['llm_service_api_key'] = self.llm_service.llm_service_api_key
+        self.self_description['llm_service']['llm_service_config'] = self.llm_service.llm_service_config 
         self.self_description['llm_service']['module_name'] = self.llm_service.module_name
         
         self.self_description['download_these_files_list'] = self.download_these_files_list

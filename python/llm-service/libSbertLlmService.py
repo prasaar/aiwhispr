@@ -22,13 +22,15 @@ from aiwhisprBaseClasses import baseLlmService
 import logging
 
 class createLlmService(baseLlmService):
-
+   #Import sentence_transformers which should have been installed
    model_service = import_module("sentence_transformers")
    model
 
-   def __init__(self,model_family, model_name, llm_service_api_key):
-      baseLlmService.__init__(self, model_family,model_name, llm_service_api_key)
-      self.module_name = 'libSbertLlmService'
+   def __init__(self,llm_service_config):
+
+      baseLlmService.__init__(self, llm_service_config=llm_service_config, module_name='libSbertLlmService')
+      self.model_family = llm_service_config['model-family']
+      self.model_name = llm_service_config['model-name']
       
    def connect(self):
       self.model = self.model_service.SentenceTransformer(self.model_name)
