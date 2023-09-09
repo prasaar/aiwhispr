@@ -67,9 +67,7 @@ def index_from_list(pickle_file_path,process_list = 0):
                                              )
     
     llm_service = initializeLlmService.initialize(llm_service_module = self_description['llm_service']['module_name'], 
-                                                  model_family = self_description['llm_service']['model_family'], 
-                                                  model_name = self_description['llm_service']['model_name'],
-                                                  llm_service_api_key = self_description['llm_service']['llm_service_api_key'])
+                                                  llm_service_config = self_description['llm_service']['llm_service_config'])
                             
     contentSite = initializeContentSite.initialize(content_site_module='awsS3ContentSite',
                                                    src_type=self_description['content_site']['src_type'],
