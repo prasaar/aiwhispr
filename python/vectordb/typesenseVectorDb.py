@@ -31,13 +31,21 @@ class createVectorDb(vectorDb):
                         src_path_for_results = src_path_for_results,
                         module_name = 'typesenseVectorDb')
         
-        self.vectordb_hostname = vectordb_config['api-address']
-        self.vectordb_portnumber = vectordb_config['api-port']
-        self.vectordb_key = vectordb_config['api-key']
-
         self.vectorDbClient:typesense.Client
+    
         self.logger = logging.getLogger(__name__)
 
+        self.vectordb_hostname = vectordb_config['api-address']
+        self.vectordb_portnumber = vectordb_config['api-port']
+        self.vectordb_key = vectordb_config['api-key']    
+        try:
+            self.vectordb_vector_dim = int(vectordb_config['vector-dim'])
+        except:
+            self.logger.error("Typesense requires vector dimensions to be provided. Have you set this as vector-dim=<int> ?")
+            sys.exit()
+
+        
+        
     def connect(self):
         try:
             self.logger.debug("Creating a Typesense Connection")
@@ -69,6 +77,7 @@ class createVectorDb(vectorDb):
                 #create the collection in typesense
                 #We are not creating an 'id' (unique id)  field. It will be provided in insert statements by the client
                 #We expect id to be in the format <site-name>/<extracted-file_directory-name>/<chunk-files-directory>/<chunk-id>
+                self.vectordb_vector_dim
                 create_response = self.vectorDbClient.collections.create({
                     "name": "content_chunk_map",
                     "fields": [
@@ -94,7 +103,7 @@ class createVectorDb(vectorDb):
                         # CHUNK_NO is a mandatory field, it is a running sequence of numbers for the sections of the text in the document. This is useful when the content is broken into sections.
                         {"name": "text_chunk_no", "type": "int32", "optional": True, "index": False },
                         #BELOW VECTOR FIELD : We are chossing a 768 dimension vector based on all_mpnet
-                        {"name": "vector_embedding", "type": "float[]", 'num_dim': 768, "optional": True , "index": True},
+                        {"name": "vector_embedding", "type": "float[]", 'num_dim': self.vectordb_vector_dim, "optional": True , "index": True},
                         # VECTOR_EMBEDDING_DATE is the last date  on which this content LLM Vector was created
                         {"name": "vector_embedding_date", "type": "float" , "optional": True, "index": False},
                     ]
