@@ -31,7 +31,7 @@ DYLD_LIBRARY_PATH=/opt/homebrew/lib
 export DYLD_LIBRARY_PATH
 fi
 
-echo "Start the search service"
+echo "Start the search service on port 5002"
 case "${machine}" in
     Mac) ($AIWHISPR_HOME/shell/start-search-service.sh -H 127.0.0.1 -P 5002 -C $AIWHISPR_HOME/config/content-site/sites-available/example_bbc.filepath.qdrant.cfg &> /tmp/search.example_bbc.filepath.qdrant.log & );;
     *) ($AIWHISPR_HOME/shell/start-search-service.sh -H 127.0.0.1 -P 5002 -C $AIWHISPR_HOME/config/content-site/sites-available/example_bbc.filepath.qdrant.cfg &> /tmp/search.example_bbc.filepath.qdrant.log &);;
@@ -40,13 +40,13 @@ esac
 ps -ef | grep "start-search-service.sh"
 
 echo
-echo "Start the exampleHttpResponder"
+echo "Start the exampleHttpResponder on port 9101"
 cd $AIWHISPR_HOME/examples/http
 (python3 exampleHttpResponder.py &> /tmp/example_bbc.exampleHttpResponder.log &);
 ps -ef | grep "exampleHttpResponder.py"
 
 echo
-echo "Start a python HttpServer at port 9000"
+echo "Start a python HttpServer at port 9100"
 cd $AIWHISPR_HOME/examples/http
-(python3 -m http.server 9000 &> /tmp/example_bbc.httpServer.log &);
+(python3 -m http.server 9100 &> /tmp/example_bbc.httpServer.log &);
 ps -ef | grep 'http.server'
