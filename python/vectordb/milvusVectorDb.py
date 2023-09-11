@@ -383,7 +383,7 @@ class createVectorDb(vectorDb):
             result['src_path'] = chunk_map_record.entity.get('src_path')
             result['src_path_for_results'] = self.src_path_for_results
             result['text_chunk'] = chunk_map_record.entity.get('text_chunk')
-            result['text_chunk_no'] = chunk_map_record.entity.get('text_chunk_no'),
+            result['text_chunk_no'] = chunk_map_record.entity.get('text_chunk_no')
             result['tags'] = chunk_map_record.entity.get('tags')
             result['title'] = chunk_map_record.entity.get('title')
             result['last_edit_date'] = chunk_map_record.entity.get('last_edit_date')
@@ -394,5 +394,11 @@ class createVectorDb(vectorDb):
 
         semantic_results['hits'] = semantic_hits
         json_results['results'].append(semantic_results)
+
+        #No text results
+        text_results['found'] = 0
+        text_results['type'] = 'text'
+        text_results['hits'] = text_hits
+        json_results['results'].append(text_results)
 
         return json_results
