@@ -35,6 +35,8 @@ echo "pip3 install qdrant-client"
 pip3 install qdrant-client
 echo "pip3 install weaviate-client"
 pip3 install weaviate-client
+echo "python3 -m pip install pymilvus"
+python3 -m pip install pymilvus
 echo "pip3 install --upgrade google-cloud-storage"
 pip3 install --upgrade google-cloud-storage
 
