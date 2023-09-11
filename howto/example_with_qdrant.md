@@ -81,7 +81,7 @@ It will finally display a config file that has been created.
 sitename=example_bbc.filepath.qdrant
 srctype=filepath
 srcpath=/<aiwhispr_home>/aiwhispr/examples/http/bbc
-displaypath=http://127.0.0.1:9000/bbc
+displaypath=http://127.0.0.1:9100/bbc
 contentSiteModule=filepathContentSite
 [content-site-auth]
 authtype=filechecks
@@ -123,9 +123,9 @@ The log file is /tmp/example_bbc.filepath.qdrant.log
 
 - the AIWhispr searchServic(port:5002) which intefaces with the vectordb
 
-- a flask python script(port:9001) that takes in user query , sends the query  to AIWhispr searchService and formats the results for HTML display
+- a flask python script(port:9101) that takes in user query , sends the query  to AIWhispr searchService and formats the results for HTML display
 
-- a python http.server(port 9000)
+- a python http.server(port 9100)
 
 The log files for these 3 processes is created in /tmp/
 
@@ -134,7 +134,7 @@ cd $AIWHISPR_HOME/examples/http; $AIWHISPR_HOME/examples/http/start_search_filep
 ```
 
 ### Ready to go
-Try the search on http://127.0.0.1:9000/IP Address>
+Try the search on http://127.0.0.1:9100/IP Address>
 
 Some examples of meaning drive search queries
 

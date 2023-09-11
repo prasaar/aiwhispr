@@ -89,7 +89,7 @@ It will finally display a config file which has been created.
 sitename=example_bbc.filepath.typesense
 srctype=filepath
 srcpath=/Users/<username>/aiwhispr/examples/http/bbc
-displaypath=http://127.0.0.1:9000/bbc
+displaypath=http://127.0.0.1:9100/bbc
 contentSiteModule=filepathContentSite
 [content-site-auth]
 authtype=filechecks
@@ -130,9 +130,9 @@ $AIWHISPR_HOME/shell/start-indexing-content-site.sh -C $AIWHISPR_HOME/config/con
 
 - the AIWhispr searchService(port:5002) which intefaces with the vectordb
 
-- a flask python script(port:9001) that takes in user query , sends the query  to AIWhispr searchService and formats the results for HTML display
+- a flask python script(port:9101) that takes in user query , sends the query  to AIWhispr searchService and formats the results for HTML display
 
-- a python http.server(port 9000)
+- a python http.server(port 9100)
 
 The log files for these 3 processes is created in /tmp/
 
@@ -152,7 +152,7 @@ export DYLD_LIBRARY_PATH
 ```
 
 ### Ready to go
-Try the search on http://127.0.0.1:9000/IP Address>
+Try the search on http://127.0.0.1:9100/IP Address>
 
 Some examples of meaning drive search queries 
 

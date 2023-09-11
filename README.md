@@ -80,7 +80,7 @@ It will finally display a config file that has been created.
 sitename=example_bbc.filepath.typesense
 srctype=filepath
 srcpath=/<aiwhispr_home>/aiwhispr/examples/http/bbc
-displaypath=http://127.0.0.1:9000/bbc
+displaypath=http://127.0.0.1:9100/bbc
 contentSiteModule=filepathContentSite
 [content-site-auth]
 authtype=filechecks
@@ -121,9 +121,9 @@ $AIWHISPR_HOME/shell/start-indexing-content-site.sh -C $AIWHISPR_HOME/config/con
 
 - the AIWhispr searchService(port:5002) which intefaces with the vectordb
 
-- a flask python script(port:9001) that takes in user query , sends the query  to AIWhispr searchService and formats the results for HTML display
+- a flask python script(port:9101) that takes in user query , sends the query  to AIWhispr searchService and formats the results for HTML display
 
-- a python http.server(port 9000)
+- a python http.server(port 9100)
 
 The log files for these 3 processes is created in /tmp/
 
@@ -132,7 +132,7 @@ cd $AIWHISPR_HOME/examples/http; $AIWHISPR_HOME/examples/http/start_search_filep
 ```
 
 ### Ready to go
-Try the search on http://127.0.0.1:9000/IP Address>
+Try the search on http://127.0.0.1:9100/IP Address>
 
 Some examples of meaning drive search queries
 
@@ -156,12 +156,12 @@ edit displaypath  configuration
 
 From
 ```
-displaypath=http://127.0.0.1:9000/bbc
+displaypath=http://127.0.0.1:9100/bbc
 ```
 
 To
 ```
-displaypath=http://<Internet IP/domain>:9000/bbc 
+displaypath=http://<Internet IP/domain>:9100/bbc 
 ```
 
 **2. Edit the index.html file for the example**
@@ -173,19 +173,19 @@ Edit index.html, replace 127.0.0.1  with your server IP/hostname
 
 From
 ```
- <form action = "http://127.0.0.1:9001/search" method = "post">
+ <form action = "http://127.0.0.1:9101/search" method = "post">
 ```
 
 To
 ```
- <form action = "http://<Internet IP/host>:9001/search" method = "post">
+ <form action = "http://<Internet IP/host>:9101/search" method = "post">
 ```
 
-**3. Open the firewall for ports 9000, 9001**
+**3. Open the firewall for ports 9100, 9101**
 
 ```
-sudo ufw allow 9000
-sudo ufw allow 9001
+sudo ufw allow 9100
+sudo ufw allow 9101
 ```
 On a cloud server, you might have to edit the firewall configs on your cloud providers portal too.
 
@@ -199,7 +199,7 @@ ps -ef | grep searchService.py
 
 ps -ef | grep exampleHttpResponder.py 
 
-ps -ef | grep 'python3 -m http.server 9000'
+ps -ef | grep 'python3 -m http.server 9100'
 ```
 
 Restart the processes 

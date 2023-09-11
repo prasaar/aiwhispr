@@ -147,7 +147,7 @@ echo "[content-site]" > $tmpConfigFile
 echo "sitename=example_bbc.filepath.qdrant" >> $tmpConfigFile
 echo "srctype=filepath" >> $tmpConfigFile
 echo "srcpath="$srcpath >> $tmpConfigFile
-echo "displaypath=http://127.0.0.1:9000/bbc" >> $tmpConfigFile
+echo "displaypath=http://127.0.0.1:9100/bbc" >> $tmpConfigFile
 echo "contentSiteModule=filepathContentSite" >> $tmpConfigFile
 
 echo "[content-site-auth]" >> $tmpConfigFile
