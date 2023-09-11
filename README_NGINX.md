@@ -6,7 +6,7 @@ AIWhispr is a no/low-code tool to enable AI powered semantic search.
 - Simple to configure.
 - Delivers fast semantic response to search queries.
 - Can handle multiple file formats (txt,csv, pdf, docx,pptx, docx) stored on AWS S3, Azure Blob Containers,Google Cloud Storage, local directory path.
-- Supports multiple vector databases (Qdrant,Weaviate,Typesense) 
+- Supports multiple vector databases (Qdrant,Weaviate,Milvus,Typesense) 
 
 ![Alt Text](./resources/aiwhispr-example.gif)
 
