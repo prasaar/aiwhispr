@@ -256,7 +256,8 @@ class createVectorDb(vectorDb):
             result['src_path'] = chunk_map_record['src_path']
             result['src_path_for_results'] = self.src_path_for_results
             result['text_chunk'] = chunk_map_record['text_chunk']
-            result['text_chunk_no'] = chunk_map_record['text_chunk_no'],
+            result['text_chunk_no'] = chunk_map_record['text_chunk_no']
+            result['tags'] = chunk_map_record['tags']
             result['title'] = chunk_map_record['title']
             result['last_edit_date'] = chunk_map_record['last_edit_date']
             result['vector_embedding_date'] = chunk_map_record['vector_embedding_date']
@@ -306,7 +307,8 @@ class createVectorDb(vectorDb):
                 #result['src_path_for_results'] = chunk_map_record['src_path_for_results']
                 result['src_path_for_results'] = self.src_path_for_results
                 result['text_chunk'] = chunk_map_record['text_chunk']
-                result['text_chunk_no'] = chunk_map_record['text_chunk_no'],
+                result['text_chunk_no'] = chunk_map_record['text_chunk_no']
+                result['tags'] = chunk_map_record['tags']
                 result['title'] = chunk_map_record['title']
                 result['last_edit_date'] = chunk_map_record['last_edit_date']
                 result['vector_embedding_date'] = chunk_map_record['vector_embedding_date']
