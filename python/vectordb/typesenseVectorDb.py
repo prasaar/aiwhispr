@@ -43,7 +43,11 @@ class createVectorDb(vectorDb):
         except:
             self.logger.error("Typesense requires vector dimensions to be provided. Have you set this as vector-dim=<int> ?")
             sys.exit()
-
+        
+        if 'collection-name' in vectordb_config:
+            self.collection_name = vectordb_config['collection-name']
+        else:
+            self.setDefaultCollectionName()
         
         
     def connect(self):
@@ -67,19 +71,19 @@ class createVectorDb(vectorDb):
             all_collections = self.vectorDbClient.collections.retrieve()
             table_found = "N"
             for collection in all_collections:
-                if collection['name'] == 'content_chunk_map':
+                if collection['name'] == self.collection_name:
                     table_found = "Y"
             
             if table_found == "Y":
-                self.logger.info("Typesense collection content_chunk_map already exists")
+                self.logger.info("Typesense collection %s already exists", self.collection_name)
             else:
-                self.logger.info("Typesense collection content_chunk_map does not exist , so we will create it")
+                self.logger.info("Typesense collection %s does not exist , so we will create it", self.collection_name)
                 #create the collection in typesense
                 #We are not creating an 'id' (unique id)  field. It will be provided in insert statements by the client
                 #We expect id to be in the format <site-name>/<extracted-file_directory-name>/<chunk-files-directory>/<chunk-id>
                 self.vectordb_vector_dim
                 create_response = self.vectorDbClient.collections.create({
-                    "name": "content_chunk_map",
+                    "name": self.collection_name,
                     "fields": [
                 #SITE_NAME IS USED TO DEFINE THE SITE e.g. mas.gov.sg. THIS IS USED AS  FILTERING CRITERIA WHEN YOU WANT TO SEPRATE SEARCH BASED ON DIFFERENT SITES
                         {"name": "content_site_name", "type": "string", "index": True  },
@@ -157,7 +161,7 @@ class createVectorDb(vectorDb):
                 'vector_embedding' : vector_embedding,
                 'vector_embedding_date': vector_embedding_date
             }
-            self.vectorDbClient.collections['content_chunk_map'].documents.create(content_chunk_map_record)
+            self.vectorDbClient.collections[self.collection_name].documents.create(content_chunk_map_record)
         except:
             self.logger.error("Could not insert the record in typesense")
             self.logger.error(json.dumps(content_chunk_map_record))
@@ -172,11 +176,11 @@ class createVectorDb(vectorDb):
             'filter_by':filter_by_conditions
         }
         try:
-            response_del = self.vectorDbClient.collections['content_chunk_map'].documents.delete(search_parameters)
-            self.logger.debug("Deleted rows from content_chunk_map")   
+            response_del = self.vectorDbClient.collections[self.collection_name].documents.delete(search_parameters)
+            self.logger.debug("Deleted rows from %s", self.collection_name)   
             self.logger.debug(json.dumps(response_del))
         except: 
-            self.logger.error("Could not deleteAll for content_chunk_map")   
+            self.logger.error("Could not deleteAll for %s",self.collection_name)   
             self.logger.erro(json.dumps(search_parameters))
 
     def search(self,content_site_name,vector_embedding, limit_hits, input_text_query = ''):
@@ -189,12 +193,12 @@ class createVectorDb(vectorDb):
             search_requests = {
                     'searches': [
                     {
-                        'collection': 'content_chunk_map',
+                        'collection': self.collection_name,
                         'q' : '*',
                         'vector_query': 'vector_embedding:([' + vector_as_string + '])',
                     },
                     {
-                        'collection': 'content_chunk_map',
+                        'collection': self.collection_name,
                         'q': input_text_query,
                         'query_by': 'text_chunk,content_path,title',
                         'sort_by': '_text_match:desc'
@@ -205,7 +209,7 @@ class createVectorDb(vectorDb):
             search_requests = {
                     'searches': [
                     {
-                        'collection': 'content_chunk_map',
+                        'collection': self.collection_name,
                         'q' : '*',
                         'vector_query': 'vector_embedding:([' + vector_as_string + '])',
                     },

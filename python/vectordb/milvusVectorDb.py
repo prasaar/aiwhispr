@@ -22,7 +22,6 @@ import logging
 
 class createVectorDb(vectorDb):
     
-    vectordb_collection_name:str
     vectordb_user:str
     vectordb_password:str
     vectordb_dbname:str
@@ -31,7 +30,6 @@ class createVectorDb(vectorDb):
 
     def __init__(self,vectordb_config:{}, content_site_name:str,src_path:str,src_path_for_results:str):    
         self.logger = logging.getLogger(__name__)
-        self.vectordb_collection_name = "content_chunk_map"
         
         vectorDb.__init__(self,
                           vectordb_config = vectordb_config,
@@ -60,6 +58,10 @@ class createVectorDb(vectorDb):
             self.logger.error("Milvus requires vector dimensions to be provided. Have you set this as vector-dim=<int> ?")
             sys.exit()        
         
+        if 'collection-name' in vectordb_config:
+            self.collection_name = vectordb_config['collection-name']
+        else:
+            self.setDefaultCollectionName()
         
         
 
@@ -85,15 +87,15 @@ class createVectorDb(vectorDb):
         #Now check if the collection already exists, if not then recreate it
         
         try:
-            collectionExistsFlag = pymilvus.utility.has_collection(self.vectordb_collection_name)
+            collectionExistsFlag = pymilvus.utility.has_collection(self.collection_name)
         except Exception as err:
-            self.logger.error("Error when checking if collection %s exists", self.vectordb_collection_name)
+            self.logger.error("Error when checking if collection %s exists", self.collection_name)
             sys.exit()
 
         if collectionExistsFlag == True:
-            self.logger.info("collection %s exists", self.vectordb_collection_name)
+            self.logger.info("collection %s exists", self.collection_name)
         else:
-            self.logger.info("Milvus collection %s does not exist , so we will create it", self.vectordb_collection_name)
+            self.logger.info("Milvus collection %s does not exist , so we will create it", self.collection_name)
             #create the fields, then schema, then collection, then index
             #1. Create the fields
             id = pymilvus.FieldSchema(   ##UUID
@@ -170,14 +172,14 @@ class createVectorDb(vectorDb):
             #3. Create Collection
             try:
                 collection = pymilvus.Collection(
-                    name=self.vectordb_collection_name,
+                    name=self.collection_name,
                     schema=schema,
                     using='default',
                     shards_num=self.vectordb_shards_num
                     )
-                self.logger.info("Created collection %s",  self.vectordb_collection_name )
+                self.logger.info("Created collection %s",  self.collection_name )
             except:
-                self.logger.error("Could not create collection %s in Milvus",  self.vectordb_collection_name )
+                self.logger.error("Could not create collection %s in Milvus",  self.collection_name )
                 sys.exit()
             
             #4. Create index
@@ -187,7 +189,7 @@ class createVectorDb(vectorDb):
                     "index_type":"DISKANN",
                     "params":{"search_list":1024}
                 }
-                vectordb_collection = pymilvus.Collection(name = self.vectordb_collection_name)
+                vectordb_collection = pymilvus.Collection(name = self.collection_name)
                 vectordb_collection.create_index(
                     field_name="vector_embedding",
                     index_params=index_params
@@ -245,7 +247,7 @@ class createVectorDb(vectorDb):
             f_vector_embedding=[vector_embedding]
 
             content_chunk_map_record=[f_id,f_content_site_name,f_src_path,f_src_path_for_results,f_content_path,f_last_edit_date,f_tags,f_title,f_text_chunk,f_text_chunk_no,f_vector_embedding_date,f_vector_embedding]
-            vectordb_collection = pymilvus.Collection(name = self.vectordb_collection_name)
+            vectordb_collection = pymilvus.Collection(name = self.collection_name)
             self.logger.debug("Inserting a record in Milvus vectordb %s with vector embedding of size: %d", str(content_chunk_map_record), len(vector_embedding))
             vectordb_collection.insert(content_chunk_map_record)
         except Exception as err:
@@ -262,12 +264,12 @@ class createVectorDb(vectorDb):
         expr_query = "content_site_name == '" + self.content_site_name + "'"
 
         try:
-            vectordb_collection = pymilvus.Collection(name = self.vectordb_collection_name)
+            vectordb_collection = pymilvus.Collection(name = self.collection_name)
             vectordb_collection.load()
             vectordb_collection.compact()  #We compact the data manually. Milvus has a soft delete, hence we should first compact.
         except:
             print(f"Unexpected {err=}, {type(err)=}")
-            self.logger.error("Could not load the collection %s ", self.vectordb_collection_name)
+            self.logger.error("Could not load the collection %s ", self.collection_name)
             raise
         else:
             try:
@@ -291,7 +293,7 @@ class createVectorDb(vectorDb):
                             vectordb_collection.delete(expr)
             except Exception as err:
                 print(f"Unexpected {err=}, {type(err)=}")
-                self.logger.error("Error when deleting rows from collection %s", self.vectordb_collection_name)
+                self.logger.error("Error when deleting rows from collection %s", self.collection_name)
                 raise
 
     def search(self,content_site_name,vector_embedding, limit_hits, input_text_query = ''):
@@ -329,10 +331,10 @@ class createVectorDb(vectorDb):
 
         #load the collection
         try:
-            vectordb_collection = pymilvus.Collection(name = self.vectordb_collection_name)
+            vectordb_collection = pymilvus.Collection(name = self.collection_name)
             vectordb_collection.load()
         except:
-            self.logger.error("Could not load the collection %s ", self.vectordb_collection_name)
+            self.logger.error("Could not load the collection %s ", self.collection_name)
             raise
 
         expr_query = "content_site_name == '" + self.content_site_name + "'"

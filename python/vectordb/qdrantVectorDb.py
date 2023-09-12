@@ -33,9 +33,15 @@ class createVectorDb(vectorDb):
         self.vectordb_portnumber = vectordb_config['api-port']
         self.vectordb_key = vectordb_config['api-key']
 
+        if 'collection-name' in vectordb_config:
+            self.collection_name = vectordb_config['collection-name']
+        else:
+            self.setDefaultCollectionName()
+        
         self.vectorDbClient:QdrantClient
         self.logger = logging.getLogger(__name__)
 
+        
     def connect(self):
 
         #First create the connection
@@ -63,28 +69,28 @@ class createVectorDb(vectorDb):
         try:
             collections_list = self.vectorDbClient.get_collections()
             for collection in collections_list.collections :
-                if collection.name == 'content_chunk_map' :
+                if collection.name == self.collection_name :
                     collectionExistsFlag = True
                     break
         except:
             self.logger.error("Could not get collections list from Qdrant")
 
         if collectionExistsFlag == True:
-            self.logger.info('collection content_chunk_map exists')
+            self.logger.info('collection %s exists', self.collection_name)
         else:
-            self.logger.info("Qdrant collection content_chunk_map does not exist , so we will create it")
+            self.logger.info("Qdrant collection %s does not exist , so we will create it", self.collection_name)
             #create the collection in Qdrant
             #We are not creating an 'id' (unique id)  field. It will be provided in insert statements by the client
             #We expect id to be in the format <site-name>/<extracted-file_directory-name>/<chunk-files-directory>/<chunk-id>
             create_response = self.vectorDbClient.create_collection(
-                collection_name =  "content_chunk_map",
+                collection_name =  self.collection_name,
                 vectors_config= models.VectorParams(size=768, distance=models.Distance.COSINE,on_disk = True), 
                 on_disk_payload = True )
                  
             if(create_response == True):
                 self.logger.info("Created collection, now creating payload index")
                 try: 
-                    self.vectorDbClient.create_payload_index(collection_name="content_chunk_map", 
+                    self.vectorDbClient.create_payload_index(collection_name=self.collection_name, 
                                 field_name="text_chunk", 
                                 field_schema=models.TextIndexParams(
                                 type="text",
@@ -134,7 +140,7 @@ class createVectorDb(vectorDb):
             self.logger.debug("Inserting a record in Qdrant vectordb: %s with vector embedding of size: %d", json.dumps(content_chunk_map_record), len(vector_embedding) )
 
             self.vectorDbClient.upsert(
-                collection_name="content_chunk_map",
+                collection_name=self.collection_name,
                 points=[
                     models.PointStruct(
                         id=id,
@@ -150,7 +156,7 @@ class createVectorDb(vectorDb):
         #delete all rows for the content_site_name 
         try:
             response_del = self.vectorDbClient.delete(
-                collection_name="content_chunk_map",
+                collection_name=self.collection_name,
                 points_selector=models.FilterSelector(
                     filter=models.Filter(
                         must=[
@@ -162,9 +168,9 @@ class createVectorDb(vectorDb):
                     )
                 ),
             )
-            self.logger.debug("Deleted rows from content_chunk_map")   
+            self.logger.debug("Deleted rows from %s", self.collection_name)   
         except: 
-            self.logger.error("Could not deleteAll for content_chunk_map")
+            self.logger.error("Could not deleteAll for %s", self.collection_name)
 
 
     def search(self,content_site_name,vector_embedding, limit_hits, input_text_query = ''):
@@ -206,7 +212,7 @@ class createVectorDb(vectorDb):
         #We will first do a semantic search
         
         search_results = self.vectorDbClient.search(
-            collection_name="content_chunk_map",
+            collection_name=self.collection_name,
             query_filter=models.Filter(
                 must=[
                     models.FieldCondition(
@@ -269,7 +275,7 @@ class createVectorDb(vectorDb):
             #We have to do a text match search , by changing the filter condition
             self.logger.debug("Will do a text search on collection")
             search_results = self.vectorDbClient.search(
-            collection_name="content_chunk_map",
+            collection_name=self.collection_name,
             query_filter=models.Filter(
                 must=[
                     models.FieldCondition(

@@ -32,6 +32,11 @@ class createVectorDb(vectorDb):
         self.vectordb_hostname = vectordb_config['api-address']
         self.vectordb_portnumber = vectordb_config['api-port']
         self.vectordb_key = vectordb_config['api-key']
+        
+        if 'collection-name' in vectordb_config:
+            self.collection_name = vectordb_config['collection-name']
+        else:
+            self.setDefaultCollectionName()
 
         self.vectorDbClient:weaviate.Client
         self.logger = logging.getLogger(__name__)
@@ -66,9 +71,9 @@ class createVectorDb(vectorDb):
             self.logger.error("Could not create Weaviate connection to Qdrant Server hostname: %s , portnumber: %s with key: %s", self.vectordb_hostname, self.vectordb_portnumber, self.vectordb_key)
         
 
-        #Define a class object ContentChunkMap
+        #Define a class object with self.collection_name
         class_obj = {
-            'class': 'ContentChunkMap',
+            'class': self.collection_name,
             'vectorizer': 'none',
             'properties': [
                   {"name": "content_site_name", "dataType": ['text']},
@@ -86,20 +91,20 @@ class createVectorDb(vectorDb):
             }
 
 
-        #Now check if the class ContentChunkMap already exists, if not then recreate it
+        #Now check if the class  already exists, if not then recreate it
         classExistsFlag =  self.vectorDbClient.schema.contains(class_obj)
         
         if classExistsFlag == True:
-            self.logger.info('Weaviate: class ContentChunkMap exists')
+            self.logger.info('Weaviate: class %s exists', self.collection_name)
         else:
-            self.logger.info("Weaviate: class ContentChunkMap does not exist , so we will create it")
+            self.logger.info("Weaviate: class %s does not exist , so we will create it", self.collection_name)
             #create the collection in Weaviate
             #We are not creating an 'uuid' (unique id)  field and vector field. It will be provided in insert statements by the client
             self.vectorDbClient.schema.create_class(class_obj)
             if(self.vectorDbClient.schema.contains(class_obj) == True):
-                self.logger.info("Weaviate: Created class ContentChunkMap ")
+                self.logger.info("Weaviate: Created class %s ", self.collection_name)
             else:
-                self.logger.error("Weaviate: Could not create class ContentChunkMap")
+                self.logger.error("Weaviate: Could not create class %s", self.collection_name)
 
     def insert(self, 
                id:str,  #should be a uuid
@@ -134,7 +139,7 @@ class createVectorDb(vectorDb):
             self.logger.debug("Inserting a record in Weaviate vectordb: %s with vector embedding of size: %d", json.dumps(data_object), len(vector_embedding) )
 
             self.vectorDbClient.data_object.create(
-                class_name="ContentChunkMap",
+                class_name=self.collection_name,
                 uuid=id,
                 vector=vector_embedding,
                 data_object = data_object
@@ -151,7 +156,7 @@ class createVectorDb(vectorDb):
             while continueDeleteFlag:
 
                 response_dry_run = self.vectorDbClient.batch.delete_objects(
-                    class_name="ContentChunkMap",
+                    class_name=self.collection_name,
                     where = {
                         'path':['content_site_name'],
                         'operator': 'Equal',
@@ -164,7 +169,7 @@ class createVectorDb(vectorDb):
                 if response_dry_run['results']['matches'] > 0:
                     continueDeleteFlag = True
                     self.vectorDbClient.batch.delete_objects(
-                    class_name="ContentChunkMap",
+                    class_name=self.collection_name,
                     where = {
                         'path':['content_site_name'],
                         'operator': 'Equal',
@@ -174,9 +179,9 @@ class createVectorDb(vectorDb):
                 else:
                     continueDeleteFlag = False            
             
-            self.logger.debug("Weaviate:Deleted rows from ContentChunkMap")   
+            self.logger.debug("Weaviate:Deleted rows from %s", self.collection_name)   
         except: 
-            self.logger.error("Weaviate:Could not deleteAll for ContentChunkMap")
+            self.logger.error("Weaviate:Could not deleteAll for %s", self.collection_name)
 
 
     def search(self,content_site_name,vector_embedding, limit_hits, input_text_query = ''):
@@ -216,7 +221,7 @@ class createVectorDb(vectorDb):
             include_text_results = True
        
         search_response = ( self.vectorDbClient.query
-            .get("ContentChunkMap",["content_site_name", "src_path", "src_path_for_results", "content_path", "last_edit_date", "tags", "title", "text_chunk", "text_chunk_no", "vector_embedding_date"])
+            .get(self.collection_name,["content_site_name", "src_path", "src_path_for_results", "content_path", "last_edit_date", "tags", "title", "text_chunk", "text_chunk_no", "vector_embedding_date"])
             .with_where({
                 "path": ["content_site_name"],
                 "operator": "Equal",
@@ -227,7 +232,7 @@ class createVectorDb(vectorDb):
             .with_additional(["distance", "id"])
             .do()
         )
-        search_results=search_response['data']['Get']['ContentChunkMap']
+        search_results=search_response['data']['Get'][self.collection_name]
         
         self.logger.debug("Search Response: %s", str(search_response))
 
@@ -274,7 +279,7 @@ class createVectorDb(vectorDb):
             self.logger.debug("Will do a text search on collection")
            
             search_response = ( self.vectorDbClient.query
-            .get("ContentChunkMap",["content_site_name", "src_path", "src_path_for_results", "content_path", "last_edit_date", "tags", "title", "text_chunk", "text_chunk_no", "vector_embedding_date"])
+            .get(self.collection_name,["content_site_name", "src_path", "src_path_for_results", "content_path", "last_edit_date", "tags", "title", "text_chunk", "text_chunk_no", "vector_embedding_date"])
             .with_bm25(query=input_text_query, properties=["text_chunk", "title", "tags"])
             .with_where({
                 "path": ["content_site_name"],
@@ -285,7 +290,7 @@ class createVectorDb(vectorDb):
             .with_additional(["score","id"])
             .do()
             )
-            search_results=search_response['data']['Get']['ContentChunkMap']
+            search_results=search_response['data']['Get'][self.collection_name]
 
             self.logger.debug("SearchResponse %s", search_response)
 

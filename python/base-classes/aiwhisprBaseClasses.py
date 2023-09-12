@@ -103,6 +103,7 @@ class vectorDb:
     content_site_name:str 
     src_path:str 
     src_path_for_results:str
+    collection_name:str
 
 
     def __init__(self, vectordb_config:{}, content_site_name:str,src_path:str,src_path_for_results:str, module_name:str):
@@ -148,6 +149,9 @@ class vectorDb:
     #public function
     def query(self):
         pass
+
+    def setDefaultCollectionName(self):
+        self.collection_name = "ContentChunkMap" + self.module_name
 
 #This is the template (base) class that implements the Content Sites
 #There will be seperate classes for each source e.g. azure, s3, file etc.
