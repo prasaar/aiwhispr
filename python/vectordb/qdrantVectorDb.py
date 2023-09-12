@@ -20,6 +20,7 @@ import aiwhisprConstants
 import logging
 
 class createVectorDb(vectorDb):
+    vectordb_vector_dim:int
 
     def __init__(self,vectordb_config:{}, content_site_name:str,src_path:str,src_path_for_results:str):
         vectorDb.__init__(self,
@@ -32,6 +33,12 @@ class createVectorDb(vectorDb):
         self.vectordb_hostname = vectordb_config['api-address']
         self.vectordb_portnumber = vectordb_config['api-port']
         self.vectordb_key = vectordb_config['api-key']
+
+        try:
+            self.vectordb_vector_dim = int(vectordb_config['vector-dim'])
+        except:
+            self.logger.error("Qdrant requires vector dimensions to be provided. Have you set this as vector-dim=<int> ?")
+            sys.exit()
 
         if 'collection-name' in vectordb_config:
             self.collection_name = vectordb_config['collection-name']
@@ -84,7 +91,7 @@ class createVectorDb(vectorDb):
             #We expect id to be in the format <site-name>/<extracted-file_directory-name>/<chunk-files-directory>/<chunk-id>
             create_response = self.vectorDbClient.create_collection(
                 collection_name =  self.collection_name,
-                vectors_config= models.VectorParams(size=768, distance=models.Distance.COSINE,on_disk = True), 
+                vectors_config= models.VectorParams(size=self.vectordb_vector_dim, distance=models.Distance.COSINE,on_disk = True), 
                 on_disk_payload = True )
                  
             if(create_response == True):
@@ -149,8 +156,9 @@ class createVectorDb(vectorDb):
                     ),
                 ]
             )
-        except:
+        except Exception as err:
             self.logger.error("Could not insert the record in Qdrant")
+            self.logger.exception(str(err))
 
     def deleteAll(self):
         #delete all rows for the content_site_name 
