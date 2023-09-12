@@ -39,6 +39,8 @@ echo "python3 -m pip install pymilvus"
 python3 -m pip install pymilvus
 echo "pip3 install --upgrade google-cloud-storage"
 pip3 install --upgrade google-cloud-storage
+echo "pip3 install openai"
+pip3 install openai
 
 echo "###List of python packages after install ####"
 pip3 list 
