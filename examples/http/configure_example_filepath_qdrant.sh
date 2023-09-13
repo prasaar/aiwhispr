@@ -100,6 +100,21 @@ echo "Using api-key="$vectordbKey
 fi
 echo
 
+
+vectorDim=768
+echo "vector-dim="$vectorDim
+echo "Do you want to change this [Y/N]" 
+read changeFlag
+if [ "${changeFlag}" = "Y" ]
+then
+echo
+echo "Enter new vector-dim  "
+read vectorDim
+echo "Using vector-dim="$vectorDim
+fi
+echo
+
+
 workingDir="${AIWHISPR_HOME}"/examples/http/working-dir
 echo "Current  working-dir="$workingDir
 echo "Do you want to change this [Y/N]" 
@@ -159,6 +174,7 @@ echo "vectorDbModule=qdrantVectorDb" >> $tmpConfigFile
 echo "api-address="$vectordbApiAddress >> $tmpConfigFile
 echo "api-port="$vectordbApiPort >> $tmpConfigFile
 echo "api-key="$vectordbKey >> $tmpConfigFile
+echo "vector-dim="$vectorDim >> $tmpConfigFile
 
 echo "[local]" >> $tmpConfigFile
 echo "working-dir="$workingDir >> $tmpConfigFile
