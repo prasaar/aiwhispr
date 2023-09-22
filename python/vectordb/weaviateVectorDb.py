@@ -41,6 +41,62 @@ class createVectorDb(vectorDb):
         self.vectorDbClient:weaviate.Client
         self.logger = logging.getLogger(__name__)
 
+    def testConnect(self):
+        #First create the connection
+        try:
+            self.logger.debug("Creating a Weaviate Connection")    
+
+            if self.vectordb_hostname[0:6] == 'https:'  or self.vectordb_hostname[0:5] == 'http:' :
+                self.logger.debug("Create Weaviate http(s) connection to hostname: %s , portnumber: %s with key: %s", self.vectordb_hostname, self.vectordb_portnumber, self.vectordb_key)
+                connect_url = self.vectordb_hostname + ':' + self.vectordb_portnumber
+                if (len(self.vectordb_key) > 0 ): 
+                    auth_config = weaviate.AuthApiKey(api_key=self.vectordb_key)
+                    self.vectorDbClient = weaviate.Client(url=connect_url,
+                                                        auth_client_secret=auth_config,
+                                                        timeout_config=(5, 15),) #Create connection to http/https host with key
+                else:
+                    self.vectorDbClient = weaviate.Client(url=connect_url, timeout_config=(5, 15),) #Create connection to http/http host without key
+            else: #Assuming IP/hostname with PortNumber
+                self.logger.debug("Create Weaviate http connection to hostname: %s , portnumber: %s with key: %s", self.vectordb_hostname, self.vectordb_portnumber, self.vectordb_key)
+                connect_url = 'http://' + self.vectordb_hostname + ':' + self.vectordb_portnumber
+                if (len(self.vectordb_key) > 0 ): 
+                    auth_config = weaviate.AuthApiKey(api_key=self.vectordb_key)      
+                    self.vectorDbClient = weaviate.Client(url=connect_url,
+                                                        auth_client_secret=auth_config,
+                                                        timeout_config=(5, 15),) #Create connection with key
+                else:
+                    self.vectorDbClient = weaviate.Client(url=connect_url, timeout_config=(5, 15),) #Create connection without key
+        except Exception:    
+            self.logger.error("Could not create Weaviate connection to Qdrant Server hostname: %s , portnumber: %s with key: %s", self.vectordb_hostname, self.vectordb_portnumber, self.vectordb_key)
+        
+
+        #Define a class object with self.collection_name
+        class_obj = {
+            'class': self.collection_name,
+            'vectorizer': 'none',
+            'properties': [
+                  {"name": "content_site_name", "dataType": ['text']},
+                  {"name": "src_path", "dataType": ['text'] }, 
+                  {"name": "src_path_for_results", "dataType": ['text']},
+                  {"name": "content_path", "dataType": ['text']},
+                  {"name": "last_edit_date", "dataType": ['number'] },
+                  {"name": "tags", "dataType": ['text'], "tokenization": "word"},
+                  {"name": "title", "dataType": ['text'], "tokenization": "word" },
+                  {"name": "text_chunk", "dataType": ['text'], "tokenization": "word"},
+                  {"name": "text_chunk_no", "dataType": ['int']},
+                  {"name": "vector_embedding_date", "dataType": ['number']},
+
+                  ],
+            }
+
+
+        #Now check if the class  already exists, if not then recreate it
+        classExistsFlag =  self.vectorDbClient.schema.contains(class_obj)
+        
+        if classExistsFlag == True:
+            self.logger.info('Weaviate class %s already exists', self.collection_name)
+
+
     def connect(self):
 
         #First create the connection

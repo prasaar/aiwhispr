@@ -28,7 +28,25 @@ class createLlmService(baseLlmService):
       except:
          self.logger.error("Could not set api-key, model-name for OpenAI using the configurations. Please ensure these are configured in the config file.")
          raise
-             
+
+   def testConnect(self):
+      try:
+        openai.api_key = self.api_key
+      except Exception as err:
+        self.logger.error("Could not set api-key for OpenAI")
+        print(err)
+        raise
+
+      try:
+        response_openai = openai.Embedding.create(
+              model = self.model_name,
+              input = "Test Connection for OpenAI"
+          )
+      except Exception as err:
+        self.logger.error("Could not create an embedding using OpenAI")
+        raise
+
+
    def connect(self):
       try:
         openai.api_key = self.api_key

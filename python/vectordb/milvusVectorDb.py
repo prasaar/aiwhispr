@@ -63,6 +63,34 @@ class createVectorDb(vectorDb):
         else:
             self.setDefaultCollectionName()
         
+    
+    def testConnect(self):
+        #First create the connection
+        try:
+            self.logger.debug("Creating a Milvus Connection")
+            pymilvus.connections.connect(
+                alias="default",         #Alias for the Milvus Server in our connections
+                user= self.vectordb_user,
+                password= self.vectordb_password ,
+                host= self.vectordb_hostname,
+                port= self.vectordb_portnumber,
+                db_name= self.vectordb_dbname
+            )
+            self.logger.info("Connected to Milvus at host: %s , port: %s , user: %s , db: %s",self.vectordb_hostname,self.vectordb_portnumber,self.vectordb_user, self.vectordb_dbname )
+            self.logger.debug("Connected to Milvus at host: %s , port: %s , user: %s , password: %s, db: %s",self.vectordb_hostname,self.vectordb_portnumber,self.vectordb_user,self.vectordb_password,self.vectordb_dbname )               
+        except Exception as err:
+            print(f"Unexpected {err=}, {type(err)=}")
+            self.logger.error("Could not connect to Milvus at host: %s , port: %s , user: %s , db: %s",self.vectordb_hostname,self.vectordb_portnumber,self.vectordb_user, self.vectordb_dbname )
+            raise
+        #Now check if the collection already exists, if not then recreate it
+        collectionExistsFlag=False
+        try:
+            collectionExistsFlag = pymilvus.utility.has_collection(self.collection_name)
+        except Exception as err:
+            self.logger.error("Error when checking if collection %s exists", self.collection_name)
+
+        if collectionExistsFlag == True:
+            self.logger.info("Collection %s already exists", self.collection_name)
         
 
     def connect(self):

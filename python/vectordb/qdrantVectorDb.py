@@ -48,7 +48,42 @@ class createVectorDb(vectorDb):
         self.vectorDbClient:QdrantClient
         self.logger = logging.getLogger(__name__)
 
+    def testConnect(self):
+        #First create the connection
+        try:
+            self.logger.debug("Creating a Qdrant Connection")
+            if self.vectordb_hostname[0:6] == 'https:'  or self.vectordb_hostname[0:5] == 'http:' :
+                self.logger.debug("Create Qdrant http(s) connection to hostname: %s , portnumber: %s with key: %s", self.vectordb_hostname, self.vectordb_portnumber, self.vectordb_key)
+                if (len(self.vectordb_key) > 0 ): 
+                    self.vectorDbClient = QdrantClient(url=self.vectordb_hostname + ':' + self.vectordb_portnumber,api_key=self.vectordb_key) #Create connection to http/https host with key
+                else:
+                    self.vectorDbClient = QdrantClient(url=self.vectordb_hostname + ':' + self.vectordb_portnumber) #Create connection to http/http host without key
+            else: #Assuming IP/hostname with PortNumber
+                self.logger.debug("Create Qdrant http connection to hostname: %s , portnumber: %s with key: %s", self.vectordb_hostname, self.vectordb_portnumber, self.vectordb_key)
+                if (len(self.vectordb_key) > 0 ): 
+                    connect_url = 'http://' + self.vectordb_hostname + ':' + self.vectordb_portnumber
+                    self.vectorDbClient = QdrantClient(url=connect_url,api_key=self.vectordb_key) #Create connection with key
+                else:
+                    connect_url = 'http://' + self.vectordb_hostname + ':' + self.vectordb_portnumber
+                    self.vectorDbClient = QdrantClient(url=connect_url) #Create connection without key
+        except:
+            self.logger.error("Could not create Qdrant connection to Qdrant Server hostname: %s , portnumber: %s with key: %s", self.vectordb_hostname, self.vectordb_portnumber, self.vectordb_key)
+
+        #Now check if the collection already exists, if not then recreate it
+        collectionExistsFlag =  False
+        try:
+            collections_list = self.vectorDbClient.get_collections()
+            for collection in collections_list.collections :
+                if collection.name == self.collection_name :
+                    collectionExistsFlag = True
+                    break
+        except:
+            self.logger.error("Could not get collections list from Qdrant")
+
+        if collectionExistsFlag == True:
+            self.logger.info('Collection %s already exists', self.collection_name)
         
+
     def connect(self):
 
         #First create the connection
