@@ -174,6 +174,28 @@ class createContentSite(srcContentSite):
        self.vector_db.connect()
        #Connect the LLM Service for encoding text -> vector
        self.llm_service.connect()
+
+    def testConnect(self):
+        # test connection to content site
+        self.logger.info("Now testing connection to filepath")
+        self.connect_to_content_site()
+        #Test connect to vector database
+        try:
+            self.logger.info("Now testing connection to vector database")
+            self.vector_db.testConnect()
+        except Exception as err:
+            self.logger.error("Could not connect to vector database")
+            print(err)
+            raise
+        #Test connect the LLM Service for encoding text -> vector
+        try:
+            self.logger.info("Now testing connection to LLM Service")    
+            self.llm_service.testConnect()
+        except Exception as err:
+            self.logger.error("Could not connect to LLM service")
+            print(err)
+            raise
+
        
     def index(self, no_of_processes = 1):
 

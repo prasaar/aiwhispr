@@ -174,19 +174,28 @@ class createContentSite(srcContentSite):
        self.logger = logging.getLogger(__name__)
 
     def connect_to_content_site(self):
-       # Connect to Azure, Connect to localDB  which stores the ContentIndex
-       # Create the BlobServiceClient object
-       match self.site_auth.auth_type:
-           case 'sas':
-               self.logger.info('Connecting to Azure using sas')
-               self.blob_service_client = BlobServiceClient(account_url=self.azure_account_url, credential=self.site_auth.sas_token)
-               self.container_client = self.blob_service_client.get_container_client(container=self.container_name)
-           case 'az-storage-key':
-               self.logger.info('Connecting to Azure using storage account key')
-               self.blob_service_client = BlobServiceClient(account_url=self.azure_account_url, credential=self.site_auth.az_key)
-               self.container_client = self.blob_service_client.get_container_client(container=self.container_name)
-           case other:
-               self.logger.error('No authentication provided for Azure connection')
+        # Connect to Azure, Connect to localDB  which stores the ContentIndex
+        # Create the BlobServiceClient object
+        match self.site_auth.auth_type:
+            case 'sas':
+                self.logger.info('Connecting to Azure using sas')
+                try:
+                    self.blob_service_client = BlobServiceClient(account_url=self.azure_account_url, credential=self.site_auth.sas_token)
+                    self.container_client = self.blob_service_client.get_container_client(container=self.container_name)
+                except Exception as err:
+                    self.logger.error("Could not connect to Azure Container")
+                    print(err)
+            case 'az-storage-key':
+                self.logger.info('Connecting to Azure using storage account key')
+                try:
+                    self.blob_service_client = BlobServiceClient(account_url=self.azure_account_url, credential=self.site_auth.az_key)
+                    self.container_client = self.blob_service_client.get_container_client(container=self.container_name)
+                except Exception as err:
+                    self.logger.error("Could not connect to Azure Container")
+                    print(err)
+            case other:
+                self.logger.error('No authentication provided for Azure connection')
+
 
 
     def connect(self):
@@ -196,6 +205,28 @@ class createContentSite(srcContentSite):
        self.vector_db.connect()
        #Connect the LLM Service for encoding text -> vector
        self.llm_service.connect()
+
+    def testConnect(self):
+        # test connection to content site
+        self.logger.info("Now testing connection to Azure")
+        self.connect_to_content_site()
+        #Test connect to vector database
+        try:
+            self.logger.info("Now testing connection to vector database")
+            self.vector_db.testConnect()
+        except Exception as err:
+            self.logger.error("Could not connect to vector database")
+            print(err)
+            raise
+        #Test connect the LLM Service for encoding text -> vector
+        try:
+            self.logger.info("Now testing connection to LLM Service")    
+            self.llm_service.testConnect()
+        except Exception as err:
+            self.logger.error("Could not connect to LLM service")
+            print(err)
+            raise
+
        
     def index(self, no_of_processes = 1):
 

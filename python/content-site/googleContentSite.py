@@ -190,28 +190,55 @@ class createContentSite(srcContentSite):
 
 
     def connect_to_content_site(self):
-       # Connect to Google Cloud
-       # Create the StorageClient object
-       match self.site_auth.auth_type:
-           case "google-cred-key":
-               self.logger.info('Connecting to Google Cloud using Credentials and Key')
-               self.google_creds= Credentials.from_service_account_file(self.site_auth.google_cred_path)
-               self.storage_client = storage.Client( 
-                   client_options={"api_key":  self.site_auth.google_storage_api_key, 
-                                   "quota_project_id": self.site_auth.google_project_id } , 
-                                credentials=self.google_creds
-                                                   )
-           case other:
+        # Connect to Google Cloud
+        # Create the StorageClient object
+        match self.site_auth.auth_type:
+            case "google-cred-key":
+                self.logger.info('Connecting to Google Cloud using Credentials and Key')
+                try:
+                    self.google_creds= Credentials.from_service_account_file(self.site_auth.google_cred_path)
+                    self.storage_client = storage.Client( 
+                        client_options={"api_key":  self.site_auth.google_storage_api_key, 
+                                    "quota_project_id": self.site_auth.google_project_id } , 
+                                    credentials=self.google_creds
+                    )
+                    mybucket=self.storage_client.get_bucket(self.bucket_name)
+                except Exception as err:
+                    self.logger.error("Could not connect to Google Cloud Storage bucket")
+                    print(err)
+            case other:
                self.logger.error('No authentication provided for Google Cloud connection')
 
-
     def connect(self):
-       # Connect to content_site
-       self.connect_to_content_site()
-       #Connect to vector database
-       self.vector_db.connect()
-       #Connect the LLM Service for encoding text -> vector
-       self.llm_service.connect()
+        # Connect to content_site
+        self.connect_to_content_site()
+        #Connect to vector database
+        self.vector_db.connect()
+        #Connect the LLM Service for encoding text -> vector
+        self.llm_service.connect()
+    
+
+    def testConnect(self):
+        # test connection to content site
+        self.logger.info("Now testing connection to Google Cloud Storage")
+        self.connect_to_content_site()
+        #Test connect to vector database
+        try:
+            self.logger.info("Now testing connection to vector database")
+            self.vector_db.testConnect()
+        except Exception as err:
+            self.logger.error("Could not connect to vector database")
+            print(err)
+            raise
+        #Test connect the LLM Service for encoding text -> vector
+        try:
+            self.logger.info("Now testing connection to LLM Service")    
+            self.llm_service.testConnect()
+        except Exception as err:
+            self.logger.error("Could not connect to LLM service")
+            print(err)
+            raise
+
        
     def index(self, no_of_processes = 1):
 
