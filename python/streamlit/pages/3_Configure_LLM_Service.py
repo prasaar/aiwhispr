@@ -13,10 +13,8 @@ else:
 
     image = Image.open(os.path.join(aiwhispr_home, 'python','streamlit', 'static', 'step3.png'))
     st.image(image)
-    st.header('AIWhispr - LLM Service Configuration')
-    st.sidebar.markdown("# Configure LLM Service")
-    st.sidebar.markdown("This is the LLM service to create vector embeddings")
-
+    st.header('AIWhispr - LLM Service Configuration for vector embeddings')
+  
     if 'select_llm_idx' not in st.session_state:
         st.session_state.select_llm_idx = 0
     
