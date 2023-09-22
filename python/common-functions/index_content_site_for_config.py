@@ -22,8 +22,29 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def index(configfile):
+def index(configfile:str,operation:str):
 
+    if len(configfile) == 0:
+        logger.error("No config file provided. Exiting...")
+        sys.exit()
+    if len(operation) == 0:
+        logger.error("No  operation argument provided. Exiting...")
+        sys.exit()
+    #List of operations under this function
+    operation_list = ['index', 'testconnection'] 
+    #Check if the operation argument matches anything in the operation_list
+    opres=False
+    c=0
+    for op in operation_list:
+        if(operation.find(op)!=-1):
+            c=c+1
+    
+    if(c>=1):
+        opres=True
+
+    if opres==False:
+        logger.error("Operation %s not supported. Exiting...", operation)
+        sys.exit()
 
     vectordb_module = ''
     vectordb_hostname = ''
@@ -238,4 +259,8 @@ def index(configfile):
                                                    do_not_read_file_list = do_not_read_file_list)
     
     #contentSite.connect()
-    contentSite.index(no_of_processes = no_of_processes)
+    if operation == 'index':
+        contentSite.index(no_of_processes = no_of_processes)
+    elif operation == 'testconnection': ## This is a connection test , so dont call index process, only connect
+        logger.info("This is a connection test so not indexing")
+        contentSite.testConnect()

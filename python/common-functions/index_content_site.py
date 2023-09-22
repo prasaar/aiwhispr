@@ -65,7 +65,7 @@ def main(argv):
       elif opt in ("-C", "--configfile"):
          configfile = arg
          logger.info(configfile)
-         index_content_site_for_config.index(configfile)
+         index_content_site_for_config.index(configfile=configfile,operation='index')
       elif opt in ("-A", "--all"):
          configfiledir = arg
          globsearchpath = configfiledir + '/*.cfg'
@@ -73,7 +73,7 @@ def main(argv):
          for configfile in myconfigfilelist:
              print('##Config File : ',configfile)
              logger.info(configfile)
-             index_content_site_for_config.index(configfile)
+             index_content_site_for_config.index(configfile=configfile,operation='index')
 
 if __name__ == "__main__":
    main(sys.argv[1:])

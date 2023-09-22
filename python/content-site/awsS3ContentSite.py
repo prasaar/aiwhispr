@@ -172,29 +172,74 @@ class createContentSite(srcContentSite):
        self.downloader = awsS3Downloader()
        self.logger = logging.getLogger(__name__)
 
+    def connect_to_content_site(self):
+        # Connect to AWS S3, Connect to localDB  which stores the ContentIndex
+        # Create the boto3 client object
+        match self.site_auth.auth_type:
+            case 'aws-key':
+                self.logger.info('Connecting to AWS S3 using AWS KEY')
+                if self.site_auth.aws_access_key_id == 'UNSIGNED':
+                    self.logger.info('Connecting to AWS S3 using UNSIGNED ACCESS')
+                    self.s3_client = boto3.client('s3',config=botoConfig(signature_version=botoUNSIGNED))   
+                else:
+                    self.s3_client = boto3.client('s3', aws_access_key_id=self.site_auth.aws_access_key_id, aws_secret_access_key=self.site_auth.aws_secret_access_key)
+        
+                try:
+                    #test the connection by retrieving the list of objects
+                    response = self.s3_client.head_bucket(Bucket=self.s3_bucket_name)
+                except Exception as err:
+                    self.logger.error("Could not connect to S3 bucket")
+                    print(err)
+                    raise
+            case other:
+                self.logger.error('No authentication provided for AWS S3 connection')
+
 
     def connect(self):
-       # Connect to content_site
-       self.connect_to_content_site()
-       #Connect to vector database
-       self.vector_db.connect()
-       #Connect the LLM Service for encoding text -> vector
-       self.llm_service.connect()
+        # Connect to content_site
+        try:
+            self.connect_to_content_site()
+        except Exception as err:
+            self.logger.error("Could not connect to content site")
+            print(err)
+            raise
 
+        #Connect to vector database
+        try:
+            self.vector_db.connect()
+        except Exception as err:
+            self.logger.error("Could not connect to vector database")
+            print(err)
+            raise
 
-    def connect_to_content_site(self):
-       # Connect to AWS S3, Connect to localDB  which stores the ContentIndex
-       # Create the boto3 client object
-       match self.site_auth.auth_type:
-           case 'aws-key':
-               self.logger.info('Connecting to AWS S3 using AWS KEY')
-               if self.site_auth.aws_access_key_id == 'UNSIGNED':
-                   self.logger.info('Connecting to AWS S3 using UNSIGNED ACCESS')
-                   self.s3_client = boto3.client('s3',config=botoConfig(signature_version=botoUNSIGNED))   
-               else:
-                   self.s3_client = boto3.client('s3', aws_access_key_id=self.site_auth.aws_access_key_id, aws_secret_access_key=self.site_auth.aws_secret_access_key)
-           case other:
-               self.logger.error('No authentication provided for AWS S3 connection')
+        #Connect the LLM Service for encoding text -> vector
+        try:    
+            self.llm_service.connect()
+        except Exception as err:
+            self.logger.error("Could not connect to LLM service")
+            print(err)
+            raise
+        
+    def testConnect(self):
+        # test connection to content site
+        self.logger.info("Now testing connection to S3")
+        self.connect_to_content_site()
+        #Test connect to vector database
+        try:
+            self.logger.info("Now testing connection to vector database")
+            self.vector_db.testConnect()
+        except Exception as err:
+            self.logger.error("Could not connect to vector database")
+            print(err)
+            raise
+        #Test connect the LLM Service for encoding text -> vector
+        try:
+            self.logger.info("Now testing connection to LLM Service")    
+            self.llm_service.testConnect()
+        except Exception as err:
+            self.logger.error("Could not connect to LLM service")
+            print(err)
+            raise
 
 
     ##Start of index function

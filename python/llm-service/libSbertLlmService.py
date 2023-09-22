@@ -27,11 +27,14 @@ class createLlmService(baseLlmService):
    model
 
    def __init__(self,llm_service_config):
-
       baseLlmService.__init__(self, llm_service_config=llm_service_config, module_name='libSbertLlmService')
       self.model_family = llm_service_config['model-family']
       self.model_name = llm_service_config['model-name']
-      
+   
+   def testConnect(self):   
+      mymodel = self.model_service.SentenceTransformer(self.model_name)
+      myembedding= mymodel.encode("Test Connection for SBert")
+   
    def connect(self):
       self.model = self.model_service.SentenceTransformer(self.model_name)
 

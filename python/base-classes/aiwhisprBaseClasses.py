@@ -41,6 +41,9 @@ class baseLlmService:
     def connect(self):
         pass
 
+    def testConnect(self):
+        pass
+
     #public function
     def encode(self,in_text:str):
         pass
@@ -138,6 +141,9 @@ class vectorDb:
     def connect(self):
         pass
 
+    def testConnect(self):
+        pass
+
     #public function
     def deleteAll(self):
         pass
@@ -209,6 +215,9 @@ class srcContentSite:
     #These operations shold be implemented is the sub(child) classes
     #public function
     def connect(self):
+        pass
+
+    def testConnect(self):
         pass
 
     #public function

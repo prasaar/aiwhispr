@@ -49,7 +49,34 @@ class createVectorDb(vectorDb):
         else:
             self.setDefaultCollectionName()
         
-        
+    def testConnect(self):
+        try:
+            self.logger.debug("Creating a Typesense Connection")
+
+            self.vectorDbClient = typesense.Client({
+                'api_key': self.vectordb_key,
+                'nodes': [
+                    {
+                    'host': self.vectordb_hostname,
+                    'port': self.vectordb_portnumber,
+                    'protocol': 'http'
+                    },
+            ],
+            'connection_timeout_seconds': 60
+            })
+        except:
+            self.logger.error("Could not create typesense connection to Typesense Server hostname: %s , portnumber: %s", self.vectordb_hostname, self.vectordb_portnumber)
+        else:
+            all_collections = self.vectorDbClient.collections.retrieve()
+            table_found = "N"
+            for collection in all_collections:
+                if collection['name'] == self.collection_name:
+                    table_found = "Y"
+            
+            if table_found == "Y":
+                self.logger.info("Collection %s already exists", self.collection_name)
+            
+
     def connect(self):
         try:
             self.logger.debug("Creating a Typesense Connection")
