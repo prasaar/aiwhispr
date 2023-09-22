@@ -41,6 +41,8 @@ echo "pip3 install --upgrade google-cloud-storage"
 pip3 install --upgrade google-cloud-storage
 echo "pip3 install openai"
 pip3 install openai
+echo "pip3 install streamlit"
+pip3 install streamlit
 
 echo "###List of python packages after install ####"
 pip3 list 
