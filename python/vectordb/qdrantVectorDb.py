@@ -191,6 +191,7 @@ class createVectorDb(vectorDb):
                     ),
                 ]
             )
+            self.logger.info("Completed inserting vector record")
         except Exception as err:
             self.logger.error("Could not insert the record in Qdrant")
             self.logger.exception(str(err))

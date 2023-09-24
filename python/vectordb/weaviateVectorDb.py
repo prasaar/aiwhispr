@@ -200,6 +200,7 @@ class createVectorDb(vectorDb):
                 vector=vector_embedding,
                 data_object = data_object
             )
+            self.logger.info("Completed inserting vector record")
         except Exception as err:
             print(f"Unexpected {err=}, {type(err)=}")
             self.logger.error("Could not insert the record in Weaviate")

@@ -189,6 +189,7 @@ class createVectorDb(vectorDb):
                 'vector_embedding_date': vector_embedding_date
             }
             self.vectorDbClient.collections[self.collection_name].documents.create(content_chunk_map_record)
+            self.logger.info("Completed inserting vector record")
         except:
             self.logger.error("Could not insert the record in typesense")
             self.logger.error(json.dumps(content_chunk_map_record))

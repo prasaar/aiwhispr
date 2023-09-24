@@ -278,6 +278,7 @@ class createVectorDb(vectorDb):
             vectordb_collection = pymilvus.Collection(name = self.collection_name)
             self.logger.debug("Inserting a record in Milvus vectordb %s with vector embedding of size: %d", str(content_chunk_map_record), len(vector_embedding))
             vectordb_collection.insert(content_chunk_map_record)
+            self.logger.info("Completed inserting vector record")
         except Exception as err:
             print(f"Unexpected {err=}, {type(err)=}")
             self.logger.error("Could not insert the record in Milvus")
