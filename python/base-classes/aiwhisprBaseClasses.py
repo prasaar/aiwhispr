@@ -253,7 +253,7 @@ class srcContentSite:
             dirpath,filename = os.path.split(content_path)
     
             if (len(dirpath)> 0 and (dirpath in self.do_not_read_dir_list) ):  ##Check in directory lists
-                self.baseLogger.info("Found directory %s in the do_not_read_dir_list", dirpath)
+                self.baseLogger.debug("Found directory %s in the do_not_read_dir_list", dirpath)
                 contentCanBeReadFlag = False
             else:   ##Else check in file list
                 if (len(filename) > 0):
@@ -262,7 +262,7 @@ class srcContentSite:
                         pattern = re.compile(pattern_str)
                         match_results= re.search(pattern, filename)
                         if (match_results != None):
-                            self.baseLogger.info("Found filename %s matching a pattern in the do_not_read_file_list", filename)
+                            self.baseLogger.debug("Found filename %s matching a pattern in the do_not_read_file_list", filename)
                             contentCanBeReadFlag = False
                             break
 
@@ -491,9 +491,9 @@ class srcDocProcessor:
  
         spacy_on_gpu = spacy.prefer_gpu()
         if spacy_on_gpu:
-            self.baseLogger.info("spacy module will use gpu")
+            self.baseLogger.debug("spacy module will use gpu")
         else:
-            self.baseLogger.info("spacy module will use cpu")
+            self.baseLogger.debug("spacy module will use cpu")
 
         self.nlp_model = spacy.load("en_core_web_sm")
         Language.factory("language_detector", func=self.get_lang_detector)
@@ -518,7 +518,7 @@ class srcDocProcessor:
             os.makedirs(self.text_chunks_dir)
             self.baseLogger.debug("Created directory for text chunks: " + self.text_chunks_dir)
         else:
-            self.baseLogger.info("The documentProcessor has been created without any downloaded_file_path")
+            self.baseLogger.debug("The documentProcessor has been created without any downloaded_file_path")
 
     #public function    
     def setDownloadFilePath(self, downloaded_file_path):

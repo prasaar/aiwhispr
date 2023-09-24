@@ -77,7 +77,7 @@ def index(configfile:str,operation:str):
     try:
         doNotReadDirList = config.get('content-site','doNotReadDirList')  #Make it easy to skip directories : a comma separated list of directories not to read
     except configparser.NoOptionError as exc:
-        logger.info("doNotReadDirList option not defined")
+        logger.debug("doNotReadDirList option not defined")
         doNotReadDirList = ''
     except:
         logger.error("Problem when reading doNotReadDirList option from config file")
@@ -86,7 +86,7 @@ def index(configfile:str,operation:str):
     try:
         doNotReadFileList = config.get('content-site','doNotReadFileList')#Make it easy to skip filename patters: a comma separated list of filename pattern not to read
     except configparser.NoOptionError as exc:
-        logger.info("doNotReadFileList option not defined")
+        logger.debug("doNotReadFileList option not defined")
         doNotReadFileList = ''
     except:
         logger.error("Problem when reading doNotReadFileList option from config file")

@@ -50,9 +50,9 @@ class aiwhisprLocalIndex:
    def deleteAll(self):
       listOfTables = self.connection.execute( """SELECT name FROM sqlite_master WHERE type='table' AND name='ContentMetaMap'; """).fetchall()
       if len(listOfTables) == 0:
-         self.logger.info('In deleteAll .... ContentMetaMap table not found. Nothing to delete!')
+         self.logger.debug('In deleteAll .... ContentMetaMap table not found. Nothing to delete!')
       else:
-         self.logger.info('Deleting from table ContentMetaMap!')
+         self.logger.debug('Deleting from table ContentMetaMap!')
          self.connection.execute("DELETE FROM ContentMetaMap;")   
 
 

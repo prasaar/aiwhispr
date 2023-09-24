@@ -56,7 +56,7 @@ class getDocProcessor(srcDocProcessor):
                 except Exception as error:
                     self.logger.error('Error when processing this file : %s', pdf_filepath)
                 finally:
-                    self.logger.info('Finished processing pdf file : %s', pdf_filepath)
+                    self.logger.debug('Finished processing pdf file : %s', pdf_filepath)
     
                 #Close text file after writing the extracted text
                 f.close()

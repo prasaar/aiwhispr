@@ -237,8 +237,8 @@ class createContentSite(srcContentSite):
 
 
         ###2\ Now start reading the site and list all the files
-        self.logger.info('Reading From Top Level Directory:' + self.src_path)
-        self.logger.info("Purging the current local ContentIndex Map")
+        self.logger.debug('Reading From Top Level Directory:' + self.src_path)
+        self.logger.debug("Purging the current local ContentIndex Map")
             
         directory = self.src_path
         for dirpath, dirnames, filenames in os.walk(directory):
@@ -250,7 +250,7 @@ class createContentSite(srcContentSite):
                 if contentShouldBeRead == True:
                     self.logger.debug("checkIfContentShouldBeRead=True for %s", content_path)
                 else:
-                    self.logger.info("checkIfContentShouldBeRead=False for %s", content_path)
+                    self.logger.debug("checkIfContentShouldBeRead=False for %s", content_path)
 
                 ##This check is specific to filepath.
                 filePermissionFlag = True #Default

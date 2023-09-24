@@ -259,8 +259,8 @@ class createContentSite(srcContentSite):
         self.createDownloadDirectory() #Create before the multiple processeses start downloading.
 
         ###2\ Now start reading the site and list all the files
-        self.logger.info('Reading Azure Storage Account : ' + self.azure_account_url +  ' with Container: ' + self.container_name)
-        self.logger.info("Purging the current local ContentIndex Map")
+        self.logger.debug('Reading Azure Storage Account : ' + self.azure_account_url +  ' with Container: ' + self.container_name)
+        self.logger.debug("Purging the current local ContentIndex Map")
         
         # List the blobs in the container
         blob_list = self.container_client.list_blobs()
