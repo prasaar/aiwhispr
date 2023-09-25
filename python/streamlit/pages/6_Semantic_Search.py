@@ -9,10 +9,7 @@ import os
 import sys
 import json
 import math
-import string
-import re
 import logging
-import getopt
 import configparser
 from importlib import import_module
 import urllib.parse
@@ -101,9 +98,16 @@ class searchHandler:
          src_path_for_results = self.src_path_for_results
          text_chunk = chunk_map_record['text_chunk']
          title = chunk_map_record['title']
-         score = str(chunk_map_record['match_score'])
+         
+            
+         if (self.vector_db.module_name == 'qdrantVectorDb') or (self.vector_db.module_name == 'milvusVectorDb'):
+            semantic_distance_score = (1 - chunk_map_record['match_score']) #Convert score to cosine distance(near)
+         else:
+            semantic_distance_score = chunk_map_record['match_score'] #Cosine Distance
 
-         angle_radians = math.acos(chunk_map_record['match_score'])
+         semantic_distance_score_str = str(semantic_distance_score)
+
+         angle_radians = math.acos(semantic_distance_score)
          self.vector_angle_radians.append(angle_radians)
          
          if output_format == 'html':
@@ -125,7 +129,7 @@ class searchHandler:
             else:  #display the content path
                display_html = display_html + '<a href="' + display_url + '">' + content_path + '</a><br>'
             
-            display_html = display_html + '<br><p> Semantic distance : ' + score +  '</pr><br>' + '<div><p>' + display_text_chunk + '</p></div><br>'
+            display_html = display_html + '<br><p> Semantic distance : ' + semantic_distance_score_str +  '</pr><br>' + '<div><p>' + display_text_chunk + '</p></div><br>'
             
             
          if output_format == 'json':
@@ -242,8 +246,11 @@ else:
     image = Image.open(os.path.join(aiwhispr_home, 'python','streamlit', 'static', 'aiwhispr_logo_results.png'))
     st.image(image)
     st.header('AIWhispr - Semantic Search')
-    st.write('### For Content Site ' + st.session_state.sitename + ' ###')
-
+    if 'sitename' in st.session_state:
+        st.write('### For Content Site ' + st.session_state.sitename + ' ###')
+    else:
+        st.write('######')
+        
     if 'indexing_started_flag' not in st.session_state:
         st.write('Indexing was not started in this session. You can specify a config file created earlier')    
         st.session_state.canSearch=True
