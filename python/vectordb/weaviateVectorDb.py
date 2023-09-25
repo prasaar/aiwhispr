@@ -34,7 +34,8 @@ class createVectorDb(vectorDb):
         self.vectordb_key = vectordb_config['api-key']
         
         if 'collection-name' in vectordb_config:
-            self.collection_name = vectordb_config['collection-name']
+            collname = vectordb_config['collection-name']
+            self.collection_name = collname[0:1].capitalize() + collname[1:]
         else:
             self.setDefaultCollectionName()
 
@@ -291,8 +292,7 @@ class createVectorDb(vectorDb):
         )
         
         #Weaviate return results always has first character of class name as a capital
-        collection_name=self.collection_name[0:1].capitalize() + self.collection_name[1:]
-        search_results=search_response['data']['Get'][collection_name]
+        search_results=search_response['data']['Get'][self.collection_name]
         
         self.logger.debug("Search Response: %s", str(search_response))
 
@@ -350,7 +350,7 @@ class createVectorDb(vectorDb):
             .with_additional(["score","id"])
             .do()
             )
-            search_results=search_response['data']['Get'][collection_name]
+            search_results=search_response['data']['Get'][self.collection_name]
 
             self.logger.debug("SearchResponse %s", search_response)
 
