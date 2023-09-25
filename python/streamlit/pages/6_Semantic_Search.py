@@ -1,7 +1,8 @@
 import streamlit as st
 import os
 from PIL import Image
-
+import matplotlib.pyplot as plt
+from numpy import sin, cos, pi
 
 from unittest import result
 import os
@@ -30,6 +31,9 @@ sys.path.append("../../common-objects")
 from aiwhisprBaseClasses import baseLlmService, vectorDb 
 import aiwhisprConstants
 
+def deg2rad(deg):
+    return deg * pi / 180
+
 class searchHandler:
    model:baseLlmService
    vector_db:vectorDb
@@ -38,6 +42,7 @@ class searchHandler:
    src_path:str
    src_path_for_results:str
    logger=logging.getLogger(__name__)
+   vector_angle_radians = [] 
 
    def setup(self,llm_service_module:str, vectordb_module:str, llm_service_config:dict, vectordb_config:dict, content_site_name:str,src_path:str,src_path_for_results:str):
       llmServiceMgr = import_module(llm_service_module)
@@ -98,6 +103,9 @@ class searchHandler:
          title = chunk_map_record['title']
          score = str(chunk_map_record['match_score'])
 
+         angle_radians = math.acos(chunk_map_record['match_score'])
+         self.vector_angle_radians.append(angle_radians)
+         
          if output_format == 'html':
             
             if src_path_for_results[0:4] == 'http': 
@@ -118,6 +126,7 @@ class searchHandler:
                display_html = display_html + '<a href="' + display_url + '">' + content_path + '</a><br>'
             
             display_html = display_html + '<br><p> Semantic distance : ' + score +  '</pr><br>' + '<div><p>' + display_text_chunk + '</p></div><br>'
+            
             
          if output_format == 'json':
             json_record = {} #Dict
@@ -197,9 +206,10 @@ class searchHandler:
          return { 'results': display_json} #Return as dict
       else:
          return display_html
-           
+      
 
 mySearchHandler = []
+
 
 def setup(configfile):
     
@@ -256,9 +266,29 @@ else:
                 input_query = st.session_state.input_query_in
                 mySearchHandler.append(searchHandler())
                 setup(configfile)
-                st.write('### Semantic Search Results ###')
+                st.write('### Semantic Plot and Search Results ###')
                 html_result = mySearchHandler[0].search(input_query=input_query, result_format='html', textsearch_flag='N')
+                
+                r = 1.0
+                plt.plot(0,r, color = 'blue', marker = 'o')
+                plt.plot([0,r * cos(deg2rad(90))], [0,r * sin( deg2rad(90))], color = 'green')
+                if len(input_query) < 40:
+                    plt.text(0.1, 0.95,input_query)
+                else:
+                    plt.text(0.1,0.95,input_query[0:37] + '...')
+                   
+                no_of_results = len(mySearchHandler[0].vector_angle_radians)
+                if no_of_results > 0:
+                    for angle_radians in mySearchHandler[0].vector_angle_radians:
+                        plt.plot([0, r * cos(angle_radians)], [0, r * sin(angle_radians)], color = "black")
+                
+                st.pyplot(plt)
+
                 st.markdown(html_result,unsafe_allow_html=True)
+                 
+
+
+
 
 
 
