@@ -16,6 +16,7 @@ import configparser
 from importlib import import_module
 import urllib.parse
 
+
 curr_dir = os.path.dirname(os.path.realpath(__file__))
 os.chdir(curr_dir)
 os.getcwd()
@@ -75,40 +76,9 @@ class searchHandler:
       else:
          search_results = self.vector_db.search(self.content_site_name,query_embedding_vector_as_list, self.limit_hits)
       
-      
       display_html = '<div class="aiwhisprSemanticSearchResults">'
       display_json = []
 
-      
-
-      """""
-        We should receive a JSON Object in the format 
-        {"results": [ semantic_results{} ,text_results{}  ]}
-       
-         semantic_results / text_results will be a format 
-         {
-         "found" : int
-         "type"  : semantic / text / image 
-         "hits"  : []
-         }
-             
-             hits[]  will be a list Example : hits[ {"result":{},   {"result":{} }]
-            "result": {
-               id: UUID,
-               content_site_name: str,
-               content_path:str,
-               src_path:str,
-               src_path_for_results,
-               tags:str,
-               text_chunk:str,
-               text_chunk_no:int,
-               title:int,
-               last_edit_date:float,
-               vector_embedding_date:float,
-               match_score: float,
-            }
-      """""
-      
       self.logger.debug('SearchService received search results from vectordb:')
       self.logger.debug(json.dumps(search_results))
 
@@ -271,6 +241,8 @@ else:
            configfile=""
         else:
            configfile=st.session_state.config_filepath
+    else:
+        configfile=st.session_state.config_filepath
 
     if st.session_state.canSearch == True:
         configfile=st.text_input("Enter the configfile path", value=configfile)
