@@ -43,6 +43,10 @@ echo "pip3 install openai"
 pip3 install openai
 echo "pip3 install streamlit"
 pip3 install streamlit
+echo "pip3 install numpy"
+pip3 install numpy
+echo "pip3 install matplotlib"
+pip3 install matplotlib
 
 echo "###List of python packages after install ####"
 pip3 list 
