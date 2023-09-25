@@ -67,7 +67,7 @@ class createVectorDb(vectorDb):
                 else:
                     self.vectorDbClient = weaviate.Client(url=connect_url, timeout_config=(5, 15),) #Create connection without key
         except Exception:    
-            self.logger.error("Could not create Weaviate connection to Qdrant Server hostname: %s , portnumber: %s with key: %s", self.vectordb_hostname, self.vectordb_portnumber, self.vectordb_key)
+            self.logger.error("Could not create Weaviate connection to Weaviate Server hostname: %s , portnumber: %s with key: %s", self.vectordb_hostname, self.vectordb_portnumber, self.vectordb_key)
         
 
         #Define a class object with self.collection_name
@@ -289,7 +289,10 @@ class createVectorDb(vectorDb):
             .with_additional(["distance", "id"])
             .do()
         )
-        search_results=search_response['data']['Get'][self.collection_name]
+        
+        #Weaviate return results always has first character of class name as a capital
+        collection_name=self.collection_name[0:1].capitalize() + self.collection_name[1:]
+        search_results=search_response['data']['Get'][collection_name]
         
         self.logger.debug("Search Response: %s", str(search_response))
 
@@ -347,7 +350,7 @@ class createVectorDb(vectorDb):
             .with_additional(["score","id"])
             .do()
             )
-            search_results=search_response['data']['Get'][self.collection_name]
+            search_results=search_response['data']['Get'][collection_name]
 
             self.logger.debug("SearchResponse %s", search_response)
 
