@@ -142,9 +142,16 @@ if st.button(label="Use This Vector Db Config", key="review_vector_db_btn", help
     else:
         st.session_state.vectordb_config = st.session_state.vectordb_config + "collection-name=" + st.session_state.collection_name + "\n"
     
-    if st.session_state.vectorDbModule == 'typesenseVectorDb' or st.session_state.vectorDbModule == 'qdrantVectorDb' or st.session_state.vectorDbModule == 'weaviateVectorDb':
+    if st.session_state.vectorDbModule == 'typesenseVectorDb':
         if st.session_state.api_key == None or len(st.session_state.api_key) == 0:
             st.write("ERROR: API Key not provided") 
+        else:
+            st.session_state.vectordb_config = st.session_state.vectordb_config + "api-key=" + st.session_state.api_key + "\n"
+    
+    if st.session_state.vectorDbModule == 'qdrantVectorDb' or st.session_state.vectorDbModule == 'weaviateVectorDb':
+        if st.session_state.api_key == None or len(st.session_state.api_key) == 0:
+            st.write("WARNING: API Key not provided") 
+            st.session_state.vectordb_config = st.session_state.vectordb_config + "api-key=" + st.session_state.api_key + "\n"
         else:
             st.session_state.vectordb_config = st.session_state.vectordb_config + "api-key=" + st.session_state.api_key + "\n"
     
