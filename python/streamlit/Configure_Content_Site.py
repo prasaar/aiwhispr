@@ -58,7 +58,7 @@ else:
     
     col1, col2 = st.columns(2)
     st.sidebar.markdown("# Configure Content Site.")
-    st.sidebar.markdown("This is the storage location for your files")
+    st.sidebar.markdown("This is the storage location of your files")
     
     #### Column 1 ####
     #Sitename

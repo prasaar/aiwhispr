@@ -47,6 +47,14 @@ echo "pip3 install numpy"
 pip3 install numpy
 echo "pip3 install matplotlib"
 pip3 install matplotlib
+echo "pip3 install pandas"
+pip3 install pandas
+echo "pip3 install umap-learn"
+pip3 install umap-learn
+echo "pip3 install scikit-learn"
+pip3 install scikit-learn
+echo "pip3 install plotly==5.17.0"
+pip3 install plotly==5.17.0
 
 echo "###List of python packages after install ####"
 pip3 list 

@@ -246,7 +246,7 @@ class createVectorDb(vectorDb):
 
         common_search_params =  {
                 'per_page': limit_hits,
-                'exclude_fields': 'vector_embedding',
+                #'exclude_fields': 'vector_embedding',
                 'filter_by': 'content_site_name:='  + content_site_name
         }
 
@@ -315,6 +315,7 @@ class createVectorDb(vectorDb):
             result['title'] = chunk_map_record['title']
             result['last_edit_date'] = chunk_map_record['last_edit_date']
             result['vector_embedding_date'] = chunk_map_record['vector_embedding_date']
+            result['vector_embedding'] = chunk_map_record['vector_embedding']
             
             semantic_hits.append(result)
             i = i + 1 
@@ -346,7 +347,8 @@ class createVectorDb(vectorDb):
                 result['title'] = chunk_map_record['title']
                 result['last_edit_date'] = chunk_map_record['last_edit_date']
                 result['vector_embedding_date'] = chunk_map_record['vector_embedding_date']
-                
+                result['vector_embedding'] = chunk_map_record['vector_embedding']
+    
                 text_hits.append(result)
                 i = i + 1 
 
@@ -355,4 +357,7 @@ class createVectorDb(vectorDb):
 
         
         return json_results
+
+    
+
 
