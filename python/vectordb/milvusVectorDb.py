@@ -63,6 +63,8 @@ class createVectorDb(vectorDb):
         else:
             self.setDefaultCollectionName()
         
+        self.efValue = 256 #Milvus specific parameter
+        self.Mvalue = 8 #Milvus specific parameter
     
     def testConnect(self):
         #First create the connection
@@ -212,27 +214,24 @@ class createVectorDb(vectorDb):
             
             #4. Create index
             try: 
-                index_params = {
-                    "metric_type":"IP",
-                    "index_type":"DISKANN",
-                    "params":{"search_list":1024}
+                vector_index_params = {
+                    "metric_type":"COSINE",
+                    "index_type":"HNSW",
+                    "params":{"M":self.Mvalue, "efConstruction":self.efValue}
                 }
                 vectordb_collection = pymilvus.Collection(name = self.collection_name)
                 vectordb_collection.create_index(
                     field_name="vector_embedding",
-                    index_params=index_params
+                    index_params=vector_index_params
                 )
-
                 vectordb_collection.create_index(
                     field_name="text_chunk",
                     index_name="scalar_index_text_chunk",
                 )
-
                 vectordb_collection.create_index(
                     field_name="tags",
                     index_name="scalar_index_tags",
                 )
-
                 vectordb_collection.create_index(
                     field_name="title",
                     index_name="scalar_index_title",
@@ -369,9 +368,10 @@ class createVectorDb(vectorDb):
         expr_query = "content_site_name == '" + self.content_site_name + "'"
         #We will first do a semantic search
         search_params = {
-            "metric_type": "IP",
+            "metric_type": "COSINE",
             "offset": 0,
             "ignore_growing": False,
+            "params":{"ef":self.efValue}
         }
 
         try:
@@ -392,7 +392,6 @@ class createVectorDb(vectorDb):
             self.logger.error("Error when searching for results from Milvus")
             print(err)
             raise
-
 
         json_results = {} #Dict
         json_results['results'] = []
@@ -439,3 +438,46 @@ class createVectorDb(vectorDb):
         json_results['results'].append(text_results)
 
         return json_results
+
+    def getExtractedText(self,content_site_name:str,content_path:str):
+        try:
+            vectordb_collection = pymilvus.Collection(name = self.collection_name)
+            vectordb_collection.load()
+        except:
+            self.logger.error("Could not load the collection %s ", self.collection_name)
+            raise
+
+        expr_query = "content_site_name == '" + content_site_name + "' and content_path == '" + content_path +"'"
+        
+        no_of_hits=0
+        try:
+            search_results = vectordb_collection.query(
+                expr=expr_query,
+                offset = 0,
+                # set the names of the fields you want to retrieve from the search result.
+                output_fields=['id', "content_site_name", "content_path", "src_path", "src_path_for_results","tags", "title","text_chunk","text_chunk_no","last_edit_date","vector_embedding_date", "vector_embedding" ],
+            )
+            no_of_hits = len(search_results)
+        except Exception as err:
+            self.logger.exception("Error when searching for results from Milvus")
+            raise
+
+        extracted_text = ""
+        text_chunks={}
+        i = 0
+        
+        while i < no_of_hits:   
+            chunk_map_record = search_results[i]
+            text_chunks[str(chunk_map_record['text_chunk_no'])] = chunk_map_record['text_chunk']
+            i = i + 1 
+
+        j = 1
+        while j <= no_of_hits:
+           extracted_text = extracted_text + text_chunks[str(j)]
+           j = j + 1
+    
+        return extracted_text
+    
+ 
+        
+
