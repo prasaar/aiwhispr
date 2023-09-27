@@ -379,3 +379,58 @@ class createVectorDb(vectorDb):
 
 
         return json_results
+
+    def getExtractedText(self,content_site_name:str,content_path:str):
+
+        no_of_hits=0
+        extracted_text=""
+        dummy_vector=[]
+        dimension_ctr=0
+        while dimension_ctr < self.vectordb_vector_dim:
+            dummy_vector.append(0.0)
+            dimension_ctr = dimension_ctr + 1
+        
+        try:
+            search_results = self.vectorDbClient.search(
+                collection_name=self.collection_name,
+                query_filter=models.Filter(
+                    must=[
+                        models.FieldCondition(
+                            key="content_site_name",
+                            match=models.MatchValue(
+                                value=content_site_name,
+                            )
+                        ),
+                        models.FieldCondition(
+                            key="content_path",
+                            match=models.MatchValue(
+                                value=content_path 
+                            )
+                        )
+
+                    ]
+                ),
+                query_vector=dummy_vector,
+                with_payload=True,
+            )
+            no_of_hits = len(search_results)
+        except Exception as err:
+            self.logger.error("Could not retrieve results in getExtractedText")
+            self.logger.exception("Could not retrieve results in getExtractedText")
+        else:
+            text_chunks={}
+            i = 0
+            while i < no_of_hits:
+                chunk_map_record = search_results[i].payload   
+                text_chunks[str(chunk_map_record['text_chunk_no'])] = chunk_map_record['text_chunk']
+                i = i + 1 
+
+            j = 1
+            while j <= no_of_hits:
+                extracted_text = extracted_text + text_chunks[str(j)]
+                j = j + 1
+    
+        return extracted_text
+    
+            
+            
