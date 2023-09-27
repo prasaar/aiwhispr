@@ -85,7 +85,7 @@ class searchHandlerStreamlit:
       self.model= llmServiceMgr.createLlmService(llm_service_config)
       self.model.connect()
 
-   def search(self,input_query:str, result_format:str, textsearch_flag:str): 
+   def search(self,input_query:str, result_format:str, textsearch_flag:str, configfile:str): 
 
       output_format = result_format      
       self.logger.debug("result format: %s", result_format)
@@ -117,7 +117,10 @@ class searchHandlerStreamlit:
      
 
       i = 0
+      st.session_state.search_results = {} #Empty dictionary
+      st.session_state.search_results['results'] = [] #Array of records
       while i < no_of_semantic_hits:
+         result_record = {}
          chunk_map_record = search_results['results'][0]['hits'][i]
          content_site_name = chunk_map_record['content_site_name']
          record_id = chunk_map_record['id']
@@ -139,6 +142,16 @@ class searchHandlerStreamlit:
          angle_radians = math.acos(semantic_distance_score)
          self.vector_angle_radians.append(angle_radians)
          
+         #Store these reults in the session state
+         result_record['content_site_name'] = content_site_name
+         result_record['id'] = record_id
+         result_record['content_path'] = content_path
+         result_record['src_path'] = src_path
+         result_record['src_path_for_results'] = src_path_for_results
+         result_record['title'] = title
+         result_record['text_chunk'] = text_chunk
+         st.session_state.search_results['results'].append(result_record)
+         
          #Vector ID for 3D UMAP Plot
          self.doc_ids.append(record_id)
          #VectorEmbedding for 3D UMAP Plot
@@ -146,7 +159,9 @@ class searchHandlerStreamlit:
 
          if output_format == 'html':
             
-            if src_path_for_results[0:4] == 'http': 
+            if src_path_for_results[0:17] == 'aiwhisprStreamlit':
+               display_url =   'Show_Complete_Text?configfile=' + urllib.parse.quote(configfile)  + '&contentpath=' + urllib.parse.quote(content_path)
+            elif src_path_for_results[0:4] == 'http':
                display_url = urllib.parse.quote_plus(src_path_for_results,safe='/:')  + '/' + urllib.parse.quote(content_path)
             else:
                display_url = src_path_for_results + '/' + content_path
@@ -204,8 +219,10 @@ class searchHandlerStreamlit:
             title = chunk_map_record['title']
                
             if output_format == 'html':
-
-               if src_path_for_results[0:4] == 'http':
+               
+               if src_path_for_results[0:17] == 'aiwhisprStreamlit':
+                  display_url =   'Show_Complete_Text?configfile=' + urllib.parse.quote(configfile)  + '&contentpath=' + urllib.parse.quote(content_path)
+               elif src_path_for_results[0:4] == 'http':
                   display_url = urllib.parse.quote_plus(src_path_for_results,safe='/:')  + '/' + urllib.parse.quote(content_path)
                else:
                   display_url = src_path_for_results + '/' + content_path
@@ -309,7 +326,7 @@ else:
                setup(configfile)
                st.write('#### Semantic Plot  ####')
                st.write("The green line represents the input query, {blue,orange,red} lines represent search results - the semantic distance is the cosine distance")
-               html_result = mySearchHandler[0].search(input_query=input_query, result_format='html', textsearch_flag='N')
+               html_result = mySearchHandler[0].search(input_query=input_query, result_format='html', textsearch_flag='N',configfile=configfile)
                no_of_results = len(mySearchHandler[0].vector_angle_radians)
                
                if no_of_results > 0: #If we have results
@@ -423,7 +440,11 @@ else:
                   #Print results from nearest to furthest by semantic distance (top 25)
                   st.write('#### Search Results  ####')
                   st.markdown(html_result,unsafe_allow_html=True)
-               
+                  try:
+                     if (len(st.session_state.search_results['results']) == 0  ):
+                        st.write("No search results yet exist")
+                  except Exception as err:
+                     st.write(err)
                  
 
 

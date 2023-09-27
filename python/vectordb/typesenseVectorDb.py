@@ -358,6 +358,39 @@ class createVectorDb(vectorDb):
         
         return json_results
 
+    def getExtractedText(self,content_site_name:str,content_path:str):
+
+        filter_by_conditions = 'content_site_name:=' + self.content_site_name + ' && content_path:=' + content_path
+        search_parameters= {
+            'q': self.content_site_name,
+            'query_by': 'content_site_name',
+            'filter_by':filter_by_conditions,
+            #'sort_by' : 'text_chunk_no:asc'
+        }
+        no_of_hits=0
+        try:
+            search_results = self.vectorDbClient.collections[self.collection_name].documents.search(search_parameters)
+            self.logger.debug('Received Typesense Search Results:')
+            self.logger.debug("getExtractedText : %s", json.dumps(search_results))
+            no_of_hits = len(search_results['hits'])
+        except Exception as err: 
+            self.logger.exception("Could not get extractedText for content-site{%s} content-path{%s}", content_site_name, content_path)   
+            
+        
+        extracted_text = ""
+        
+        #I am not using Typesense sort_by since it had some issues.
+        #Instead using a dictionary to store the text chunks
+        text_chunks={}
+        i = 0
+        while i < no_of_hits:   
+            text_chunks[str(search_results['hits'][i]['document']['text_chunk_no'])] = search_results['hits'][i]['document']['text_chunk']
+            i = i + 1 
+
+        j = 1
+        while j <= no_of_hits:
+           extracted_text = extracted_text + text_chunks[str(j)]
+           j = j + 1
     
-
-
+        return extracted_text
+    
