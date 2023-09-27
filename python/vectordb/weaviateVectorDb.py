@@ -268,6 +268,7 @@ class createVectorDb(vectorDb):
                text_chunk_no:int,
                title:int,
                last_edit_date:float,
+               vector_embedding:arry_of_float
                vector_embedding_date:float,
                match_score: float,
             }
@@ -287,7 +288,7 @@ class createVectorDb(vectorDb):
             })
             .with_near_vector({ "vector": vector_embedding})
             .with_limit(limit_hits)
-            .with_additional(["distance", "id"])
+            .with_additional(["distance", "id", "vector"])
             .do()
         )
         
@@ -326,6 +327,7 @@ class createVectorDb(vectorDb):
             result['title'] = chunk_map_record['title']
             result['last_edit_date'] = chunk_map_record['last_edit_date']
             result['vector_embedding_date'] = chunk_map_record['vector_embedding_date']
+            result['vector_embedding'] = chunk_map_record['_additional']['vector']
             
             semantic_hits.append(result)
             i = i + 1 
@@ -347,7 +349,7 @@ class createVectorDb(vectorDb):
                "valueText": self.content_site_name
             })
             .with_limit(limit_hits)
-            .with_additional(["score","id"])
+            .with_additional(["score", "id", "vector"])
             .do()
             )
             search_results=search_response['data']['Get'][self.collection_name]
@@ -377,6 +379,8 @@ class createVectorDb(vectorDb):
                 result['title'] = chunk_map_record['title']
                 result['last_edit_date'] = chunk_map_record['last_edit_date']
                 result['vector_embedding_date'] = chunk_map_record['vector_embedding_date']
+                result['vector_embedding'] = chunk_map_record['_additional']['vector']
+                
                 
                 text_hits.append(result)
                 i = i + 1 

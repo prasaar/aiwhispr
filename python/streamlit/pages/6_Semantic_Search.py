@@ -112,7 +112,6 @@ class searchHandlerStreamlit:
       display_json = []
 
       self.logger.debug('SearchService received search results from vectordb:')
-      self.logger.debug(json.dumps(search_results))
 
       no_of_semantic_hits = search_results['results'][0]['found']
      
@@ -162,7 +161,7 @@ class searchHandlerStreamlit:
             else:  #display the content path
                display_html = display_html + '<a href="' + display_url + '">' + content_path + '</a><br>'
             
-            display_html = display_html + '<p> Semantic distance : ' + semantic_distance_score_str +  '</pr>'
+            display_html = display_html + '<p> Cosine semantic distance : ' + semantic_distance_score_str +  '</pr>'
             display_html = display_html + '<p> Document Id: ' + record_id + '</pr><br>'
             display_html = display_html + '<div><p>' + display_text_chunk + '</p></div><br>'
             

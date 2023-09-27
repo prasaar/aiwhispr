@@ -370,23 +370,28 @@ class createVectorDb(vectorDb):
         #We will first do a semantic search
         search_params = {
             "metric_type": "IP",
-            "offset": 1,
+            "offset": 0,
             "ignore_growing": False,
         }
 
-        search_results = vectordb_collection.search(
-            data=[vector_embedding],
-            anns_field="vector_embedding",
-            # the sum of `offset` in `param` and `limit` 
-            # should be less than 16384.
-            param=search_params,
-            limit=limit_hits,
-            expr=expr_query,
-            # set the names of the fields you want to 
-            # retrieve from the search result.
-            output_fields=['id', "content_site_name", "content_path", "src_path", "src_path_for_results","tags", "title","text_chunk","text_chunk_no","last_edit_date","vector_embedding_date" ],
-            consistency_level="Strong"
-        )
+        try:
+            search_results = vectordb_collection.search(
+                data=[vector_embedding],
+                anns_field="vector_embedding",
+                # the sum of `offset` in `param` and `limit` 
+                # should be less than 16384.
+                param=search_params,
+                limit=limit_hits,
+                expr=expr_query,
+                # set the names of the fields you want to 
+                # retrieve from the search result.
+                output_fields=['id', "content_site_name", "content_path", "src_path", "src_path_for_results","tags", "title","text_chunk","text_chunk_no","last_edit_date","vector_embedding_date", "vector_embedding" ],
+                consistency_level="Strong"
+            )
+        except Exception as err:
+            self.logger.error("Error when searching for results from Milvus")
+            print(err)
+            raise
 
 
         json_results = {} #Dict
@@ -419,6 +424,7 @@ class createVectorDb(vectorDb):
             result['title'] = chunk_map_record.entity.get('title')
             result['last_edit_date'] = chunk_map_record.entity.get('last_edit_date')
             result['vector_embedding_date'] = chunk_map_record.entity.get('vector_embedding_date')
+            result['vector_embedding'] = chunk_map_record.entity.get('vector_embedding')
             
             semantic_hits.append(result)
             i = i + 1 

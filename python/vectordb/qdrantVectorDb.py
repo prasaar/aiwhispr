@@ -273,7 +273,8 @@ class createVectorDb(vectorDb):
             ),
             query_vector=vector_embedding,
             limit=limit_hits,
-            with_payload=True
+            with_payload=True,
+            with_vectors=True
         )
 
        
@@ -307,6 +308,8 @@ class createVectorDb(vectorDb):
             result['title'] = chunk_map_record['title']
             result['last_edit_date'] = chunk_map_record['last_edit_date']
             result['vector_embedding_date'] = chunk_map_record['vector_embedding_date']
+            result['vector_embedding'] = search_results[i].vector
+            
             
             semantic_hits.append(result)
             i = i + 1 
@@ -339,7 +342,8 @@ class createVectorDb(vectorDb):
             ),
             query_vector=vector_embedding,
             limit=limit_hits,
-            with_payload=True
+            with_payload=True,
+            with_vectors=True
             )
 
             no_of_text_hits = len(search_results)
@@ -365,6 +369,7 @@ class createVectorDb(vectorDb):
                 result['title'] = chunk_map_record['title']
                 result['last_edit_date'] = chunk_map_record['last_edit_date']
                 result['vector_embedding_date'] = chunk_map_record['vector_embedding_date']
+                result['vector_embedding'] = search_results[i].vector
                 
                 text_hits.append(result)
                 i = i + 1 
