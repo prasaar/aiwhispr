@@ -20,6 +20,7 @@ import aiwhisprConstants
 import logging
 
 class createVectorDb(vectorDb):
+    vectordb_vector_dim:int
 
     def __init__(self,vectordb_config:{}, content_site_name:str,src_path:str,src_path_for_results:str):
         vectorDb.__init__(self,
@@ -38,6 +39,12 @@ class createVectorDb(vectorDb):
             self.collection_name = collname[0:1].capitalize() + collname[1:]
         else:
             self.setDefaultCollectionName()
+
+        try:
+            self.vectordb_vector_dim = int(vectordb_config['vector-dim'])
+        except:
+            self.logger.error("Vector dimensionsion is not provided. Have you set this as vector-dim=<int> ?")
+            sys.exit()
 
         self.vectorDbClient:weaviate.Client
         self.logger = logging.getLogger(__name__)
@@ -390,3 +397,59 @@ class createVectorDb(vectorDb):
 
 
         return json_results
+
+
+    def getExtractedText(self,content_site_name:str,content_path:str):
+
+        no_of_hits=0
+        extracted_text=""
+        dummy_vector=[]
+        dimension_ctr=0
+
+        while dimension_ctr < self.vectordb_vector_dim :
+            dummy_vector.append(0.0)
+            dimension_ctr = dimension_ctr + 1
+        
+        try:
+            search_response = ( self.vectorDbClient.query
+                .get(self.collection_name,["content_site_name", "src_path", "src_path_for_results", "content_path", "last_edit_date", "tags", "title", "text_chunk", "text_chunk_no", "vector_embedding_date"])
+                .with_where({
+                    "operator": "And",
+                    "operands": [
+                    {
+                    "path": ["content_site_name"],
+                    "operator": "Equal",
+                    "valueText": content_site_name
+                    },
+                    {
+                    "path": ["content_path"],
+                    "operator": "Equal",
+                    "valueText": content_path
+                    },
+                    ]
+                })
+                .with_near_vector({ "vector": dummy_vector})
+                .do()
+            )
+            
+            #Weaviate return results always has first character of class name as a capital
+            search_results=search_response['data']['Get'][self.collection_name]
+            no_of_hits=len(search_results)
+        except Exception as err:
+            self.logger.exception("Could not retrieve results in getExtractedText")
+        else:
+            text_chunks={}
+            i = 0
+            while i < no_of_hits:
+                chunk_map_record = search_results[i]
+                text_chunks[str(chunk_map_record['text_chunk_no'])] = chunk_map_record['text_chunk']
+                i = i + 1 
+
+            j = 1
+            while j <= no_of_hits:
+                extracted_text = extracted_text + text_chunks[str(j)]
+                j = j + 1
+    
+        return extracted_text
+    
+            
