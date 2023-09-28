@@ -31,6 +31,8 @@ else:
             
 
         if st.button(label="Start Indexing", key="run_indexing_btn", help="Click to run indexing", type="primary", disabled=st.session_state.indexing_started_flag):
+            st.write("#### Please do not navigate away. ###")
+            st.write("#### This takes approximately 15 minutes to create vector embeddings for 2000 files. ####")
             st.write("########################################")
             fwrite_in_this_process_flag= False
             if st.session_state.indexing_started_flag == False: ##If this is the first time
