@@ -116,13 +116,13 @@ else:
     #Get the displaypath
     if len(st.session_state.displaypath)==0:
         if st.session_state.srctype == 'filepath':
-            displayprefix='http://localhost:9100/bbc/'
+            displayprefix='aiwhisprStreamlit'
         else:
-            displayprefix=""
+            displayprefix="http://mywebserver/"
     else:
         displayprefix=st.session_state.displaypath
 
-    col1.text_input('Prefix path to display link to the file e.g. http://localhost/myfiles',value=displayprefix, key="displaypath_in")
+    col1.text_input('Prefix path to display webserver from where files are served e.g. http://localhost/myfiles or keyword aiwhisprStreamlit',value=displayprefix, key="displaypath_in")
     st.session_state.displaypath = st.session_state.displaypath_in
 
     #Set the authtype
