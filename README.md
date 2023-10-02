@@ -108,7 +108,7 @@ Click on the button "Use this Content Site Config" and procced to the next step 
 
 Choose your vectordb and provide the connection details.
 
-When you choose the vector databe, the Vector Db IP address and Port numbers are populated based on the default installations.
+When you choose the vector database, the Vector Db IP address and Port numbers are populated based on the default installations.
 You can change this based on your setup.
 
 Your vector database should be configured for authentication. In the case of Qdrant, Weaviate, Typesense an API Key is required.
