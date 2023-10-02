@@ -15,9 +15,9 @@ contact@aiwhispr.com
 
 ## Prerequisites for a Linux install with Typesense
 
-[For Linux install with Qdrant vector database, refer to example_with_qdrant.md](./howto/example_with_qdrant.md)
+[For Linux install with Qdrant vector database, refer to example_with_qdrant.md](../qdrant/example_with_qdrant.md)
 
-[For MacOS refer to README_MACOS.md](./howto/README_MACOS.md)
+[For MacOS refer to README_MACOS.md](../macos/README_MACOS.md)
 
 For Windows 10/11 you can follow the same instructions as below on wsl (Windows Subsystem for Linux) 
 
