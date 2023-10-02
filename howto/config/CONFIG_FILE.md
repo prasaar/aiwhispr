@@ -19,7 +19,16 @@ srcpath = <path from which AIWhispr will start reading and indexing files>
 displaypath = <top level path that AIWhispr will use when returning the search results. 
               Example : you can save all your files under /var/www/html , 
               when the search results are displayed, 
-              the top level path is replaced with http://hostname >
+              the top level path is replaced with http://hostname 
+              "aiwhisprStreamlit" is a special keyword for this configuration.
+              This keyword is used when the configuration file is to be used by the 
+              Streamlit front end to configure, test, index , search using 
+              $AIWHISPR_HOME/python/streamlit/Configure_Content_Site.py
+              if displaypath=aiwhisprStreamlit then the search results in the streamlit app,
+              will have the href link to the Streamlit module "Show_Complete_Text" which retrieves the 
+              the text chunk from the Vector database to display.  
+              >
+
 
 contentSiteModule = <python module that handles indexing for files/content in the specified srctype.
                     There are test configuration examples for s3 , azureblob. 
@@ -61,6 +70,7 @@ api-port = <vectordb-api-port(EDIT)>
 api-key = <vectordb-api-key(EDIT)>
 vectorDbModule=<python module to handle the vectordb storage schema. 
                 You can write your own handlers under $AIWHISPR_HOME/python/vectordb>
+vector-dim=<INT : this is the  number of dimensions of the vector embedding e.g. vector-dim=1536 for OpenAPI text-embedding-ada-002>
 ```
 
 **[local]**
