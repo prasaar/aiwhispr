@@ -1,25 +1,34 @@
 # AIWhispr
 
 ## Overview
-AIWhispr is a no/low code tool to enable AI powered semantic search.
-- It is easy to install.
-- Simple to configure.
-- Delivers fast semantic response to search queries.
-- Can handle multiple file formats (txt,csv, pdf, docx,pptx, docx) stored on AWS S3, Azure Blob Containers,Google Cloud Storage, local directory path.
-- Supports multiple vector databases (Qdrant,Weaviate,Milvus,Typesense) 
+AIWhispr is a no/low code tool to automate vector embedding pipelines for semantic search. 
+It drives the pipeline for reading files, extracting text, creating vector embeddings and storing it in a vector database using simple configurations.
 
-![Alt Text](./resources/aiwhispr-example.gif)
+AIWhispr
+- is easy to install.
+- simple to configure.
+- delivers fast semantic response to search queries.
+- can handle multiple file formats (txt,csv, pdf, docx,pptx, docx) stored on AWS S3, Azure Blob Containers,Google Cloud Storage, local directory path.
+- supports multiple vector databases (Qdrant,Weaviate,Milvus,Typesense) 
 
 ## Contact
 contact@aiwhispr.com
 
-## Prerequisites for a Linux install with Typesense
+## Setting up your environment after cloning AIWhispr from github 
 
-[For Linux install with Qdrant vector database, refer to example_with_qdrant.md](./howto/example_with_qdrant.md)
+### Install and start your vector database
 
-[For MacOS refer to README_MACOS.md](./howto/README_MACOS.md)
+AIWhispr has connectors for the following vector databases 
 
-For Windows 10/11 you can follow the same instructions as below on wsl (Windows Subsystem for Linux) 
+1\ Qdrant
+
+2\ Milvus
+
+3\ Weaviate
+
+4\ Typesese 
+
+Please  ensure that you have installed and started your vector database. 
 
 ### Environment variables
 AIWHISPR_HOME_DIR environment variable should be the full path to aiwhispr directory.
@@ -31,20 +40,10 @@ AIWHISPR_LOG_LEVEL=DEBUG
 export AIWHISPR_HOME
 export AIWHISPR_LOG_LEVEL
 ```
-### Download Typesense and install
-AIWhispr uses Typesense to store text, corresponding vector embeddings created by the LLM.
-A big Thanks!! to the Typesense team, community. You can follow the installation instructions - 
- 
-https://typesense.org/docs/guide/install-typesense.html
+**Remember to add the environment variables in your shell login script**
 
-Note down the "api" values from the typesense configuration file typically at /etc/typesense/typesense-server.ini
-
-You will need this later to configure the AIWhispr service.
-```
-cat /etc/typesense/typesense-server.ini | grep api
-```
-
-### Python packages
+### Install Python packages 
+Run the below command
 ```
 $AIWHISPR_HOME/shell/install_python_packages.sh
 ```
@@ -56,156 +55,138 @@ sudo apt install python3-dev
 pip3 install uwsgi
 ```
 
-**Remember to add the environment variables in your shell login script**
+## Using Streamlit app to configure, index, search 
 
-## Your first setup
-**1. Configuration file**
+AIWhispr comes with a streamlit app to help you get started.
 
-A configuration file is maintained under $AIWHISPR_HOME/config/content-site/sites-available
-
-We will use the example under examples/http to create a config file to index over 2000+ files which contain BBC news content.
-
-To create the config file run the following commands. 
-
-You can enter "N" and choose to go with the default values
+Run the streamlit app 
 ```
-cd $AIWHISPR_HOME/examples/http
-./configure_example_filepath_typesense.sh
+cd $AIWHISPR_HOME/python/streamlit
+streamlit run ./Configure_Content_Site.py &
 ```
 
-It will finally display a config file that has been created.
-```
-#### CONFIG FILE ####
-[content-site]
-sitename=example_bbc.filepath.typesense
-srctype=filepath
-srcpath=/<aiwhispr_home>/aiwhispr/examples/http/bbc
-displaypath=http://127.0.0.1:9100/bbc
-contentSiteModule=filepathContentSite
-[content-site-auth]
-authtype=filechecks
-check-file-permission=Y
-[vectordb]
-vectorDbModule=typesenseVectorDb
-api-address= 0.0.0.0
-api-port= 8108
-api-key= xyz
-[local]
-working-dir=/<aiwhispr_home>/aiwhispr/examples/http/working-dir
-index-dir=/<aiwhispr_home>/aiwhispr/examples/http/working-dir
-[llm-service]
-model-family=sbert
-model-name=all-mpnet-base-v2
-llm-service-api-key=
-llmServiceModule=libSbertLlmService
-```
+This should start a streamlit app on the default port 8501 and  start a session on your web browser
 
-Check that config file has been created.
-```
-ls $AIWHISPR_HOME/config/content-site/sites-available/example_bbc.filepath.typesense.cfg
-```
+There are 3 steps to configure the pipeline for indexing your content for smeantic search. 
 
-For more details about sections in the config file please refer to [CONFIG_FILE.md](./CONFIG_FILE.md)
+- Configure Content Sites : Provide details of the storage location that hosts your content (files).
+- Configure Vector DB : Provide connection details of your Vector DB in which the vector embeddings of your content will be stored.
+- Configure LLM Service : Provide the large language model details (SBert/OpenAI) which will be used to encode your content into vector embeddings. 
 
-**2. Start Indexing**
-Confirm that the environment variables AIWHISPR_HOME and AIWHISPR_LOG_LEVEL are set and exported.
+**1. Configuration to reading files from a storage location**
 
-Index the file content for semantic search. This will take some time as it has to process over 2000 files.
-```
-$AIWHISPR_HOME/shell/start-indexing-content-site.sh -C $AIWHISPR_HOME/config/content-site/sites-available/example_bbc.filepath.typesense.cfg
-```
+![Alt Text](../../resources/config.png)
 
-**3. Start the AIWhispr search service**
+You can continue with the default configuration by clicking on the button 
+"Use this Content Site Config"
 
-3 services will be started under this shell script.
+and move to the next step to configure vector database connection.
 
-- the AIWhispr searchService(port:5002) which intefaces with the vectordb
+The default example will index over news stories from BBC for semantic search.
 
-- a flask python script(port:9101) that takes in user query , sends the query  to AIWhispr searchService and formats the results for HTML display
+The streamlit app assumes that you are starting a new configuration and will 
+assign a random configuration name. You can overwrite this to give it a more 
+meaningful name. The configuration name should be unique and not contain whitespace or special characters.
 
-- a python http.server(port 9100)
+The default configuration will read content from the local directory path 
+$AIWHISPR_HOME/examples/http/bbc 
 
-The log files for these 3 processes is created in /tmp/
+This contains over 2000+ news stories from BBC which be indexed for semantic search.
 
-```
-cd $AIWHISPR_HOME/examples/http; $AIWHISPR_HOME/examples/http/start_search_filepath_typesense.sh
-```
+You can choose to read content stored on AWS S3, Azure Blob, Google Cloud Storage.
 
-### Ready to go
-Try the search on http://127.0.0.1:9100/IP Address>
+The prefix path configuration is used to create the href web links for the search results.
+You can continue with the default keyword "aiwhisprStreamlit"
 
-Some examples of meaning drive search queries
+Click on the button "Use this Content Site Config" and procced to the next step to configure vector database connection by clikcing on "Configure Vector Db" in the left sidebar.
 
-"What are the top TV moments in Olympics"
+**2. Configure Vector Db**
 
-"Which is the best laptop to buy"
+![Alt Text](../../resources/vectordb.png)
 
-"How is inflation impacting the economy"
+Choose your vectordb and provide the connection details.
 
-You can compare the semantic search results against text search results.
+When you choose the vector databe, the Vector Db IP address and Port numbers are populated based on the default installations.
+You can change this based on your setup.
 
-## How can I access through an internet facing IP/host
+Your vector database should be configured for authentications. In the case of Qdrant, Weaviate, Typesense an API Key is required.
+For Milvus a userid , password combination is provided.
 
-If you want to access the search site through an internet facing IP/host then then do the following changes
+The vector dimension size should be specified based on the LLM you plan to use. 
+Example: if you please to use Open AI "text-embedding-ada-002" then this should be configured as 1536 which is the size of the vector returned by  OpenAI embedding service.
 
-**1. Edit the config file.**
+The default collection name created in the vector database is aiwhisprContentChunkMap. You can specify your own collectionName.
 
-In file $AIWHISPR_HOME/config/content-site/sites-available/example_bbc.filepath.cfg
+Click on the button "Use This Vector Db Config" and then move to the next step by clicking on "Configure LLM Service" in the left sidebar.
 
-edit displaypath  configuration
+**3. Configure  LLM Service**
 
-From
-```
-displaypath=http://127.0.0.1:9100/bbc
-```
+![Alt Text](../../resources/llmservice.png)
 
-To
-```
-displaypath=http://<Internet IP/domain>:9100/bbc 
-```
+You can choose to create vector embeddings using [Sbert](https://www.sbert.net/docs/pretrained_models.html) pretrained models that are run locally or use OpenAI API.
 
-**2. Edit the index.html file for the example**
+For SBert model family, the default model used is all-mpnet-base-v2. You can specify another SBert model.
 
-edit $AIWHISPR_HOME/examples/http/index.html 
+For OpenAI the default embedding model is text-embedding-ada-002
+
+The default working directory is /tmp 
+
+The working-directory is the location on the local machine which will be used as a working directory to process the files that are read/downloaded from your storage location.
+The extracted text from your documents is then chunked into smaller size , usually 700 words, which is then encoded as vector embeddings.
+The working-dir is used to store the text chunks.
+
+The default local indexing directory is /tmp
+
+You can specify a persistent local directory path for working and index directory.
+
+The index-dir is used to store the indexing list of content files that have to be read.
+AIWhispr supports multiple processes for indexing , each process will use its own indexing list thereby allowing you to leverage multiple CPU's on your machine.
+
+If you want to leverage multiple CPU's for indexing(reading content, create vector embedding, store in vector database) then specify this in the test box for number of parallel processes.
+Our recommendation is that this should be 1 or max ( Number of CPU's/ 2). Example on a 8 CPU machine this should be set to 4.
+AIWHispr used multiprocessing to bypass the Python GIL limitations.
+
+Click on "Use This LLM Service Config"  to create the final version of your vector embedding pipeline configuration file.
+
+The contents of the configuration file and its location on your machine will be displayed.
+
+You can test this configuration by clicking on "Test Config File" in the left sidebar.
 
 
-Edit index.html, replace 127.0.0.1  with your server IP/hostname
+**4. Test Configuration**
 
-From
-```
- <form action = "http://127.0.0.1:9101/search" method = "post">
-```
+You should now see a message that shows the location of your vector embedding pipeline configuration file and a button "Test Configfile"
 
-To
-```
- <form action = "http://<Internet IP/host>:9101/search" method = "post">
-```
+Clicking on the button will start the process which will test the pipeline configuration for 
+- connecting to the storage location
+- connecting to the vector database
+- encoding a sample query using the LLM Service
 
-**3. Open the firewall for ports 9100, 9101**
+You should see "NO ERRORS" message at the end of the logs which informs you that this pipeline configuration can be used. 
 
-```
-sudo ufw allow 9100
-sudo ufw allow 9101
-```
-On a cloud server, you might have to edit the firewall configs on your cloud providers portal too.
+Click on "Run Indexing process" in the left sidebar to start the pipeline.
 
-For a secure approach using nginx installation, you can follow  [README_NGINX.md](./README_NGINX.md]
+**5. Run Indexing Process**
 
-**4. Kill the existing search service processes and restart**
+You should see a "Start Indexing" button.
 
-Find the existing processes and issue a kill command to stop them
-```
-ps -ef | grep searchService.py 
+Once you click on this buttong it will start the pipeline. The logs are updated every 15 seconds. 
 
-ps -ef | grep exampleHttpResponder.py 
+The default indexing processing using the example of 2000+ BBC news stories takes approximately 20 minutes.
 
-ps -ef | grep 'python3 -m http.server 9100'
-```
+Don't navigate away from this page while the indexing process is running i.e. while the Streamlit "Running" status is displayed on the top right.
 
-Restart the processes 
+You can also check if the indexing process is running using grep on your machine.
 
 ```
-cd $AIWHISPR_HOME/examples/http; $AIWHISPR_HOME/examples/http/start_http_service.sh
+ps -ef | grep python3 | grep index_content_site.py 
 ```
+
+**6. Semantic Search **
+
+![Alt Text](../../resources/semanticplot_search.png)
+![Alt Text](../../resources/pcamap_search.png)
+
+You can now run semantic search queries. A semantic plot that displays the cosine distance, and a top 3 PCA analysis, for the search results is also displayed alongwith the text search search results..
 
 
