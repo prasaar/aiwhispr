@@ -184,9 +184,13 @@ ps -ef | grep python3 | grep index_content_site.py
 
 **6. Semantic Search **
 
+You can now run semantic search queries. 
+
+A semantic plot that displays the cosine distance, and a top 3 PCA analysis, for the search results is also displayed alongwith the text search search results..
+
+
 ![Alt Text](../../resources/semanticplot_search.png)
 ![Alt Text](../../resources/pcamap_search.png)
 
-You can now run semantic search queries. A semantic plot that displays the cosine distance, and a top 3 PCA analysis, for the search results is also displayed alongwith the text search search results..
 
 
