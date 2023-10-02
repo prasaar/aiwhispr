@@ -26,7 +26,7 @@ AIWhispr has connectors for the following vector databases
 
 3\ Weaviate
 
-4\ Typesese 
+4\ Typesense 
 
 Please  ensure that you have installed and started your vector database. 
 
