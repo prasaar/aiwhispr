@@ -67,7 +67,7 @@ streamlit run ./Configure_Content_Site.py &
 
 This should start a streamlit app on the default port 8501 and  start a session on your web browser
 
-There are 3 steps to configure the pipeline for indexing your content for smeantic search. 
+There are 3 steps to configure the pipeline for indexing your content for semantic search. 
 
 - Configure Content Sites : Provide details of the storage location that hosts your content (files).
 - Configure Vector DB : Provide connection details of your Vector DB in which the vector embeddings of your content will be stored.
@@ -91,14 +91,14 @@ meaningful name. The configuration name should be unique and not contain whitesp
 The default configuration will read content from the local directory path 
 $AIWHISPR_HOME/examples/http/bbc 
 
-This contains over 2000+ news stories from BBC which be indexed for semantic search.
+This contains over 2000+ news stories from BBC which are indexed for semantic search.
 
 You can choose to read content stored on AWS S3, Azure Blob, Google Cloud Storage.
 
 The prefix path configuration is used to create the href web links for the search results.
 You can continue with the default keyword "aiwhisprStreamlit"
 
-Click on the button "Use this Content Site Config" and procced to the next step to configure vector database connection by clikcing on "Configure Vector Db" in the left sidebar.
+Click on the button "Use this Content Site Config" and procced to the next step to configure vector database connection by clicking on "Configure Vector Db" in the left sidebar.
 
 **2. Configure Vector Db**
 
@@ -110,12 +110,12 @@ When you choose the vector databe, the Vector Db IP address and Port numbers are
 You can change this based on your setup.
 
 Your vector database should be configured for authentications. In the case of Qdrant, Weaviate, Typesense an API Key is required.
-For Milvus a userid , password combination is provided.
+For Milvus a user-id , password combination is provided.
 
 The vector dimension size should be specified based on the LLM you plan to use. 
-Example: if you please to use Open AI "text-embedding-ada-002" then this should be configured as 1536 which is the size of the vector returned by  OpenAI embedding service.
+Example: for Open AI "text-embedding-ada-002" this should be configured as 1536, which is the size of the vector returned by  OpenAI embedding service.
 
-The default collection name created in the vector database is aiwhisprContentChunkMap. You can specify your own collectionName.
+The default collection name created in the vector database is aiwhisprContentChunkMap. You can specify your own collection name.
 
 Click on the button "Use This Vector Db Config" and then move to the next step by clicking on "Configure LLM Service" in the left sidebar.
 
@@ -170,7 +170,7 @@ Click on "Run Indexing process" in the left sidebar to start the pipeline.
 
 You should see a "Start Indexing" button.
 
-Once you click on this buttong it will start the pipeline. The logs are updated every 15 seconds. 
+Click on this button to start the pipeline. The logs are updated every 15 seconds. 
 
 The default indexing processing using the example of 2000+ BBC news stories takes approximately 20 minutes.
 
