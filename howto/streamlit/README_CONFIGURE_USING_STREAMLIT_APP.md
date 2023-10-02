@@ -182,7 +182,7 @@ You can also check if the indexing process is running using grep on your machine
 ps -ef | grep python3 | grep index_content_site.py 
 ```
 
-**6. Semantic Search **
+**6. Semantic Search**
 
 You can now run semantic search queries. 
 
