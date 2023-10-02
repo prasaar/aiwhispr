@@ -2,7 +2,7 @@
 
 ## Overview
 AIWhispr is a no/low code tool to automate vector embedding pipelines for semantic search. 
-It drives the pipeline for reading files, extracting text, creating vector embeddings and storing it in a vector database using simple configurations.
+A simple configuration drives the pipeline for reading files, extracting text, create vector embeddings and storing them in a vector database.
 
 AIWhispr
 - is easy to install.
@@ -11,7 +11,7 @@ AIWhispr
 - can handle multiple file formats (txt,csv, pdf, docx,pptx, docx) stored on AWS S3, Azure Blob Containers,Google Cloud Storage, local directory path.
 - supports multiple vector databases (Qdrant,Weaviate,Milvus,Typesense) 
 
-![Alt Text](../..//resources/aiwhispr_3steps.gif)
+![Alt Text](../../resources/aiwhispr_3steps.gif)
 
 ## Contact
 contact@aiwhispr.com
@@ -75,7 +75,7 @@ There are 3 steps to configure the pipeline for indexing your content for semant
 - Configure Vector DB : Provide connection details of your Vector DB in which the vector embeddings of your content will be stored.
 - Configure LLM Service : Provide the large language model details (SBert/OpenAI) which will be used to encode your content into vector embeddings. 
 
-**1. Configuration to reading files from a storage location**
+**1. Configure to read files from a storage location**
 
 ![Alt Text](../../resources/config.png)
 
@@ -84,11 +84,11 @@ You can continue with the default configuration by clicking on the button
 
 and move to the next step to configure vector database connection.
 
-The default example will index over news stories from BBC for semantic search.
+The default example will index news stories from BBC for semantic search.
 
 The streamlit app assumes that you are starting a new configuration and will 
 assign a random configuration name. You can overwrite this to give it a more 
-meaningful name. The configuration name should be unique and not contain whitespace or special characters.
+meaningful name. The configuration name should be unique; it cannot contain whitespace or special characters.
 
 The default configuration will read content from the local directory path 
 $AIWHISPR_HOME/examples/http/bbc 
@@ -108,13 +108,13 @@ Click on the button "Use this Content Site Config" and procced to the next step 
 
 Choose your vectordb and provide the connection details.
 
-When you choose the vector databe, the Vector Db IP address and Port numbers are populated based on the default installations.
+When you choose the vector database, the Vector Db IP address and Port numbers are populated based on the default installations.
 You can change this based on your setup.
 
-Your vector database should be configured for authentications. In the case of Qdrant, Weaviate, Typesense an API Key is required.
-For Milvus a user-id , password combination is provided.
+Your vector database should be configured for authentication. In the case of Qdrant, Weaviate, Typesense an API Key is required.
+For Milvus a user-id , password combination should be configured.
 
-The vector dimension size should be specified based on the LLM you plan to use. 
+The vector dimension size should be specified based on the LLM you plan to use to encode text as vector embeddings. 
 Example: for Open AI "text-embedding-ada-002" this should be configured as 1536, which is the size of the vector returned by  OpenAI embedding service.
 
 The default collection name created in the vector database is aiwhisprContentChunkMap. You can specify your own collection name.
@@ -146,7 +146,7 @@ AIWhispr supports multiple processes for indexing , each process will use its ow
 
 If you want to leverage multiple CPU's for indexing(reading content, create vector embedding, store in vector database) then specify this in the test box for number of parallel processes.
 Our recommendation is that this should be 1 or max ( Number of CPU's/ 2). Example on a 8 CPU machine this should be set to 4.
-AIWHispr used multiprocessing to bypass the Python GIL limitations.
+AIWhispr uses multiprocessing to bypass the Python GIL limitations.
 
 Click on "Use This LLM Service Config"  to create the final version of your vector embedding pipeline configuration file.
 
@@ -174,7 +174,7 @@ You should see a "Start Indexing" button.
 
 Click on this button to start the pipeline. The logs are updated every 15 seconds. 
 
-The default indexing processing using the example of 2000+ BBC news stories takes approximately 20 minutes.
+The default example indexes 2000+ BBC news stories which takes approximately 20 minutes.
 
 Don't navigate away from this page while the indexing process is running i.e. while the Streamlit "Running" status is displayed on the top right.
 
