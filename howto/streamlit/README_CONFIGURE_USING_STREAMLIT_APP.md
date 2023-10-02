@@ -11,6 +11,8 @@ AIWhispr
 - can handle multiple file formats (txt,csv, pdf, docx,pptx, docx) stored on AWS S3, Azure Blob Containers,Google Cloud Storage, local directory path.
 - supports multiple vector databases (Qdrant,Weaviate,Milvus,Typesense) 
 
+![Alt Text](../..//resources/aiwhispr_3steps.gif)
+
 ## Contact
 contact@aiwhispr.com
 
