@@ -20,6 +20,7 @@ import urllib.parse
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
+from sklearn.feature_extraction.text import CountVectorizer
 
 import plotly.express as px
 import plotly.graph_objects as go
@@ -151,4 +152,28 @@ else:
         extracted_text = myUrlLinkHandler[0].getExtractedText(content_path=contentpath)
         st.write("### EXTRACTED TEXT ###")
         st.write(extracted_text)
+
+        #Get all the unique words and get their encoding
+        my_text_data = {'Text': [extracted_text]}
+        extracted_text_dataframe = pd.DataFrame(my_text_data)
+
+        vectorizer = CountVectorizer()
+        X = vectorizer.fit_transform(extracted_text_dataframe['Text'])
+        unique_words = vectorizer.get_feature_names_out()
+
+        unique_words_vectors = []
+        for word in unique_words:
+            word_vector = myUrlLinkHandler[0].model.encode(word)
+            unique_words_vectors.append(word_vector)
+
+        #PCA for all the unique words
+        pca = PCA()
+        pipe = Pipeline([('scaler', StandardScaler()), ('pca', pca)])
+        embedding_array = np.array(unique_words_vectors)
+        Xt = pca.fit_transform(embedding_array)
+        st.write("### PCA MAP FOR UNIQUE WORDS IN THIS DOCUMENT ###")
+        #PCA using Plotly
+        pca_data = go.Scatter3d(x=Xt[:,0], y=Xt[:,1], z=Xt[:,2],hovertext=unique_words, mode='markers')
+        pca_data_fig = go.Figure(pca_data)
+        st.plotly_chart(pca_data_fig)
         
