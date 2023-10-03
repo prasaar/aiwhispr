@@ -423,7 +423,7 @@ else:
                   pipe = Pipeline([('scaler', StandardScaler()), ('pca', pca)])
                   Xt = pca.fit_transform(embedding_array)
 
-                  st.write("#### PCA MAP ####")
+                  st.write("#### PCA MAP FOR DOCUMENTS ####")
          
                   ##PCA using Matplotlib
                   #fig = plt.figure()
