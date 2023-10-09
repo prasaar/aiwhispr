@@ -462,9 +462,19 @@ class srcDocProcessor:
         ctr = 0
         for i, sent in enumerate(doc.sents):
             ctr = ctr + 1
+            encoded_sentence = ''
             if sent._.language['language'] == 'en':
-                out_text_chunk = out_text_chunk + sent.text.encode('latin1').decode('utf-8')
-                self.baseLogger.debug("sentence {%s}  [validated sentence as English])", sent.text.encode('latin1').decode('utf-8'))
+                try:
+                    encoded_sentence = sent.text.encode('latin1').decode('utf-8')
+                except Exception as e1:
+                    self.baseLogger.warning("Could not decode sentence as utf-8, will now try iso-8859-1")
+                    try:
+                        encoded_sentence = sent.text.encode('latin1').decode('iso-8859-1')
+                    except Exception as e2:
+                        self.baseLogger.warning("Could not decode this sentence, hence encoded text is blank")
+
+                out_text_chunk = out_text_chunk + encoded_sentence
+                self.baseLogger.debug("sentence {%s}  [validated sentence as English])", encoded_sentence)
             else:
                 self.baseLogger.warning('Found sentence number %d in text chunk which is not English. Removing this sentence.Lang= %s', ctr, sent._.language['language'])
         return out_text_chunk
@@ -553,8 +563,10 @@ class srcDocProcessor:
         out_text_chunk = text_chunk
         try:
             out_text_chunk = self.detectLanguage(text_chunk)
-        except:
-            self.baseLogger.error('Error when validating the text chunk language')
+        except Exception as e:
+            self.baseLogger.warning('Error when validating the text chunk language using spacy')
+            self.baseLogger.warning(text_chunk)
+            print(e)
         return out_text_chunk
 
     #private function
