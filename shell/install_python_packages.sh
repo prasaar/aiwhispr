@@ -55,6 +55,8 @@ echo "pip3 install scikit-learn"
 pip3 install scikit-learn
 echo "pip3 install plotly==5.17.0"
 pip3 install plotly==5.17.0
+echo "pip3 install marqo"
+pip3 install marqo
 
 echo "###List of python packages after install ####"
 pip3 list 
