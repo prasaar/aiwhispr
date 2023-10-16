@@ -1,0 +1,97 @@
+{
+    "modelfamily":"sbert",
+    "models":[
+    {
+        "name":"all-mpnet-base-v2",
+        "description": "All-round model tuned for many use-cases. Trained on a large and diverse dataset of over 1 billion training pairs.",
+        "max_sequence_length": 384,
+        "dimensions": 768,
+        "modelcard": "https://huggingface.co/sentence-transformers/all-mpnet-base-v2"
+    },
+    {
+        "name":"multi-qa-mpnet-base-dot-v1",
+        "description": "This model was tuned for semantic search. Given a query or question, it can find relevant passages. It was trained on a large and diverse set of question, answer pairs.",
+        "max_sequence_length": 512,
+        "dimensions": 768,
+        "modelcard": "https://huggingface.co/sentence-transformers/multi-qa-mpnet-base-dot-v1"
+    },
+    {
+        "name":"all-distilroberta-v1",
+        "description": "All-round model tuned for many use-cases. Trained on a large and diverse dataset of over 1 billion training pairs",
+        "max_sequence_length": 512,
+        "dimensions": 768,
+        "modelcard": "https://huggingface.co/sentence-transformers/all-distilroberta-v1"
+    },
+    {
+        "name":"all-MiniLM-L12-v2",
+        "description": "All-round model tuned for many use-cases. Trained on a large and diverse dataset of over 1 billion training pairs",
+        "max_sequence_length": 256,
+        "dimensions": 384,
+        "modelcard": "https://huggingface.co/sentence-transformers/all-MiniLM-L12-v2"
+    },
+    {
+        "name":"multi-qa-distilbert-cos-v1",
+        "description": "This model was tuned for semantic search. Given a query or question, it can find relevant passages. It was trained on a large and diverse set of question, answer pairs.",
+        "max_sequence_length": 512,
+        "dimensions": 768,
+        "modelcard": "https://huggingface.co/sentence-transformers/multi-qa-distilbert-cos-v1"
+    },
+    {
+        "name":"all-MiniLM-L6-v2",
+        "description": "All-round model tuned for many use-cases. Trained on a large and diverse dataset of over 1 billion training pairs",
+        "max_sequence_length": 256,
+        "dimensions": 384,
+        "modelcard": "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2"
+    },
+    {
+        "name":"multi-qa-MiniLM-L6-cos-v1",
+        "description": "This model was tuned for semantic search. Given a query or question, it can find relevant passages. It was trained on a large and diverse set of question, answer pairs.",
+        "max_sequence_length": 512,
+        "dimensions": 384,
+        "modelcard": "https://huggingface.co/sentence-transformers/multi-qa-MiniLM-L6-cos-v1"
+    },
+    {
+        "name":"paraphrase-multilingual-mpnet-base-v2",
+        "description": "Multi-lingual model of paraphrase-mpnet-base-v2, extended to 50+ languages.",
+        "max_sequence_length": 128,
+        "dimensions": 768,
+        "modelcard": "https://huggingface.co/sentence-transformers/paraphrase-multilingual-mpnet-base-v2"
+    },
+    {
+        "name":"paraphrase-albert-small-v2",
+        "description": "AllNLI, sentence-compression, SimpleWiki, altlex, msmarco-triplets, quora_duplicates, coco_captions,flickr30k_captions, yahoo_answers_title_question, S2ORC_citation_pairs",
+        "max_sequence_length": 256,
+        "dimensions": 768,
+        "modelcard": "https://huggingface.co/sentence-transformers/paraphrase-albert-small-v2"
+    },
+    {
+        "name":"paraphrase-multilingual-MiniLM-L12-v2",
+        "description": "Multi-lingual model of paraphrase-multilingual-MiniLM-L12-v2, extended to 50+ languages",
+        "max_sequence_length": 256,
+        "dimensions": 768,
+        "modelcard": "https://huggingface.co/sentence-transformers/paraphrase-albert-small-v2"
+    },
+    {
+        "name":"paraphrase-MiniLM-L3-v2",
+        "description": "AllNLI, sentence-compression, SimpleWiki, altlex, msmarco-triplets, quora_duplicates, coco_captions,flickr30k_captions, yahoo_answers_title_question, S2ORC_citation_pairs, stackexchange_duplicate_questions, wiki-atomic-edits",
+        "max_sequence_length": 128,
+        "dimensions": 384,
+        "modelcard": "https://huggingface.co/sentence-transformers/paraphrase-MiniLM-L3-v2"
+    },
+    {
+        "name":"distiluse-base-multilingual-cased-v1",
+        "description": "Multi-Lingual model of Universal Sentence Encoder for 15 languages Arabic, Chinese, Dutch, English, French, German, Italian, Korean, Polish, Portuguese, Russian, Spanish, Turkish.",
+        "max_sequence_length": 128,
+        "dimensions": 512,
+        "modelcard": "https://huggingface.co/sentence-transformers/distiluse-base-multilingual-cased-v1"
+    },
+    {
+        "name":"distiluse-base-multilingual-cased-v2",
+        "description": "Multi-Lingual model of Universal Sentence Encoder for 50 languages.",
+        "max_sequence_length": 128,
+        "dimensions": 512,
+        "modelcard": "https://huggingface.co/sentence-transformers/distiluse-base-multilingual-cased-v2"
+    }
+    
+    ]
+}

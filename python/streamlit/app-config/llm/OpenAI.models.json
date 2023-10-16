@@ -1,0 +1,13 @@
+{
+    "modelfamily":"openai",
+    "models":[
+    {
+        "name":"text-embedding-ada-002",
+        "description": "All-round model tuned for many use-cases.",
+        "max_sequence_length": 8191,
+        "dimensions": 1536,
+        "modelcard": "https://platform.openai.com/docs/models/embeddings"
+    }
+    
+    ]
+}
