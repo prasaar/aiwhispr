@@ -83,6 +83,18 @@ else:
     )
     
     modelname=add_selectbox_model_name
+     #Now write the model details in the second column
+    f=open(modellistfilepath)
+    models_list=json.load(f)
+    model_dimensions=0
+    for model in models_list['models']:
+        if modelname == model['name']:
+            col5.json(model,expanded=False)
+            model_dimensions=model['dimensions']
+    if int(st.session_state.vector_dim) != model_dimensions:
+        col5.write("ERROR: Vector Dimensions mismatch for this model. Please review the vector dimension configured in your vector database configuration")
+    f.close()
+
     
     #col5.text_input("Model Name", value=modelname, key="model_name_in")
     #st.session_state.model_name = st.session_state.model_name_in
@@ -102,6 +114,7 @@ else:
     st.session_state.indexing_processes = st.session_state.indexing_processes_in
 
 
+    
     if st.button(label="Use This LLM Service Config", key="review_llm_service_btn", help="Click to review config"):
         st.session_state.llm_config = "[llm-service]\n"
         st.session_state.local_config = "[local]\n"
