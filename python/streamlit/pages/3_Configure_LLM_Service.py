@@ -2,7 +2,7 @@ import streamlit as st
 import os
 from PIL import Image
 import multiprocessing as mp
-
+import json
 
 # get the value of the PATH environment variable
 try:
@@ -17,6 +17,9 @@ else:
   
     if 'select_llm_idx' not in st.session_state:
         st.session_state.select_llm_idx = 0
+    
+    if 'select_llm_model_name_idx' not in st.session_state:
+        st.session_state.select_llm_model_name_idx = 0
     
     if 'llmServiceModule' not in st.session_state:
         st.session_state.llmServiceModule = ""
@@ -54,17 +57,36 @@ else:
         st.session_state.model_family = "sbert"
         st.session_state.llm_service_api_key = ""
         st.session_state.select_llm_idx = 0
-        modelname="all-mpnet-base-v2"
+    
         
 
     if add_selectbox_llm_service == 'OpenAI':
         st.session_state.llmServiceModule = "openaiLlmService"
         st.session_state.model_family = "openai"
         st.session_state.select_llm_idx = 1
-        modelname="text-embedding-ada-002"
+    
+    #Select the Model Name
+    modellistfiename=add_selectbox_llm_service + '.models.json'
+    modellistfilepath=os.path.join(aiwhispr_home,'python','streamlit','app-config','llm',modellistfiename)
+    model_names = []
+    f=open(modellistfilepath)
+    models_list=json.load(f)
+    for model in models_list['models']:
+        model_names.append(model['name'])
+    f.close()
 
-    col5.text_input("Model Name", value=modelname, key="model_name_in")
-    st.session_state.model_name = st.session_state.model_name_in
+    
+    add_selectbox_model_name = col5.selectbox(  #then show options for selecting the model name
+        label = 'Select the Model',
+        options = model_names,
+        index = st.session_state.select_llm_model_name_idx
+    )
+    
+    modelname=add_selectbox_model_name
+    
+    #col5.text_input("Model Name", value=modelname, key="model_name_in")
+    #st.session_state.model_name = st.session_state.model_name_in
+    st.session_state.model_name = modelname
 
     if st.session_state.llmServiceModule == "openaiLlmService":
         col5.text_input("Open AI Key", value="", key="llm_service_api_key_in")
