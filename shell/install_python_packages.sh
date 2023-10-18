@@ -57,6 +57,8 @@ echo "pip3 install plotly==5.17.0"
 pip3 install plotly==5.17.0
 echo "pip3 install marqo"
 pip3 install marqo
+echo "pip3 install pymongo"
+pip3 install pymongo 
 
 echo "###List of python packages after install ####"
 pip3 list 
