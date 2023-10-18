@@ -9,6 +9,7 @@ import re
 import logging
 import getopt
 import configparser
+import aiwhisprConstants
 
 curr_dir = os.path.dirname(os.path.realpath(__file__))
 os.chdir(curr_dir)
@@ -30,6 +31,12 @@ class createLlmService(baseLlmService):
       baseLlmService.__init__(self, llm_service_config=llm_service_config, module_name='libSbertLlmService')
       self.model_family = llm_service_config['model-family']
       self.model_name = llm_service_config['model-name']
+      if 'chunk-size' in llm_service_config:
+         self.text_chunk_size = int(llm_service_config['chunk-size'])
+         logging.debug("LLM Service is setting text_chunk_size=%d from config",self.text_chunk_size)
+      else:
+         self.text_chunk_size = aiwhisprConstants.TXTCHUNKSIZE
+         logging.debug("LLM Service is setting text_chunk_size=%d as default",self.text_chunk_size)
    
    def testConnect(self):   
       mymodel = self.model_service.SentenceTransformer(self.model_name)

@@ -3,6 +3,7 @@ import sys
 import logging
 import openai
 import time
+import aiwhisprConstants
 
 curr_dir = os.path.dirname(os.path.realpath(__file__))
 os.chdir(curr_dir)
@@ -28,6 +29,13 @@ class createLlmService(baseLlmService):
       except:
          self.logger.error("Could not set api-key, model-name for OpenAI using the configurations. Please ensure these are configured in the config file.")
          raise
+      
+      if 'chunk-size' in llm_service_config:
+         self.text_chunk_size = int(llm_service_config['chunk-size'])
+         logging.debug("LLM Service is setting text_chunk_size=%d from config",self.text_chunk_size)
+      else:
+         self.text_chunk_size = aiwhisprConstants.TXTCHUNKSIZE
+         logging.debug("LLM Service is setting text_chunk_size=%d as default",self.text_chunk_size)
 
    def testConnect(self):
       try:

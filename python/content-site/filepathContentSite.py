@@ -76,6 +76,8 @@ def index_from_list(pickle_file_path,process_list = 0):
                                                    do_not_read_file_list = self_description['content_site']['do_not_read_file_list'] )
     
     contentSite.connect()
+    text_chunk_size=contentSite.llm_service.text_chunk_size
+
     # Read list of paths to download from the path_to_download_file_list, 
     #      for each file  get the file suffix and decide if we extract text for vector embeddings
     #          If we decide to process the file then download it, extract text and break the text into chunks
@@ -119,7 +121,7 @@ def index_from_list(pickle_file_path,process_list = 0):
                     #Extract text
                     docProcessor.extractText()
                     #Create text chunks
-                    chunk_dict = docProcessor.createChunks()
+                    chunk_dict = docProcessor.createChunks(chunksize=text_chunk_size)
                     logger.debug("%d chunks created for %s", len(chunk_dict), download_file_path)
                     
                     #For each chunk, read text, create vector embedding and insert in vectordb

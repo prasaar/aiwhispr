@@ -32,6 +32,7 @@ class baseLlmService:
     
     llm_service_config:dict
     module_name:str
+    text_chunk_size:int
 
     def __init__(self, llm_service_config:dict, module_name:str):
         self.llm_service_config = llm_service_config
@@ -579,9 +580,12 @@ class srcDocProcessor:
         f.close()
     
 
-    #public function
-    def createChunks(self):
-        self.baseLogger.debug('MAXCHUNK SIZE is :' + str(self.MAXCHUNKSIZE))
+    #public function, the chunksize is dependent on the model configured in the LLM service. The calling process should specificy this
+    def createChunks(self,chunksize=0):
+        if chunksize == 0:
+            chunksize = self.MAXCHUNKSIZE  #Default Chunk Size in case the LLM Service did not tell us what chunksize to use
+
+        self.baseLogger.debug('MAXCHUNK SIZE is :' + str(chunksize))
         self.baseLogger.debug('Creating Chunks for ' + self.extracted_text_file_path)
         #This function should be called only after the extractText function has been called
         ## ##this dictionary will have key=/filepath_to_the_file_containing_text_chunk, value=integer value of the chunk number.
@@ -593,7 +597,7 @@ class srcDocProcessor:
 
                 #We are using fill the bucket approach
                 #We fill the current_text_chunk bucket with previous leftover words and words from new line
-                #If the count whats in the bucket[word counter] + (previous leftover words + newline words) is less than bucket capacity(MAXCHUNKSIZE) then put both in the bucket, you have no leftovers 
+                #If the count whats in the bucket[word counter] + (previous leftover words + newline words) is less than bucket capacity(chunksize) then put both in the bucket, you have no leftovers 
                 #If the previous leftover words and the newline will not fit in the bucket then start putting each word in the bucket until the bucket is full 
                 #IF the bucket is full then we empty the bucket by saving it to a file,  the remaining words which could not be put in the bucke are treated as leftover words.
                 #Process repeats until we reach end of line
@@ -611,12 +615,12 @@ class srcDocProcessor:
                     words_in_the_current_line =  current_line.split()
                     no_of_words_in_current_line = len(words_in_the_current_line)
 
-                    while ((word_ctr <= self.MAXCHUNKSIZE) and ( no_of_words_in_current_line > 0)):  
+                    while ((word_ctr <= chunksize) and ( no_of_words_in_current_line > 0)):  
                         self.baseLogger.debug('Word Counter: ' + str(word_ctr) + ' Words in current line: ' + str(no_of_words_in_current_line) )
                         
     
-                        ##Add this line to current text chunk if the total number of words (word ctr + current_line) is below the MACHUNKSIZE 
-                        if ((word_ctr + no_of_words_in_current_line) <= (self.MAXCHUNKSIZE) ):
+                        ##Add this line to current text chunk if the total number of words (word ctr + current_line) is below the chunksize 
+                        if ((word_ctr + no_of_words_in_current_line) <= (chunksize) ):
                             #Fill the bucket with the current line since it fits in the remaining space of the text chunk bucket
                             current_text_chunk = current_text_chunk + ' ' + current_line
                             word_ctr = word_ctr + no_of_words_in_current_line ##Set size of the bucket (current total no of words)
@@ -625,7 +629,7 @@ class srcDocProcessor:
                             words_in_the_current_line =  current_line.split()
                             no_of_words_in_current_line = 0
 
-                            if word_ctr == self.MAXCHUNKSIZE:
+                            if word_ctr == chunksize:
                                 #if the last fill has filled the text chunk bucket then save it to file
                                 self.no_of_chunks = self.no_of_chunks + 1
                                 chunk_file_path = os.path.join(self.text_chunks_dir, str(self.no_of_chunks) + '.txt')
@@ -643,13 +647,13 @@ class srcDocProcessor:
                             i = 0
                             self.baseLogger.debug('We have to read each word in the line to fill in text chunk')
                             no_words_added_to_text_chunk = 0
-                            while (word_ctr <= self.MAXCHUNKSIZE and i < no_of_words_in_current_line ):
+                            while (word_ctr <= chunksize and i < no_of_words_in_current_line ):
                                 current_text_chunk = current_text_chunk + words_in_the_current_line[i] + ' '
                                 i = i + 1
                                 word_ctr = word_ctr + 1
                                 no_words_added_to_text_chunk = no_words_added_to_text_chunk + 1
                             
-                                if word_ctr == self.MAXCHUNKSIZE:
+                                if word_ctr == chunksize:
                                     self.no_of_chunks = self.no_of_chunks + 1
                                     chunk_file_path = os.path.join(self.text_chunks_dir, str(self.no_of_chunks) + '.txt')
                                     self.baseLogger.debug('Text chunk full.Write the text chunk no: ' + str(self.no_of_chunks) + ' to ' + chunk_file_path )
