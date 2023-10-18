@@ -1,7 +1,14 @@
 import streamlit as st
 import os
 from PIL import Image
+import random
+import string
 
+def get_random_string(length):
+    # choose from all lowercase letter
+    letters = string.ascii_lowercase
+    result_str = ''.join(random.choice(letters) for i in range(length))
+    return result_str
 
 # get the value of the PATH environment variable
 try:
@@ -95,7 +102,8 @@ else:
 
     #Collection Name
     if len(st.session_state.collection_name)==0:
-        collname="aiWhisprContentChunkMap"
+    #    collname="aiWhisprContentChunkMap"
+        collname="aiWhisprChunkMap" +  get_random_string(9)
     else:
         collname=st.session_state.collection_name
 
