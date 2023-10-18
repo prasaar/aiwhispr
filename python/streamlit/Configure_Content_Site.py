@@ -129,7 +129,7 @@ else:
     
     if st.session_state.srctype == 's3':
         add_selectbox_aws_auth_type = col1.selectbox(
-        'Select the type of authentication for Azure',
+        'Select the type of authentication for AWS',
         ('AWS Key', 'AWS Unsigned Access')
         )
         if add_selectbox_aws_auth_type == 'AWS Key':
