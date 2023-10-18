@@ -97,7 +97,7 @@ else:
     f.close()
 
     #Set the text chunk size
-    chunksize=0.7*int(model_dimensions)
+    chunksize=0.8*int(model_max_sequence_length)
     col5.text_input("Text Chunk Size", value=str(int(chunksize)), key="text_chunk_size_in")
     st.session_state.text_chunk_size = st.session_state.text_chunk_size_in
 
