@@ -91,11 +91,16 @@ else:
         if modelname == model['name']:
             col5.json(model,expanded=False)
             model_dimensions=model['dimensions']
+            model_max_sequence_length=model['max_sequence_length']
     if int(st.session_state.vector_dim) != model_dimensions:
         col5.write("ERROR: Vector Dimensions mismatch for this model. Please review the vector dimension configured in your vector database configuration")
     f.close()
 
-    
+    #Set the text chunk size
+    chunksize=0.7*int(model_dimensions)
+    col5.text_input("Text Chunk Size", value=str(int(chunksize)), key="text_chunk_size_in")
+    st.session_state.text_chunk_size = st.session_state.text_chunk_size_in
+
     #col5.text_input("Model Name", value=modelname, key="model_name_in")
     #st.session_state.model_name = st.session_state.model_name_in
     st.session_state.model_name = modelname
@@ -138,6 +143,12 @@ else:
             st.write("ERROR: could not configure LLM Service API Key")
         else:
             st.session_state.llm_config = st.session_state.llm_config + "llm-service-api-key=" + st.session_state.llm_service_api_key + "\n"
+
+        if st.session_state.text_chunk_size == None or len(st.session_state.text_chunk_size) == 0:
+            st.write("ERROR: could not configure chunk-size")
+        else:
+            st.session_state.llm_config = st.session_state.llm_config + "chunk-size=" + st.session_state.text_chunk_size + "\n"
+
 
         if st.session_state.working_dir == None or len(st.session_state.working_dir)==0:
             st.write("ERROR: could not configure working_dir")
