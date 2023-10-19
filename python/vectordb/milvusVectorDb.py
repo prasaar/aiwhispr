@@ -463,18 +463,20 @@ class createVectorDb(vectorDb):
             raise
 
         extracted_text = ""
+        text_chunk_numbers=[]
         text_chunks={}
         i = 0
         
         while i < no_of_hits:   
             chunk_map_record = search_results[i]
             text_chunks[str(chunk_map_record['text_chunk_no'])] = chunk_map_record['text_chunk']
+            text_chunk_numbers.append(chunk_map_record['text_chunk_no'])
             i = i + 1 
 
-        j = 1
-        while j <= no_of_hits:
+        
+        for j in sorted(text_chunk_numbers):
            extracted_text = extracted_text + text_chunks[str(j)]
-           j = j + 1
+           
     
         return extracted_text
     

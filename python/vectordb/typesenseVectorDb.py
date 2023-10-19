@@ -373,6 +373,8 @@ class createVectorDb(vectorDb):
             self.logger.debug('Received Typesense Search Results:')
             self.logger.debug("getExtractedText : %s", json.dumps(search_results))
             no_of_hits = len(search_results['hits'])
+            self.logger.debug("getExtractedText no_of_hits:%d", no_of_hits)
+            
         except Exception as err: 
             self.logger.exception("Could not get extractedText for content-site{%s} content-path{%s}", content_site_name, content_path)   
             
@@ -381,16 +383,19 @@ class createVectorDb(vectorDb):
         
         #I am not using Typesense sort_by since it had some issues.
         #Instead using a dictionary to store the text chunks
+        text_chunk_numbers=[]
         text_chunks={}
         i = 0
         while i < no_of_hits:   
             text_chunks[str(search_results['hits'][i]['document']['text_chunk_no'])] = search_results['hits'][i]['document']['text_chunk']
+            text_chunk_numbers.append(search_results['hits'][i]['document']['text_chunk_no'])
+            self.logger.debug("getExtractedText text_chunk_no:%d",search_results['hits'][i]['document']['text_chunk_no'] )
             i = i + 1 
 
-        j = 1
-        while j <= no_of_hits:
+        for j in sorted(text_chunk_numbers):
+           self.logger.debug("getExtractedText text chunk append number:%d", j)
            extracted_text = extracted_text + text_chunks[str(j)]
-           j = j + 1
+        
     
         return extracted_text
     
