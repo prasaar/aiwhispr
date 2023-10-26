@@ -425,16 +425,23 @@ class createVectorDb(vectorDb):
         projection = {"text_chunk":1, "text_chunk_no": 1}
         
         try:
-            search_results = self.vectorDbClient[self.collection_name].find(search_query, projection).sort({"text_chunk_no":1})
+            search_results = self.vectorDbClient[self.collection_name].find(search_query, projection)
             self.logger.debug('Received mongodb search results:')
             self.logger.debug("getExtractedText for content-site{%s} content-path{%s}", content_site_name, content_path)
         except Exception as err: 
             self.logger.exception("Could not get extractedText for content-site{%s} content-path{%s}", content_site_name, content_path)   
             
-        
+        text_chunk_numbers=[]
+        text_chunks={}
         extracted_text = ""
+
         for document in search_results:   
-           self.logger.debug("getExtractedText text chunk append number:%d", document['text_chunk_no'])
-           extracted_text = extracted_text + document['text_chunk']
-        
+            text_chunks[str(document['text_chunk_no'])] = document['text_chunk']
+            text_chunk_numbers.append(document['text_chunk_no'])
+            self.logger.debug("getExtractedText text_chunk_no:%d",document['text_chunk_no'] )
+            
+        for j in sorted(text_chunk_numbers):
+           self.logger.debug("getExtractedText text chunk append number:%d", j)
+           extracted_text = extracted_text + text_chunks[str(j)]
+
         return extracted_text
