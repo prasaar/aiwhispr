@@ -78,7 +78,12 @@ class createVectorDb(vectorDb):
         except:
             self.logger.error("Could not create mongodb connection")
         else:
-            collectionExists = self.vectorDbClient.ListCollectionNames().ToList().Contains(self.collection_name)
+            collectionExists = False
+            self.logger.debug(self.vectorDbClient.list_collection_names())
+            for coll_name in self.vectorDbClient.list_collection_names():
+                if coll_name == self.collection_name:
+                    self.logger.debug("Found collection name %s", coll_name)
+                    collectionExists = True
             if collectionExists == True:
                 self.logger.info("Collection %s already exists", self.collection_name)
             
