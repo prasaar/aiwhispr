@@ -48,16 +48,28 @@ else:
     
     if 'user_pwd' not in st.session_state:
         st.session_state.user_pwd = ""
-    
 
-    
+    if 'vector_index' not in st.session_state:
+        st.session_state.vector_index = ""    
+
+    if 'text_index' not in st.session_state:
+        st.session_state.text_index = ""    
+
+    if 'vectordb_connection_string' not in st.session_state:
+        st.session_state.vectordb_connection_string = ""    
+
+    if 'vectordb_dbname' not in st.session_state:
+        st.session_state.vectordb_dbname = ""    
+
+
+
     col3,col4 = st.columns(2)
     
     #### Column 3(Page2) ####
     # Select the Vector Db
     add_selectbox_vector_db = col3.selectbox(
         label = 'Select the Vector Database',
-        options = ('Typesense', 'Qdrant', 'Weaviate', 'Milvus'),
+        options = ('Typesense', 'Qdrant', 'Weaviate', 'Milvus', 'MongoDb'),
         index = st.session_state.select_vectordb_idx
     )
     if add_selectbox_vector_db == 'Typesense':
@@ -80,16 +92,28 @@ else:
         hostaddress="localhost"
         hostport="19530"
         st.session_state.select_vectordb_idx = 3
+    elif add_selectbox_vector_db == 'MongoDb':
+        st.session_state.vectorDbModule = 'mongodbVectorDb'
+        st.session_state.select_vectordb_idx = 3
     
-    col3.text_input("VectorDb IP Address/Hostname",value=hostaddress, key="api_address_in")
-    # You can access the value at any point with:
-    st.session_state.api_address = st.session_state.api_address_in
+    if add_selectbox_vector_db != 'MongoDb':
+        col3.text_input("VectorDb IP Address/Hostname",value=hostaddress, key="api_address_in")
+        # You can access the value at any point with:
+        st.session_state.api_address = st.session_state.api_address_in
+    else:
+        col3.text_input("VectorDb Connection String",value="", key="vectordb_connection_string_in")
+        # You can access the value at any point with:
+        st.session_state.vectordb_connection_string = st.session_state.vectordb_connection_string_in
     
-    #Api Port
-    col3.text_input("VectorDb Port Number", value=hostport, key="api_port_in")
-    # You can access the value at any point with:
-    st.session_state.api_port = st.session_state.api_port_in
-
+    if add_selectbox_vector_db != 'MongoDb':
+        col3.text_input("VectorDb Port Number", value=hostport, key="api_port_in")
+        # You can access the value at any point with:
+        st.session_state.api_port = st.session_state.api_port_in
+    else:
+        col3.text_input("VectorDb  Database Name",value="", key="vectordb_dbname_in")
+        # You can access the value at any point with:
+        st.session_state.vectordb_dbname = st.session_state.vectordb_dbname_in
+    
     #Vector Dimension
     if len(st.session_state.vector_dim) == 0:
         vectordim = "768"
@@ -120,7 +144,12 @@ else:
         st.session_state.user_id = st.session_state.user_id_in
         col4.text_input("VectorDb Password",value=st.session_state.user_pwd,key="user_pwd_in")
         st.session_state.user_pwd = st.session_state.user_pwd_in
-            
+    
+    if st.session_state.vectorDbModule == 'mongodbVectorDb':
+        col4.text_input("Vector-Index Name",value=st.session_state.vector_index,key="vector_index_in")
+        st.session_state.vector_index = st.session_state.vector_index_in
+        col4.text_input("Text-Index Name",value=st.session_state.user_pwd,key="text_index_in")
+        st.session_state.text_index = st.session_state.text_index_in
         
 if st.button(label="Use This Vector Db Config", key="review_vector_db_btn", help="Click to review config"):
 
@@ -130,16 +159,42 @@ if st.button(label="Use This Vector Db Config", key="review_vector_db_btn", help
     else:
         st.session_state.vectordb_config = st.session_state.vectordb_config + "vectorDbModule=" + st.session_state.vectorDbModule + "\n"
     
-    if st.session_state.api_address == None or len(st.session_state.api_address) == 0:
-        st.write("ERROR: VectorDB Host IP not provided") 
-    else:
-        st.session_state.vectordb_config = st.session_state.vectordb_config + "api-address=" + st.session_state.api_address + "\n"
+    if st.session_state.vectorDbModule != 'mongodbVectorDb':
+        if ( st.session_state.api_address == None or len(st.session_state.api_address) == 0):
+            st.write("ERROR: VectorDB Host IP not provided") 
+        else:
+            st.session_state.vectordb_config = st.session_state.vectordb_config + "api-address=" + st.session_state.api_address + "\n"
     
-    if st.session_state.api_port == None or len(st.session_state.api_port) == 0:
-        st.write("ERROR: VectorDB Port Number not provided") 
-    else:
-        st.session_state.vectordb_config = st.session_state.vectordb_config + "api-port=" + st.session_state.api_port + "\n"
-    
+    if st.session_state.vectorDbModule != 'mongodbVectorDb':
+        if st.session_state.api_port == None or len(st.session_state.api_port) == 0:
+            st.write("ERROR: VectorDB Port Number not provided") 
+        else:
+            st.session_state.vectordb_config = st.session_state.vectordb_config + "api-port=" + st.session_state.api_port + "\n"
+
+
+    if st.session_state.vectorDbModule == 'mongodbVectorDb':
+        if st.session_state.vectordb_connection_string == None or  len(st.session_state.vectordb_connection_string) == 0:
+            st.write("ERROR: Connection String not provided")
+        else:
+            st.session_state.vectordb_config = st.session_state.vectordb_config + "connection-string=" + st.session_state.vectordb_connection_string + "\n"
+        
+        if st.session_state.vectordb_dbname == None or  len(st.session_state.vectordb_dbname) == 0:
+            st.write("ERROR: dbname not provided")
+        else:
+            st.session_state.vectordb_config = st.session_state.vectordb_config + "dbname=" + st.session_state.vectordb_dbname + "\n"
+        
+        if st.session_state.vector_index == None or  len(st.session_state.vector_index) == 0:
+            st.write("ERROR: vector-index not provided")
+        else:
+            st.session_state.vectordb_config = st.session_state.vectordb_config + "vector-index=" + st.session_state.vector_index + "\n"
+        
+        if st.session_state.text_index == None or  len(st.session_state.text_index) == 0:
+            st.write("ERROR: text-index not provided")
+        else:
+            st.session_state.vectordb_config = st.session_state.vectordb_config + "text-index=" + st.session_state.text_index + "\n"
+        
+
+
     if st.session_state.vector_dim == None or len(st.session_state.vector_dim) == 0:
         st.write("ERROR: Vector Dimension not provided") 
     else:
