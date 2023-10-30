@@ -66,6 +66,7 @@ class siteAuth:
     google_cred_path:str=''
     google_project_id:str=''
     google_storage_api_key:str=''
+    index_service_access_key_id=''
 
     auth_config: dict = {}
 
@@ -93,6 +94,9 @@ class siteAuth:
                 self.google_cred_path = kwargs['google_cred_path']
                 self.google_project_id = kwargs['google_project_id']
                 self.google_storage_api_key = kwargs['google_storage_api_key']
+            case 'index-service-key':
+                self.logger.debug("index_service_access_key_id=%s", kwargs['index_service_access_key_id'])
+                self.index_service_access_key_id = kwargs['index_service_access_key_id']
             case other:
                 self.logger.debug('Dont know how to handle the auth type %s', self.auth_type)
                 self.auth_config = kwargs['auth_config']
@@ -410,6 +414,7 @@ class srcContentSite:
         self.self_description['site_auth']['google_cred_path'] = self.site_auth.google_cred_path
         self.self_description['site_auth']['google_project_id'] = self.site_auth.google_project_id
         self.self_description['site_auth']['google_storage_api_key'] = self.site_auth.google_storage_api_key    
+        self.self_description['site_auth']['index_service_access_key_id'] = self.site_auth.index_service_access_key_id 
         self.self_description['site_auth']['auth_config'] = self.site_auth.auth_config
     
         self.self_description['vector_db'] = {}
