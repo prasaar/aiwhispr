@@ -237,8 +237,6 @@ class createContentSite(srcContentSite):
             self.logger.error("Could not connect to vector database ... Exiting")
             sys.exit()
 
-        #Cleanup : Purge old records in vectorDb for this site, take backup of old working directory
-        self.vector_db.deleteAll()
         self.backupDownloadDirectories()
         self.createDownloadDirectory() #Create before the multiple processeses start downloading
 
