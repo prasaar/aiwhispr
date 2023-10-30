@@ -30,6 +30,8 @@ AIWhispr has connectors for the following vector databases
 
 4\ Typesense 
 
+5\ MongoDB 
+
 Please  ensure that you have installed and started your vector database. 
 
 ### Environment variables
