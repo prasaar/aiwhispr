@@ -212,7 +212,7 @@ if __name__ == '__main__':
    for opt, arg in opts:
       if opt == '-h':
          print('This uses flask so provide full path to python3 for the python script and the config file in command line argument')
-         print('<full_directory_path>/searchService.py -C <config file of the content site> -P<flask port number on which this service should listen> ' )
+         print('<full_directory_path>/searchService.py -C <config file of the content site> -H<hostip> -P<flask port number on which this service should listen> ' )
          sys.exit()
       elif opt in ("-C", "--configfile"):
          configfile = arg
