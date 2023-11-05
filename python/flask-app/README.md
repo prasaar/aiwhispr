@@ -1,8 +1,9 @@
 # Flask App Services
 
-## Index Service
 AIWhispr is a no/low code tool to automate vector embedding pipelines for semantic search.
 A simple configuration drives the pipeline for reading files, extracting text, create vector embeddings and storing them in a vector database.
+
+## Index Service
 The indexing service is an API service that accepts a Json payload for semantic index.
 The indexing service is started using the below command
 
@@ -78,3 +79,25 @@ for new_data in data_in:
     # Print the response
     print(post_response)
 ```
+
+## Search Service
+
+The search service is an API service that returns semantic and text search results. 
+To start the search service 
+```
+python3 /Users/arunprasad/python-venv/aiwhispr/python/flask-app/searchService.py  -H 127.0.0.1 -P 10002 -C <PATH_TO_CONFIG_FILE>
+```
+
+You run a search query, example 
+```
+curl -sS 'http://127.0.0.1:10002/aiwhispr?query=Top%20TV%20moments%in%20sports&resultformat=json&withtextsearch=Y'
+```
+The query paramters are 
+
+query=<The search query>
+      `
+resultformat=<json|html>
+
+withtextsearch=<Y|N>  i.e. if Y then include text search results alongwith semantic search results
+             
+
