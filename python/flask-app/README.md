@@ -95,7 +95,7 @@ curl -sS 'http://127.0.0.1:10002/aiwhispr?query=Top%20TV%20moments%in%20sports&r
 The query paramters are 
 
 query=<search_query>
-      `
+      
 resultformat=<json|html>
 
 withtextsearch=<Y|N>  i.e. if Y then include text search results alongwith semantic search results
