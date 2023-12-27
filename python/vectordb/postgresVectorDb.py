@@ -50,7 +50,7 @@ class createVectorDb(vectorDb):
         try:
             self.vectordb_dbname = vectordb_config['db-name']
         except:
-            self.logger.error("db-name not provided for Postgres PGVector")  
+            self.logger.error("dbname not provided for Postgres PGVector")  
             sys.exit()
          
         try:
@@ -483,10 +483,6 @@ class createVectorDb(vectorDb):
         sql_limit_hits =  " LIMIT " + str(limit_hits)
         
         
-        
-        
-
-
         json_results = {} #Dict
         json_results['results'] = []
         semantic_results = {} #Dict
@@ -599,7 +595,3 @@ class createVectorDb(vectorDb):
                 row = cur.fetchone()
     
         return extracted_text
-    
- 
-        
-

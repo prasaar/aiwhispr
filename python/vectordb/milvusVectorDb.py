@@ -42,8 +42,8 @@ class createVectorDb(vectorDb):
         self.vectordb_portnumber = vectordb_config['api-port']
         self.vectordb_user = vectordb_config['user']
         self.vectordb_password = vectordb_config['password']
-        if 'db-name' in  vectordb_config:
-            self.vectordb_dbname = vectordb_config['db-name']
+        if 'dbname' in  vectordb_config:
+            self.vectordb_dbname = vectordb_config['dbname']
         else:
             self.vectordb_dbname = "default"  
         
