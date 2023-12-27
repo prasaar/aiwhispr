@@ -458,6 +458,7 @@ class createVectorDb(vectorDb):
         
         sqlcommand_common = "SELECT id, content_site_name, content_path, src_path, src_path_for_results,tags, title, text_chunk, text_chunk_no, last_edit_date, vector_embedding_date, vector_embedding,"
         sqlcommand_vector_score = " cosine_distance(" + vector_embedding_str_for_pgvector + ", vector_embedding)"
+        sqlcommand_text_score = " 0" #Text match scores are not available explicitly
         sqlcommand_from =  " FROM " + self.collection_name
         sqlcommand_where = " WHERE content_site_name = '" +  content_site_name + "'"
         sql_order_by_vector_rank = " ORDER BY vector_embedding <=> " + vector_embedding_str_for_pgvector + " "
@@ -475,7 +476,7 @@ class createVectorDb(vectorDb):
         
         sqlcommand_where_text_search = " AND  ( text_chunk_tsvector @@ to_tsquery('" + tsquery_str +  "') = True ) "
         
-        sql_order_by_text_rank = " ORDER BY ts_rank(text_chunk_tsvector,to_tsquery('" + tsquery_str +  "') DESC"
+        sql_order_by_text_rank = " ORDER BY ts_rank(text_chunk_tsvector,to_tsquery('" + tsquery_str +  "')) DESC"
 
         sql_limit_hits =  " LIMIT " + str(limit_hits)
         
@@ -532,7 +533,7 @@ class createVectorDb(vectorDb):
 
         if include_text_results == True:
             try:
-                textsearchsql = sqlcommand_common + sqlcommand_from + sqlcommand_where + sqlcommand_where_text_search + sql_order_by_text_rank + sql_limit_hits
+                textsearchsql = sqlcommand_common + sqlcommand_text_score + sqlcommand_from + sqlcommand_where + sqlcommand_where_text_search + sql_order_by_text_rank + sql_limit_hits
                 self.logger.debug(textsearchsql)
                 cur2 = self.vectordDbClient.cursor()
                 cur2.execute(textsearchsql)
@@ -559,13 +560,13 @@ class createVectorDb(vectorDb):
                     result['last_edit_date'] = row[9]
                     result['vector_embedding_date'] = row[10]
                     result['vector_embedding'] = self.str_to_float_list(row[11])
-                    result['match_score'] =  0
+                    result['match_score'] =  row[12]
                     text_hits.append(result)
                     row = cur2.fetchone()
                     
                 text_results['found'] = no_of_text_hits
                 self.logger.debug("Postgres PGVector: text full search  found %d results", no_of_text_hits)
-                text_results['type'] = 'semantic'
+                text_results['type'] = 'text'
                 text_results['hits'] = text_hits
                 json_results['results'].append(text_results)
 
