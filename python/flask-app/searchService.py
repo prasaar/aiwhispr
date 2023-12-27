@@ -86,6 +86,7 @@ class searchHandler:
       self.logger.debug("vector embedding:{%s}",vector_as_string)
 
       if textsearch_flag == 'Y':
+         self.logger.debug("Search will include text search results")
          search_results = self.vector_db.search(self.content_site_name,query_embedding_vector_as_list, self.limit_hits ,input_query)
       else:
          search_results = self.vector_db.search(self.content_site_name,query_embedding_vector_as_list, self.limit_hits)
