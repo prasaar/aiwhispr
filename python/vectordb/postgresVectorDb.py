@@ -454,15 +454,6 @@ class createVectorDb(vectorDb):
             self.logger.debug('Will do multisearch, vector and text')
             include_text_results = True
         
-        vector_embedding_str_for_pgvector  = "'" + self.list_to_string(vector_embedding) + "'"
-        
-        sqlcommand_common = "SELECT id, content_site_name, content_path, src_path, src_path_for_results,tags, title, text_chunk, text_chunk_no, last_edit_date, vector_embedding_date, vector_embedding,"
-        sqlcommand_vector_score = " cosine_distance(" + vector_embedding_str_for_pgvector + ", vector_embedding)"
-        sqlcommand_text_score = " 0" #Text match scores are not available explicitly
-        sqlcommand_from =  " FROM " + self.collection_name
-        sqlcommand_where = " WHERE content_site_name = '" +  content_site_name + "'"
-        sql_order_by_vector_rank = " ORDER BY vector_embedding <=> " + vector_embedding_str_for_pgvector + " "
-        
         text_words = input_text_query.split()
         tsquery_str = ""
         count = 0
@@ -470,15 +461,29 @@ class createVectorDb(vectorDb):
             word = self.remove_punctuations(text_words[count])
             count = count + 1
             if count < len(text_words):
-                tsquery_str = tsquery_str + word + ' & '
+                tsquery_str = tsquery_str + word + ' '
             else: #last word processed
                 tsquery_str = tsquery_str + word  
-        
-        sqlcommand_where_text_search = " AND  ( text_chunk_tsvector @@ to_tsquery('" + tsquery_str +  "') = True ) "
-        
-        sql_order_by_text_rank = " ORDER BY ts_rank(text_chunk_tsvector,to_tsquery('" + tsquery_str +  "')) DESC"
 
+
+        vector_embedding_str_for_pgvector  = "'" + self.list_to_string(vector_embedding) + "'"
+        
+        sqlcommand_common = "SELECT id, content_site_name, content_path, src_path, src_path_for_results,tags, title, text_chunk, text_chunk_no, last_edit_date, vector_embedding_date, vector_embedding,"
+        sqlcommand_vector_score = " cosine_distance(" + vector_embedding_str_for_pgvector + ", vector_embedding) as rank"
+        sqlcommand_text_score = " ts_rank(text_chunk_tsvector,websearch_to_tsquery('" + tsquery_str +  "')) as rank" #Text match scores are not available explicitly
+        
+        sqlcommand_from =  " FROM " + self.collection_name
+        sqlcommand_where = " WHERE content_site_name = '" +  content_site_name + "'"
+        
+        sql_order_by_vector_rank = " ORDER BY vector_embedding <=> " + vector_embedding_str_for_pgvector + " "
+        
+        sqlcommand_where_text_search = " AND  ( text_chunk_tsvector @@ websearch_to_tsquery('" + tsquery_str +  "') = True ) "
+        sql_order_by_text_rank = " ORDER BY rank DESC"
+        
         sql_limit_hits =  " LIMIT " + str(limit_hits)
+        
+        
+        
         
 
 
