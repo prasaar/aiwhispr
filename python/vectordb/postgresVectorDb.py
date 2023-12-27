@@ -48,7 +48,7 @@ class createVectorDb(vectorDb):
         self.vectordb_user = vectordb_config['user']
         self.vectordb_password = vectordb_config['password']
         try:
-            self.vectordb_dbname = vectordb_config['db-name']
+            self.vectordb_dbname = vectordb_config['dbname']
         except:
             self.logger.error("dbname not provided for Postgres PGVector")  
             sys.exit()
