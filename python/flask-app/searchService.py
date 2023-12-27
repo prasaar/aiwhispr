@@ -142,6 +142,7 @@ class searchHandler:
          src_path_for_results = self.src_path_for_results
          text_chunk = chunk_map_record['text_chunk']
          title = chunk_map_record['title']
+         tags = chunk_map_record['tags']
 
          if output_format == 'html':
             
@@ -173,6 +174,7 @@ class searchHandler:
             json_record['text_chunk'] = text_chunk
             json_record['search_type'] = 'semantic'
             json_record['title'] = title
+            json_record['tags'] = tags
             ##Add this dict record in the list
             display_json.append(json_record)
       
@@ -199,6 +201,7 @@ class searchHandler:
             src_path_for_results = self.src_path_for_results
             text_chunk = chunk_map_record['text_chunk']
             title = chunk_map_record['title']
+            tags = chunk_map_record['tags']
                
             if output_format == 'html':
 
@@ -229,6 +232,7 @@ class searchHandler:
                json_record['text_chunk'] = text_chunk
                json_record['search_type'] = 'text'
                json_record['title'] = title
+               json_record['tags'] = tags
                ##Add this dict record in the list
                display_json.append(json_record)
          
