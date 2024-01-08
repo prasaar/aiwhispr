@@ -9,7 +9,7 @@ AIWhispr
 - simple to configure.
 - delivers fast semantic response to search queries.
 - can handle multiple file formats (txt,csv, pdf, docx,pptx, docx) stored on AWS S3, Azure Blob Containers,Google Cloud Storage, local directory path.
-- supports multiple vector databases (Qdrant,Weaviate,Milvus,Typesense) 
+- supports multiple vector databases (Qdrant,Weaviate,Milvus,Typesense,Postgres PGVector, MongoDb - Atlas) 
 
 ![Alt Text](./resources/aiwhispr_3steps.gif)
 
@@ -31,6 +31,8 @@ AIWhispr has connectors for the following vector databases
 4\ Typesense 
 
 5\ MongoDB 
+
+6\ Postgres - PGVector
 
 Please  ensure that you have installed and started your vector database. 
 
