@@ -69,7 +69,7 @@ else:
     # Select the Vector Db
     add_selectbox_vector_db = col3.selectbox(
         label = 'Select the Vector Database',
-        options = ('Typesense', 'Qdrant', 'Weaviate', 'Milvus', 'MongoDb'),
+        options = ('Typesense', 'Qdrant', 'Weaviate', 'Milvus', 'MongoDb', 'Postgres'),
         index = st.session_state.select_vectordb_idx
     )
     if add_selectbox_vector_db == 'Typesense':
@@ -94,7 +94,13 @@ else:
         st.session_state.select_vectordb_idx = 3
     elif add_selectbox_vector_db == 'MongoDb':
         st.session_state.vectorDbModule = 'mongodbVectorDb'
-        st.session_state.select_vectordb_idx = 3
+        st.session_state.select_vectordb_idx = 4
+    elif add_selectbox_vector_db == 'Postgres':
+        st.session_state.vectorDbModule = 'postgresVectorDb'
+        hostaddress="localhost"
+        hostport="5432"
+        st.session_state.select_vectordb_idx = 5
+    
     
     if add_selectbox_vector_db != 'MongoDb':
         col3.text_input("VectorDb IP Address/Hostname",value=hostaddress, key="api_address_in")
@@ -113,7 +119,13 @@ else:
         col3.text_input("VectorDb  Database Name",value="", key="vectordb_dbname_in")
         # You can access the value at any point with:
         st.session_state.vectordb_dbname = st.session_state.vectordb_dbname_in
-    
+       
+    if add_selectbox_vector_db == 'Postgres':
+        col3.text_input("VectorDb  Database Name",value="", key="vectordb_dbname_in")
+        # You can access the value at any point with:
+        st.session_state.vectordb_dbname = st.session_state.vectordb_dbname_in
+       
+
     #Vector Dimension
     if len(st.session_state.vector_dim) == 0:
         vectordim = "768"
@@ -139,7 +151,7 @@ else:
         col4.text_input("VectorDb API Key",value=st.session_state.api_key,key="api_key_in")
         st.session_state.api_key = st.session_state.api_key_in
     
-    if st.session_state.vectorDbModule == 'milvusVectorDb':
+    if (st.session_state.vectorDbModule == 'milvusVectorDb' ) or (st.session_state.vectorDbModule == 'postgresVectorDb') :
         col4.text_input("VectorDb UserId",value=st.session_state.user_id,key="user_id_in")
         st.session_state.user_id = st.session_state.user_id_in
         col4.text_input("VectorDb Password",value=st.session_state.user_pwd,key="user_pwd_in")
@@ -193,7 +205,11 @@ if st.button(label="Use This Vector Db Config", key="review_vector_db_btn", help
         else:
             st.session_state.vectordb_config = st.session_state.vectordb_config + "text-index=" + st.session_state.text_index + "\n"
         
-
+    if st.session_state.vectorDbModule == 'postgresVectorDb':
+        if st.session_state.vectordb_dbname == None or  len(st.session_state.vectordb_dbname) == 0:
+            st.write("ERROR: dbname not provided")
+        else:
+            st.session_state.vectordb_config = st.session_state.vectordb_config + "dbname=" + st.session_state.vectordb_dbname + "\n"
 
     if st.session_state.vector_dim == None or len(st.session_state.vector_dim) == 0:
         st.write("ERROR: Vector Dimension not provided") 
@@ -218,7 +234,7 @@ if st.button(label="Use This Vector Db Config", key="review_vector_db_btn", help
         else:
             st.session_state.vectordb_config = st.session_state.vectordb_config + "api-key=" + st.session_state.api_key + "\n"
     
-    if st.session_state.vectorDbModule == 'milvusVectorDb':
+    if (st.session_state.vectorDbModule == 'milvusVectorDb') or (st.session_state.vectorDbModule == 'postgresVectorDb'):
         if st.session_state.user_id == None or  len(st.session_state.user_id) == 0:
             st.write("ERROR: User ID not provided")
         else:
