@@ -70,7 +70,7 @@ class searchHandler:
       self.model= llmServiceMgr.createLlmService(llm_service_config)
       self.model.connect()
 
-   def search(self,input_query:str, result_format:str, textsearch_flag:str): 
+   def search(self,input_query:str, result_format:str, textsearch_flag:str, content_path=""): 
 
       output_format = result_format      
       self.logger.debug("result format: %s", result_format)
@@ -78,7 +78,7 @@ class searchHandler:
          self.logger.error("cannot handle this result format type")
       if textsearch_flag not in ['Y', 'N']:
          self.logger.error("text search flag should be a Y or N")
-
+      
       self.logger.debug("get vector embedding for text:{%s}",input_query)
       query_embedding_vector =  self.model.encode(input_query)
       query_embedding_vector_as_list = query_embedding_vector
@@ -86,11 +86,15 @@ class searchHandler:
       self.logger.debug("vector embedding:{%s}",vector_as_string)
 
       if textsearch_flag == 'Y':
+         pass_input_query = input_query
          self.logger.debug("Search will include text search results")
-         search_results = self.vector_db.search(self.content_site_name,query_embedding_vector_as_list, self.limit_hits ,input_query)
       else:
-         search_results = self.vector_db.search(self.content_site_name,query_embedding_vector_as_list, self.limit_hits)
-      
+         pass_input_query = ""
+
+      if len(content_path) > 0:
+         search_results = self.vector_db.search(self.content_site_name,query_embedding_vector_as_list, self.limit_hits ,pass_input_query, content_path)
+      else:
+         search_results = self.vector_db.search(self.content_site_name,query_embedding_vector_as_list, self.limit_hits ,pass_input_query)
       
       display_html = '<div class="aiwhisprSemanticSearchResults">'
       display_json = []
@@ -282,10 +286,12 @@ def semantic_search():
       input_query = request.form['query']
       result_format = request.form['resultformat']
       textsearch_flag = request.form['withtextsearch']
+      content_path = request.form['contentpath']
    else:
       input_query = request.args.get('query')
       result_format = request.args.get('resultformat')
       textsearch_flag = request.args.get('withtextsearch')
+      content_path = request.args.get('contentpath')
 
    if result_format == None or len(result_format) == 0:
       result_format = 'json' #Default
@@ -294,8 +300,11 @@ def semantic_search():
    if textsearch_flag == 'Y' or textsearch_flag == "yes" or textsearch_flag == "Yes":
       textsearch_flag = 'Y'
    
-   return mySearchHandler[0].search(input_query, result_format, textsearch_flag)
+   if content_path == None or len(content_path) == 0:
+      content_path = '' #empty string
+   
 
+   return mySearchHandler[0].search(input_query, result_format, textsearch_flag,content_path)
 
 
 ### END OF FUNCTION SEARCH

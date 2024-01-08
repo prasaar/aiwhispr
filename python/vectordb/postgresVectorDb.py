@@ -417,7 +417,7 @@ class createVectorDb(vectorDb):
             self.logger.error("Error when deleting rows from collection %s", self.collection_name)
             raise
 
-    def search(self,content_site_name,vector_embedding, limit_hits, input_text_query = ''):
+    def search(self,content_site_name,vector_embedding, limit_hits, input_text_query = '', content_path=''):
       
         """""
         We will not do test search in Milvus. It's not good for text search
@@ -453,6 +453,12 @@ class createVectorDb(vectorDb):
         if len(input_text_query) > 0 :
             self.logger.debug('Will do multisearch, vector and text')
             include_text_results = True
+
+        include_where_content_path = False
+        if len(content_path) > 0:
+            self.logger.debug('Will include content_path{%s"} in where clause for search')
+            include_where_content_path = True
+
         
         text_words = input_text_query.split()
         tsquery_str = ""
@@ -473,8 +479,12 @@ class createVectorDb(vectorDb):
         sqlcommand_text_score = " ts_rank(text_chunk_tsvector,websearch_to_tsquery('" + tsquery_str +  "')) as rank" #Text match scores are not available explicitly
         
         sqlcommand_from =  " FROM " + self.collection_name
-        sqlcommand_where = " WHERE content_site_name = '" +  content_site_name + "'"
-        
+
+        if include_where_content_path == True:
+            sqlcommand_where = " WHERE content_site_name = '" +  content_site_name + "' AND content_path='" + content_path +"' "
+        else:
+            sqlcommand_where = " WHERE content_site_name = '" +  content_site_name + "'"
+
         sql_order_by_vector_rank = " ORDER BY vector_embedding <=> " + vector_embedding_str_for_pgvector + " "
         
         sqlcommand_where_text_search = " AND  ( text_chunk_tsvector @@ websearch_to_tsquery('" + tsquery_str +  "') = True ) "
