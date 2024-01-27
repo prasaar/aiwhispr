@@ -2,6 +2,9 @@ import os
 import sys
 import logging
 import openai
+from openai import OpenAI
+
+
 import time
 import aiwhisprConstants
 
@@ -19,6 +22,7 @@ import logging
 class createLlmService(baseLlmService):
    api_key:str
    model_name:str
+   client:OpenAI
   
    def __init__(self,llm_service_config):
       self.logger=logging.getLogger(__name__)
@@ -39,17 +43,14 @@ class createLlmService(baseLlmService):
 
    def testConnect(self):
       try:
-        openai.api_key = self.api_key
+        self.client = OpenAI(api_key=self.api_key)
       except Exception as err:
-        self.logger.error("Could not set api-key for OpenAI")
-        print(err)
+        self.logger.error("Could not connect to OpenAI")
         raise
 
       try:
-        response_openai = openai.Embedding.create(
-              model = self.model_name,
-              input = "Test Connection for OpenAI"
-          )
+        response_openai = self.client.embeddings.create(model = self.model_name,
+        input = "Test Connection for OpenAI")
       except Exception as err:
         self.logger.error("Could not create an embedding using OpenAI")
         raise
@@ -57,9 +58,11 @@ class createLlmService(baseLlmService):
 
    def connect(self):
       try:
-        openai.api_key = self.api_key
-      except:
-        self.logger.error("Could not set api-key for OpenAI")
+        self.client = OpenAI(api_key=self.api_key)
+      except Exception as err:
+        self.logger.error("Could not connect to OpenAI")
+        raise
+
 
    def encode(self, in_text:str):
       
@@ -69,11 +72,9 @@ class createLlmService(baseLlmService):
       
       while continueTrying == True and remainingAttempts > 0:
         try:
-          response_openai = openai.Embedding.create(
-              model = self.model_name,
-              input = in_text
-          )
-        except openai.error.APIError as e:
+          response_openai = self.client.embeddings.create(model = self.model_name,
+          input = in_text)
+        except openai.APIError as e:
           continueTrying=False
           remainingAttempts=0
           self.logger.error("OpenAI API returned an APIError for encoding of {%s}", in_text)
@@ -129,5 +130,5 @@ class createLlmService(baseLlmService):
           continueTrying=False
           remainingAttempts=0
       
-      vector_embedding = response_openai['data'][0]['embedding']
+      vector_embedding = response_openai.data[0].embedding
       return vector_embedding
