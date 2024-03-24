@@ -3,11 +3,25 @@
     "models":[
     {
         "name":"text-embedding-ada-002",
-        "description": "All-round model tuned for many use-cases.",
+        "description": "Most capable 2nd generation embedding model which replaces 16 first generation models",
         "max_sequence_length": 8191,
         "dimensions": 1536,
         "modelcard": "https://platform.openai.com/docs/models/embeddings"
+    },
+    {
+        "name":"text-embedding-3-small",
+        "description": "Increased performance over 2nd generation ada embedding model",
+        "max_sequence_length": 8191,
+        "dimensions": 1536,
+        "modelcard": "https://platform.openai.com/docs/models/embeddings"
+    },
+    {
+        "name":"text-embedding-3-large",
+        "description": "Most capable embedding model for both english and non-english tasks",
+        "max_sequence_length": 8191,
+        "dimensions": 3072,
+        "modelcard": "https://platform.openai.com/docs/models/embeddings"
     }
-    
+
     ]
 }
